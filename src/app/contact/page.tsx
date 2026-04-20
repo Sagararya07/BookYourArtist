@@ -1,13 +1,22 @@
 'use client';
 
-import { useState } from 'react';
-import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaCheckCircle } from 'react-icons/fa';
+import { useState, useEffect, useRef } from 'react';
+import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaCheckCircle, FaPaperPlane, FaClock, FaHeadset } from 'react-icons/fa';
+import styles from './contact.module.css';
 
 export default function ContactPage() {
-  const [form, setForm] = useState({ name: '', phone: '', message: '' });
+  const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState('');
+  const [focused, setFocused] = useState<string | null>(null);
+  const [visible, setVisible] = useState(false);
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(true), 100);
+    return () => clearTimeout(timer);
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm((p) => ({ ...p, [e.target.name]: e.target.value }));
@@ -21,12 +30,12 @@ export default function ContactPage() {
       const res = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ name: form.name, phone: form.phone, message: form.message }),
       });
       const data = await res.json();
       if (data.success) {
         setSuccess(true);
-        setForm({ name: '', phone: '', message: '' });
+        setForm({ name: '', email: '', phone: '', message: '' });
       } else {
         setError(data.error || 'Something went wrong.');
       }
@@ -37,194 +46,289 @@ export default function ContactPage() {
     }
   };
 
+  const infoCards = [
+    {
+      icon: <FaPhoneAlt />,
+      label: 'Call Us',
+      value: '+91 89560 59005',
+      sub: 'Mon – Sat, 10am – 8pm',
+      href: 'tel:+918956059005',
+      color: '#d4a843',
+    },
+    {
+      icon: <FaWhatsapp />,
+      label: 'WhatsApp',
+      value: 'Chat Instantly',
+      sub: 'Fastest response',
+      href: 'https://wa.me/918956059005',
+      color: '#25d366',
+    },
+    {
+      icon: <FaEnvelope />,
+      label: 'Email',
+      value: 'artistmanager',
+      sub: 'abhishek@gmail.com',
+      href: 'mailto:artistmanagerabhishek@gmail.com',
+      color: '#6c63ff',
+    },
+    {
+      icon: <FaMapMarkerAlt />,
+      label: 'Office',
+      value: 'Mumbai HQ',
+      sub: 'Suite 405, Premium Park',
+      href: 'https://maps.google.com/?q=Mumbai+Maharashtra+400001',
+      color: '#ef4444',
+    },
+  ];
+
   return (
     <>
-      {/* PAGE HEADER */}
-      <section className="relative pt-40 pb-24 overflow-hidden border-b border-[rgba(255,255,255,0.05)]">
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0a0a0f] to-[#10101a] z-0"></div>
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_rgba(212,168,67,0.08)_0%,_transparent_70%)] pointer-events-none"></div>
-        
-        <div className="container relative z-10 text-center">
-          <span className="section-tag animate-fadeIn">Get In Touch</span>
-          <h1 className="font-display text-5xl md:text-7xl font-bold text-white mt-4 mb-6 animate-slideUp">
-            Let's Start a <span className="text-gradient">Conversation</span>
-          </h1>
-          <p className="text-xl text-gray-400 max-w-2xl mx-auto leading-relaxed animate-slideUp" style={{ animationDelay: '0.2s' }}>
-            Whether you're planning a wedding, a corporate gala, or an intimate party, our team is here to help you find the perfect artist.
-          </p>
+      <div className={styles.page}>
+        {/* ── Animated Background ── */}
+        <div className={styles.bgLayer}>
+          <div className={styles.orb1} />
+          <div className={styles.orb2} />
+          <div className={styles.orb3} />
+          <div className={styles.gridLines} />
         </div>
-      </section>
 
-      <section className="section bg-[#0a0a0f] relative overflow-hidden">
-        {/* Animated Background Accents */}
-        <div className="absolute top-[-10%] right-[-5%] w-[500px] h-[500px] bg-[#d4a843] rounded-full blur-[150px] opacity-[0.03] animate-pulse"></div>
-        <div className="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-[#6c63ff] rounded-full blur-[150px] opacity-[0.02] animate-pulse" style={{ animationDelay: '2s' }}></div>
-
-        <div className="container relative z-10">
-          <div className="grid-2">
-            
-            {/* CONTACT DETAILS */}
-            <div className="animate-slideUp" style={{ animationDelay: '0.3s' }}>
-              <div className="mb-10">
-                <h2 className="font-display text-4xl font-bold text-white mb-4">Our Office</h2>
-                <p className="text-gray-400">Visit us or reach out through any of these channels.</p>
-              </div>
-              
-              <div className="flex flex-col gap-6 mb-10">
-                {/* Location Card */}
-                <div className="card-glass p-6 group hover:border-[#d4a843]/50 transition-all duration-300" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                  <div style={{ 
-                    width: '4rem', height: '4rem', borderRadius: '1rem', backgroundColor: 'rgba(212,168,67,0.1)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d4a843',
-                    border: '1px solid rgba(212,168,67,0.2)', flexShrink: 0,
-                    transition: 'all 0.3s ease'
-                  }} className="group-hover:bg-[#d4a843] group-hover:text-black">
-                    <FaMapMarkerAlt className="text-2xl" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-bold text-white mb-1 group-hover:text-[#d4a843] transition-colors">Mumbai Headquarters</h4>
-                    <p className="text-sm text-gray-400 leading-relaxed">
-                      Suite 405, Premium Business Park, Mumbai, MH 400001
-                    </p>
-                  </div>
-                </div>
-
-                {/* Phone Card */}
-                <div className="card-glass p-6 group hover:border-[#d4a843]/50 transition-all duration-300" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                  <div style={{ 
-                    width: '4rem', height: '4rem', borderRadius: '1rem', backgroundColor: 'rgba(212,168,67,0.1)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d4a843',
-                    border: '1px solid rgba(212,168,67,0.2)', flexShrink: 0,
-                    transition: 'all 0.3s ease'
-                  }} className="group-hover:bg-[#d4a843] group-hover:text-black">
-                    <FaPhoneAlt className="text-2xl" />
-                  </div>
-                  <div className="flex-1">
-                    <h4 className="text-lg font-bold text-white mb-1 group-hover:text-[#d4a843] transition-colors">Call or WhatsApp</h4>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
-                      <a href="tel:+918956059005" className="text-xl font-display font-bold text-white hover:text-[#d4a843] transition-colors">+91 89560 59005</a>
-                      <a href="https://wa.me/918956059005" target="_blank" rel="noreferrer" 
-                         style={{ 
-                           display: 'inline-flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.8rem', 
-                           borderRadius: '0.5rem', backgroundColor: 'rgba(37,211,102,0.1)', color: '#25d366', 
-                           fontSize: '0.7rem', fontWeight: '800', border: '1px solid rgba(37,211,102,0.3)',
-                           letterSpacing: '0.05em'
-                         }}
-                         className="hover:bg-[#25d366] hover:text-black transition-all duration-300">
-                        <FaWhatsapp className="text-sm" /> CHAT
-                      </a>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Email Card */}
-                <div className="card-glass p-6 group hover:border-[#d4a843]/50 transition-all duration-300" style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', backgroundColor: 'rgba(255,255,255,0.02)' }}>
-                  <div style={{ 
-                    width: '4rem', height: '4rem', borderRadius: '1rem', backgroundColor: 'rgba(212,168,67,0.1)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#d4a843',
-                    border: '1px solid rgba(212,168,67,0.2)', flexShrink: 0,
-                    transition: 'all 0.3s ease'
-                  }} className="group-hover:bg-[#d4a843] group-hover:text-black">
-                    <FaEnvelope className="text-2xl" />
-                  </div>
-                  <div>
-                    <h4 className="text-lg font-bold text-white mb-1 group-hover:text-[#d4a843] transition-colors">Email Support</h4>
-                    <a href="mailto:artistmanagerabhishek@gmail.com" className="text-gray-400 hover:text-white transition-colors border-b border-gray-700 pb-0.5">artistmanagerabhishek@gmail.com</a>
-                  </div>
-                </div>
-              </div>
-
-
-              {/* MAP PLACEHOLDER */}
-              <div className="hover-reveal-container overflow-hidden" style={{ width: '100%', height: '18rem', borderRadius: '1.5rem', border: '1px solid rgba(255,255,255,0.05)', boxShadow: '0 20px 40px rgba(0,0,0,0.4)', position: 'relative' }}>
-                <div className="hover-reveal-content" style={{ position: 'absolute', inset: 0, backgroundColor: 'rgba(0,0,0,0.6)', backdropFilter: 'blur(4px)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10 }}>
-                  <a href="https://maps.google.com/?q=Mumbai+Maharashtra+400001" target="_blank" rel="noreferrer" className="btn btn-secondary">
-                    View on Google Maps
-                  </a>
-                </div>
-                <img 
-                  src="/location.jpg" 
-                  alt="Mumbai Office Map" 
-                  style={{ width: '100%', height: '100%', objectFit: 'cover', transition: 'transform 0.8s ease' }}
-                />
-              </div>
+        {/* ── HERO ── */}
+        <section className={styles.hero}>
+          <div className={`container ${styles.heroInner}`}>
+            <div className={`${styles.badge} ${visible ? styles.fadeIn : ''}`}>
+              <FaHeadset className={styles.badgeIcon} />
+              <span>We're here 7 days a week</span>
             </div>
+            <h1 className={`${styles.heroTitle} ${visible ? styles.slideUp : ''}`}>
+              Let's Create Something
+              <span className={styles.titleGlow}> Extraordinary</span>
+            </h1>
+            <p className={`${styles.heroSub} ${visible ? styles.slideUp2 : ''}`}>
+              Tell us about your event. Our booking specialists respond within 2 hours.
+            </p>
 
-            {/* CONTACT FORM */}
-            <div className="animate-slideUp" style={{ animationDelay: '0.5s' }}>
-              <div className="card-glass p-10" style={{ position: 'relative', overflow: 'hidden', border: '1px solid rgba(212,168,67,0.15)', boxShadow: '0 25px 50px -12px rgba(0, 0, 0, 0.5)' }}>
-                {/* Subtle background glow */}
-                <div style={{ position: 'absolute', top: '-20%', right: '-20%', width: '60%', height: '60%', backgroundColor: 'rgba(212,168,67,0.05)', filter: 'blur(80px)', borderRadius: '50%', zIndex: 0 }}></div>
-                
-                <div className="mb-10 relative z-10">
-                  <h2 className="font-display text-4xl font-bold text-white mb-2">Send a Message</h2>
-                  <p className="text-gray-400">Our booking experts typically respond within 2 hours.</p>
+            {/* Floating stat pills */}
+            <div className={`${styles.stats} ${visible ? styles.slideUp3 : ''}`}>
+              {[['500+', 'Events Booked'], ['200+', 'Artists'], ['4.9★', 'Rating']].map(([num, label]) => (
+                <div key={label} className={styles.statPill}>
+                  <span className={styles.statNum}>{num}</span>
+                  <span className={styles.statLabel}>{label}</span>
                 </div>
-
-                {success ? (
-                  <div className="text-center py-12 animate-fadeIn relative z-10">
-                    <div style={{ width: '5rem', height: '5rem', borderRadius: '50%', backgroundColor: 'rgba(34,197,94,0.1)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', border: '1px solid rgba(34,197,94,0.3)' }}>
-                      <FaCheckCircle className="text-5xl text-[#22c55e]" />
-                    </div>
-                    <h3 className="text-2xl font-bold text-white mb-4">Inquiry Received</h3>
-                    <p className="text-gray-400 mb-10 leading-relaxed">Thank you for reaching out. We've sent a confirmation email to our team and will get back to you shortly.</p>
-                    <button onClick={() => setSuccess(false)} className="btn btn-secondary w-full">Send Another Inquiry</button>
-                  </div>
-                ) : (
-                  <form onSubmit={handleSubmit} style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                    {error && <div className="alert alert-error">{error}</div>}
-                    
-                    <div className="form-group mb-0">
-                      <label className="form-label" style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800', marginBottom: '0.75rem', display: 'block' }}>Full Name</label>
-                      <input 
-                        name="name" 
-                        className="form-control" 
-                        placeholder="e.g. Rahul Sharma" 
-                        value={form.name} 
-                        onChange={handleChange} 
-                        required 
-                        style={{ padding: '1.2rem', backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '0.75rem', fontSize: '1rem' }}
-                      />
-                    </div>
-                    
-                    <div className="form-group mb-0">
-                      <label className="form-label" style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800', marginBottom: '0.75rem', display: 'block' }}>Phone Number</label>
-                      <input 
-                        name="phone" 
-                        className="form-control" 
-                        placeholder="e.g. +91 98765 43210" 
-                        value={form.phone} 
-                        onChange={handleChange} 
-                        required 
-                        style={{ padding: '1.2rem', backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '0.75rem', fontSize: '1rem' }}
-                      />
-                    </div>
-                    
-                    <div className="form-group mb-0">
-                      <label className="form-label" style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.8rem', textTransform: 'uppercase', letterSpacing: '0.1em', fontWeight: '800', marginBottom: '0.75rem', display: 'block' }}>Your Inquiry</label>
-                      <textarea 
-                        name="message" 
-                        className="form-control" 
-                        placeholder="Describe your event and what kind of artist you are looking for..." 
-                        value={form.message} 
-                        onChange={handleChange} 
-                        rows={5}
-                        required 
-                        style={{ padding: '1.2rem', backgroundColor: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: '0.75rem', fontSize: '1rem', resize: 'none' }}
-                      />
-                    </div>
-                    
-                    <button type="submit" className="btn btn-primary w-full" disabled={loading} style={{ height: '4rem', fontSize: '1.1rem', letterSpacing: '0.05em' }}>
-                      {loading ? 'Processing...' : 'Send Message'}
-                    </button>
-                  </form>
-                )}
-              </div>
+              ))}
             </div>
-
           </div>
-        </div>
-      </section>
+
+          {/* Scroll indicator */}
+          <div className={styles.scrollIndicator}>
+            <div className={styles.scrollDot} />
+          </div>
+        </section>
+
+        {/* ── INFO CARDS ── */}
+        <section className={styles.cardsSection}>
+          <div className="container">
+            <div className={styles.cardsGrid}>
+              {infoCards.map((card, i) => (
+                <a
+                  key={card.label}
+                  href={card.href}
+                  target={card.href.startsWith('http') ? '_blank' : undefined}
+                  rel="noreferrer"
+                  className={styles.infoCard}
+                  style={{ '--card-color': card.color, '--delay': `${i * 0.1}s` } as React.CSSProperties}
+                >
+                  <div className={styles.infoCardGlow} />
+                  <div className={styles.infoIconWrap}>
+                    {card.icon}
+                  </div>
+                  <div className={styles.infoCardText}>
+                    <span className={styles.infoLabel}>{card.label}</span>
+                    <span className={styles.infoValue}>{card.value}</span>
+                    <span className={styles.infoSub}>{card.sub}</span>
+                  </div>
+                  <div className={styles.infoArrow}>→</div>
+                </a>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ── MAIN CONTENT ── */}
+        <section className={styles.mainSection} ref={sectionRef}>
+          <div className="container">
+            <div className={styles.mainGrid}>
+
+              {/* LEFT — Details */}
+              <div className={styles.leftCol}>
+                <div className={styles.sectionLabel}>Our Office</div>
+                <h2 className={styles.leftTitle}>Visit Us Anytime</h2>
+                <p className={styles.leftDesc}>
+                  Drop by our Mumbai headquarters or connect digitally — we're always just a message away.
+                </p>
+
+                <div className={styles.hoursCard}>
+                  <FaClock className={styles.hoursIcon} />
+                  <div>
+                    <div className={styles.hoursTitle}>Business Hours</div>
+                    <div className={styles.hoursRow}><span>Mon – Fri</span><span>10:00 AM – 8:00 PM</span></div>
+                    <div className={styles.hoursRow}><span>Saturday</span><span>11:00 AM – 6:00 PM</span></div>
+                    <div className={styles.hoursRow}><span>Sunday</span><span className={styles.closed}>By Appointment</span></div>
+                  </div>
+                </div>
+
+                {/* Map */}
+                <div className={styles.mapWrap}>
+                  <div className={styles.mapOverlay}>
+                    <a
+                      href="https://maps.google.com/?q=Mumbai+Maharashtra+400001"
+                      target="_blank"
+                      rel="noreferrer"
+                      className={`btn btn-secondary ${styles.mapBtn}`}
+                    >
+                      <FaMapMarkerAlt /> Open in Maps
+                    </a>
+                  </div>
+                  <img
+                    src="/location.jpg"
+                    alt="Mumbai Office"
+                    className={styles.mapImg}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=600&auto=format&fit=crop';
+                    }}
+                  />
+                  <div className={styles.mapPin}>
+                    <FaMapMarkerAlt />
+                    <span>Mumbai HQ</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT — Form */}
+              <div className={styles.rightCol}>
+                <div className={styles.formCard}>
+                  <div className={styles.formGlow} />
+                  <div className={styles.formCardTop}>
+                    <div className={styles.formCardDots}>
+                      <span /><span /><span />
+                    </div>
+                    <span className={styles.formCardTag}>Secure Contact Form</span>
+                  </div>
+
+                  {success ? (
+                    <div className={styles.successState}>
+                      <div className={styles.successRing}>
+                        <FaCheckCircle className={styles.successIcon} />
+                      </div>
+                      <h3 className={styles.successTitle}>Message Sent! 🎉</h3>
+                      <p className={styles.successText}>
+                        Thank you for reaching out. Our team will get back to you within 2 hours.
+                      </p>
+                      <button onClick={() => setSuccess(false)} className={`btn btn-secondary ${styles.retryBtn}`}>
+                        Send Another Message
+                      </button>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleSubmit} className={styles.form}>
+                      <div className={styles.formHeader}>
+                        <h2 className={styles.formTitle}>Send a Message</h2>
+                        <p className={styles.formSubtitle}>We reply within 2 hours on business days</p>
+                      </div>
+
+                      {error && <div className="alert alert-error">{error}</div>}
+
+                      <div className={styles.formRow}>
+                        <div className={`${styles.fieldWrap} ${focused === 'name' ? styles.fieldFocused : ''} ${form.name ? styles.fieldFilled : ''}`}>
+                          <label className={styles.floatLabel}>Full Name</label>
+                          <input
+                            id="contact-name"
+                            name="name"
+                            className={styles.field}
+                            value={form.name}
+                            onChange={handleChange}
+                            onFocus={() => setFocused('name')}
+                            onBlur={() => setFocused(null)}
+                            required
+                            autoComplete="name"
+                          />
+                          <div className={styles.fieldBar} />
+                        </div>
+
+                        <div className={`${styles.fieldWrap} ${focused === 'phone' ? styles.fieldFocused : ''} ${form.phone ? styles.fieldFilled : ''}`}>
+                          <label className={styles.floatLabel}>Phone Number</label>
+                          <input
+                            id="contact-phone"
+                            name="phone"
+                            className={styles.field}
+                            value={form.phone}
+                            onChange={handleChange}
+                            onFocus={() => setFocused('phone')}
+                            onBlur={() => setFocused(null)}
+                            required
+                            autoComplete="tel"
+                          />
+                          <div className={styles.fieldBar} />
+                        </div>
+                      </div>
+
+                      <div className={`${styles.fieldWrap} ${focused === 'email' ? styles.fieldFocused : ''} ${form.email ? styles.fieldFilled : ''}`}>
+                        <label className={styles.floatLabel}>Email Address</label>
+                        <input
+                          id="contact-email"
+                          name="email"
+                          type="email"
+                          className={styles.field}
+                          value={form.email}
+                          onChange={handleChange}
+                          onFocus={() => setFocused('email')}
+                          onBlur={() => setFocused(null)}
+                          autoComplete="email"
+                        />
+                        <div className={styles.fieldBar} />
+                      </div>
+
+                      <div className={`${styles.fieldWrap} ${focused === 'message' ? styles.fieldFocused : ''} ${form.message ? styles.fieldFilled : ''}`}>
+                        <label className={styles.floatLabel}>Your Inquiry</label>
+                        <textarea
+                          id="contact-message"
+                          name="message"
+                          className={`${styles.field} ${styles.textarea}`}
+                          value={form.message}
+                          onChange={handleChange}
+                          onFocus={() => setFocused('message')}
+                          onBlur={() => setFocused(null)}
+                          rows={5}
+                          required
+                        />
+                        <div className={styles.fieldBar} />
+                      </div>
+
+                      <button
+                        type="submit"
+                        id="contact-submit"
+                        className={styles.submitBtn}
+                        disabled={loading}
+                      >
+                        {loading ? (
+                          <span className={styles.loadingDots}>
+                            <span /><span /><span />
+                          </span>
+                        ) : (
+                          <>
+                            <FaPaperPlane className={styles.sendIcon} />
+                            Send Message
+                          </>
+                        )}
+                        <div className={styles.btnShine} />
+                      </button>
+                    </form>
+                  )}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </section>
+      </div>
     </>
   );
 }

@@ -13,7 +13,7 @@ export default function AdminDashboard() {
   const [formOpen, setFormOpen] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [form, setForm] = useState({
-    name: '', category: '', location: '', price: '', imageUrl: '',
+    name: '', category: '', location: '', price: '', imageUrl: '', rating: '', bio: '',
     isExclusive: false, isFeatured: false, isActive: true
   });
 
@@ -62,7 +62,7 @@ export default function AdminDashboard() {
 
   const openNewForm = () => {
     setEditingId(null);
-    setForm({ name: '', category: '', location: '', price: '', imageUrl: '', isExclusive: false, isFeatured: false, isActive: true });
+    setForm({ name: '', category: '', location: '', price: '', imageUrl: '', rating: '', bio: '', isExclusive: false, isFeatured: false, isActive: true });
     setFormOpen(true);
   };
 
@@ -70,7 +70,7 @@ export default function AdminDashboard() {
     setEditingId(artist.id);
     setForm({
       name: artist.name, category: artist.category, location: artist.location, price: artist.price,
-      imageUrl: artist.imageUrl || '',
+      imageUrl: artist.imageUrl || '', rating: artist.rating || '', bio: artist.bio || '',
       isExclusive: artist.isExclusive, isFeatured: artist.isFeatured, isActive: artist.isActive
     });
     setFormOpen(true);
@@ -240,6 +240,14 @@ export default function AdminDashboard() {
                 <div className="form-group mb-0">
                   <label className="form-label">Starting Price</label>
                   <input name="price" className="form-control" placeholder="e.g. ₹50,000 onwards" value={form.price} onChange={handleFormChange} />
+                </div>
+                <div className="form-group mb-0">
+                  <label className="form-label">Rating</label>
+                  <input name="rating" type="number" step="0.1" min="1" max="5" className="form-control" placeholder="e.g. 4.5" value={form.rating} onChange={handleFormChange} />
+                </div>
+                <div className="form-group mb-0 col-span-2">
+                  <label className="form-label">Bio / Details</label>
+                  <textarea name="bio" className="form-control" rows={3} placeholder="Artist details, experience, etc." value={form.bio} onChange={handleFormChange}></textarea>
                 </div>
                 <div className="form-group mb-0 col-span-2">
                   <label className="form-label">Photo Link (URL)</label>

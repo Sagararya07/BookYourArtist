@@ -4,6 +4,8 @@ import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { FaStar, FaFilter } from 'react-icons/fa';
 import BookingModal from '@/components/BookingModal/BookingModal';
+import NewsletterSection from '@/components/NewsletterSection/NewsletterSection';
+import ArtistDetailsModal from '@/components/ArtistDetailsModal/ArtistDetailsModal';
 
 const categories = ['All', 'DJ', 'Singer', 'Dancer', 'Comedian', 'Band', 'Anchor', 'Musician', 'Magician', 'Stand-up Comic'];
 
@@ -18,6 +20,9 @@ function ArtistsContent() {
   
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedArtist, setSelectedArtist] = useState<{ id?: number; name?: string } | null>(null);
+
+  const [viewModalOpen, setViewModalOpen] = useState(false);
+  const [viewArtist, setViewArtist] = useState<any>(null);
 
   useEffect(() => {
     async function fetchArtists() {
@@ -61,7 +66,7 @@ function ArtistsContent() {
   return (
     <>
       {/* PAGE HEADER */}
-      <section className="bg-[#0a0a0f] pt-32 pb-12 border-b border-[rgba(255,255,255,0.05)]">
+      <section className="bg-[#0a0a0f] pt-32 pb-12 border-b border-[rgba(255,255,255,0.05)]" style={{ background: 'linear-gradient(180deg, #0a0a0e 0%, #111114 100%)' }}>
         <div className="container text-center">
           <h1 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">Browse & Book Artists</h1>
           <p className="text-gray-400 max-w-2xl mx-auto">
@@ -71,7 +76,7 @@ function ArtistsContent() {
       </section>
 
       {/* FILTER SECTION */}
-      <section className="bg-[#10101a] py-6 sticky top-[80px] z-40 border-b border-[rgba(255,255,255,0.05)] shadow-lg" style={{ padding: '20px 0' }}>
+      <section className="py-6 sticky top-[80px] z-40 border-b border-[rgba(255,255,255,0.05)] shadow-lg" style={{ padding: '20px 0', background: '#111114' }}>
         <div className="container">
           <div className="flex items-center gap-md" style={{ overflowX: 'auto', paddingBottom: '8px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <div className="flex items-center gap-sm text-[#d4a843]" style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.875rem', flexShrink: 0, marginRight: '8px' }}>
@@ -82,6 +87,7 @@ function ArtistsContent() {
                 <button
                   key={cat}
                   onClick={() => handleCategoryClick(cat)}
+                  suppressHydrationWarning
                   className={`btn btn-sm ${
                     activeCategory === cat 
                       ? 'btn-primary' 
@@ -148,7 +154,10 @@ function ArtistsContent() {
                             <span>{artist.location}</span>
                           </div>
                           <div className="text-sm font-bold text-white mb-4">{artist.price}</div>
-                          <button onClick={() => openBooking(artist)} className="btn btn-primary btn-sm w-full">Book Now</button>
+                          <div className="flex gap-2">
+                            <button onClick={() => { setViewArtist(artist); setViewModalOpen(true); }} className="btn btn-sm flex-1 font-bold" style={{ backgroundColor: '#c0c0c0', color: '#000' }}>View</button>
+                            <button onClick={() => openBooking(artist)} className="btn btn-primary btn-sm flex-1">Book Now</button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -191,7 +200,10 @@ function ArtistsContent() {
                             <span>{artist.location}</span>
                           </div>
                           <div className="text-sm font-bold text-gray-300 mb-4">{artist.price}</div>
-                          <button onClick={() => openBooking(artist)} className="btn btn-secondary btn-sm w-full">Book Now</button>
+                          <div className="flex gap-2">
+                            <button onClick={() => { setViewArtist(artist); setViewModalOpen(true); }} className="btn btn-sm flex-1 font-bold" style={{ backgroundColor: '#c0c0c0', color: '#000' }}>View</button>
+                            <button onClick={() => openBooking(artist)} className="btn btn-secondary btn-sm flex-1">Book Now</button>
+                          </div>
                         </div>
                       </div>
                     ))}
@@ -202,6 +214,18 @@ function ArtistsContent() {
           )}
         </div>
       </section>
+
+      {/* CTA / NEWSLETTER */}
+      <NewsletterSection />
+
+      {/* Artist Details Modal */}
+      {viewModalOpen && viewArtist && (
+        <ArtistDetailsModal 
+          artist={viewArtist} 
+          onClose={() => setViewModalOpen(false)} 
+          onBook={() => { setViewModalOpen(false); openBooking(viewArtist); }} 
+        />
+      )}
 
       {/* Booking Modal */}
       {modalOpen && <BookingModal onClose={() => setModalOpen(false)} artistName={selectedArtist?.name} artistId={selectedArtist?.id} />}

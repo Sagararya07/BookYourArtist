@@ -1,4 +1,4 @@
-/* ─── HEADER ─────────────────────────────────────────────── */
+ /* ─── HEADER ─────────────────────────────────────────────── */
 .header {
   position: fixed;
   top: 0;
@@ -95,13 +95,13 @@
 }
 
 .contactBtn:hover {
-  background: var(--orange);
-  color: #fff;
+  background: #c0c0c0;
+  color: #333;
 }
 
 /* ─── NAV BAR ────────────────────────────────────────────── */
 .navBar {
-  background: linear-gradient(135deg, #d35400, #e67e22, #c0392b);
+  background: linear-gradient(135deg, #8b6914, #b8860b, #daa520, #f1c40f);
   padding: 0;
 }
 
@@ -135,9 +135,9 @@
 
 .navLink:hover,
 .navLink.active {
-  background: rgba(255,255,0,0.15);
-  border-color: #ffff00;
-  color: #ffff00;
+  background: #c0c0c0;
+  border-color: #c0c0c0;
+  color: #333;
 }
 
 /* Mobile logo (hidden on desktop) */
@@ -167,7 +167,9 @@
 }
 
 .hamburger:hover {
-  border-color: #fff;
+  background: #c0c0c0;
+  border-color: #c0c0c0;
+  color: #333;
 }
 
 /* Mobile menu */
@@ -193,9 +195,9 @@
 
 .mobileLink:hover,
 .mobileLink.active {
-  color: var(--orange);
-  background: rgba(230, 126, 34, 0.1);
-  border-color: rgba(230, 126, 34, 0.3);
+  color: #333;
+  background: #c0c0c0;
+  border-color: #c0c0c0;
 }
 
 /* ─── RESPONSIVE ─────────────────────────────────────────── */

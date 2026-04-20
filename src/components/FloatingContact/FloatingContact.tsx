@@ -41,6 +41,7 @@ export default function FloatingContact() {
 
       {/* Main FAB */}
       <button
+        suppressHydrationWarning
         className={`${styles.fab} ${open ? styles.fabOpen : ''}`}
         onClick={() => setOpen((p) => !p)}
         aria-label="Contact Us"
