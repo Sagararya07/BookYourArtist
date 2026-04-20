@@ -50,9 +50,9 @@ export default function ContactPage() {
     {
       icon: <FaPhoneAlt />,
       label: 'Call Us',
-      value: '+91 89560 59005',
+      value: '+91 88879 29860',
       sub: 'Mon – Sat, 10am – 8pm',
-      href: 'tel:+918956059005',
+      href: 'tel:+918887929860',
       color: '#d4a843',
     },
     {
@@ -189,8 +189,8 @@ export default function ContactPage() {
                     </a>
                   </div>
                   <img
-                    src="/location.jpg"
-                    alt="Mumbai Office"
+                    src="https://img.freepik.com/premium-photo/gateway-india-mumbai-india_78361-17139.jpg"
+                    alt="Mumbai Office - Gateway of India"
                     className={styles.mapImg}
                     onError={(e) => {
                       (e.target as HTMLImageElement).src = 'https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?q=80&w=600&auto=format&fit=crop';

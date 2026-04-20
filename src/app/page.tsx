@@ -6,10 +6,11 @@ import Link from 'next/link';
 import {
   FaHeadphones, FaMicrophoneAlt, FaUserFriends, FaLaughBeam,
   FaGuitar, FaMicrophone, FaMusic, FaMagic, FaStar,
-  FaPlayCircle, FaTimes, FaArrowRight
+  FaArrowRight
 } from 'react-icons/fa';
 import BookingModal from '@/components/BookingModal/BookingModal';
 import FeaturedArtistsCarousel from '@/components/FeaturedArtistsCarousel/FeaturedArtistsCarousel';
+import IntentSection from '@/components/IntentSection/IntentSection';
 import styles from './home.module.css';
 
 /* ── Scroll-triggered animation hook ────────────────── */
@@ -56,39 +57,29 @@ const services = [
   { num: '09', title: 'Stand-up', icon: <FaLaughBeam />, desc: 'Hilarious, witty, and relatable stand-up routines for a night of endless laughs.' },
 ];
 
-/* ── Testimonials data ──────────────────────────────── */
-const testimonials = [
-  {
-    id: 1,
-    name: 'Hannah Jahan',
-    role: 'Event Manager',
-    content: `Nikita's voice lit up the entire evening. Her energy and stage presence made the event unforgettable.`,
-    rating: 5,
-  },
-  {
-    id: 2,
-    name: 'Talia Varen',
-    role: 'Event Organizer',
-    content: `The guitar riffs electrified the crowd, blending precision with passion. Truly turned every performance into an experience.`,
-    rating: 5,
-  },
-  {
-    id: 3,
-    name: 'Arden Kale',
-    role: 'Music Producer',
-    content: `Production skills shaped every beat to perfection. Transformed simple sounds into cinematic masterpieces.`,
-    rating: 5,
-  },
-];
+// Testimonials are now fetched dynamically from the database.
 
 export default function Home() {
   const [modalOpen, setModalOpen] = useState(false);
   const [selectedArtist, setSelectedArtist] = useState<{ id?: number; name?: string } | null>(null);
-  const [videoOpen, setVideoOpen] = useState(false);
+  const [testimonials, setTestimonials] = useState<any[]>([]);
 
   const servicesRef = useScrollAnimation();
   const aboutRef = useScrollAnimation();
   const testimonialsRef = useScrollAnimation();
+
+  useEffect(() => {
+    async function fetchTestimonials() {
+      try {
+        const res = await fetch('/api/testimonials');
+        const data = await res.json();
+        if (data.success) setTestimonials(data.data);
+      } catch (err) {
+        console.error('Failed to fetch testimonials', err);
+      }
+    }
+    fetchTestimonials();
+  }, []);
 
   const openBooking = useCallback((artist?: { id: number; name: string }) => {
     setSelectedArtist(artist ? { id: artist.id, name: artist.name } : null);
@@ -125,7 +116,7 @@ export default function Home() {
               <Link href="/artists" className="btn btn-primary">
                 Explore Artists
               </Link>
-              <button onClick={() => openBooking()} className="btn btn-secondary">
+              <button suppressHydrationWarning onClick={() => openBooking()} className="btn btn-secondary">
                 Book Now <FaArrowRight />
               </button>
             </div>
@@ -142,36 +133,11 @@ export default function Home() {
           </div>
         </div>
 
-        {/* Floating Video Card */}
-        <div className={styles.heroVideoCard}>
-          <button
-            type="button"
-            onClick={() => setVideoOpen(true)}
-            className={styles.heroVideoBtn}
-          >
-            <FaPlayCircle />
-          </button>
-          <p className={styles.heroVideoLabel}>Live Performances</p>
-          {videoOpen && (
-            <div className={styles.heroVideoOverlay}>
-              <button
-                type="button"
-                onClick={() => setVideoOpen(false)}
-                className={styles.heroVideoClose}
-              >
-                <FaTimes />
-              </button>
-              <video
-                controls autoPlay muted loop playsInline
-                className={styles.heroVideoPlayer}
-                poster="https://images.unsplash.com/photo-1501612780327-45045538702b?q=80&w=2070&auto=format&fit=crop"
-              >
-                <source src="https://assets.mixkit.co/videos/preview/mixkit-cold-looking-hip-hop-dancer-on-the-street-39951-large.mp4" type="video/mp4" />
-              </video>
-            </div>
-          )}
-        </div>
+
       </section>
+
+      {/* ═══════════════════ INTENT SECTION ═══════════════════ */}
+      <IntentSection />
 
       {/* ═══════════════════ FEATURED ARTISTS CAROUSEL ═══════════════════ */}
       <FeaturedArtistsCarousel />
@@ -282,24 +248,21 @@ export default function Home() {
           </div>
 
           <div className={styles.testimonialsGrid}>
-            {testimonials.map((t, index) => (
+            {testimonials.length > 0 ? testimonials.map((t, index) => (
               <div
                 key={t.id}
-                className={`${styles.testimonialCard} ${styles.animateOnScroll} ${
-                  index === 0 ? styles.animateDelay1 :
-                  index === 1 ? styles.animateDelay2 : styles.animateDelay3
-                }`}
+                className={styles.testimonialCard}
               >
                 <span className={styles.testimonialQuoteMark}>&ldquo;</span>
                 <div className={styles.testimonialStars}>
-                  {[...Array(t.rating)].map((_, i) => (
+                  {[...Array(t.rating || 5)].map((_, i) => (
                     <FaStar key={i} />
                   ))}
                 </div>
                 <p className={styles.testimonialText}>{t.content}</p>
                 <div className={styles.testimonialAuthor}>
                   <div className={styles.testimonialAvatar}>
-                    {t.name.charAt(0)}
+                    {t.imageUrl ? <img src={t.imageUrl} alt={t.name} /> : t.name.charAt(0)}
                   </div>
                   <div>
                     <h4 className={styles.testimonialName}>{t.name}</h4>
@@ -307,7 +270,9 @@ export default function Home() {
                   </div>
                 </div>
               </div>
-            ))}
+            )) : (
+              <p className="text-gray-400">Loading testimonials...</p>
+            )}
           </div>
         </div>
       </section>

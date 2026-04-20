@@ -9,7 +9,7 @@ import styles from './Header.module.css';
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
-  { href: '/artists', label: 'Artists' },
+  { href: '/artists', label: 'Book Now' },
   { href: '/contact', label: 'Contact Us' },
 ];
 
@@ -34,7 +34,6 @@ export default function Header() {
       <div className={styles.topBar}>
         <div className={styles.topBarInner}>
           <div className={styles.socialWrap}>
-            <span className={styles.followLabel}>Follow Us :</span>
             <div className={styles.socialIcons}>
               <a href="https://instagram.com/artistvibes_entertainment" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
               <a href="https://facebook.com/ArtistvibesEntertainment" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebookF /></a>
@@ -71,6 +70,7 @@ export default function Header() {
           </div>
 
           <button
+            suppressHydrationWarning
             className={styles.hamburger}
             onClick={() => setMenuOpen((p) => !p)}
             aria-label="Toggle menu"
@@ -92,9 +92,6 @@ export default function Header() {
               {link.label}
             </Link>
           ))}
-          <Link href="/contact" className={`${styles.mobileLink}`}>
-            Contact Us
-          </Link>
         </div>
       )}
     </header>

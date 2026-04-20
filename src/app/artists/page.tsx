@@ -7,6 +7,8 @@ import BookingModal from '@/components/BookingModal/BookingModal';
 import NewsletterSection from '@/components/NewsletterSection/NewsletterSection';
 import ArtistDetailsModal from '@/components/ArtistDetailsModal/ArtistDetailsModal';
 
+import IntentSection from '@/components/IntentSection/IntentSection';
+
 const categories = ['All', 'DJ', 'Singer', 'Dancer', 'Comedian', 'Band', 'Anchor', 'Musician', 'Magician', 'Stand-up Comic'];
 
 function ArtistsContent() {
@@ -65,18 +67,13 @@ function ArtistsContent() {
 
   return (
     <>
-      {/* PAGE HEADER */}
-      <section className="bg-[#0a0a0f] pt-32 pb-12 border-b border-[rgba(255,255,255,0.05)]" style={{ background: 'linear-gradient(180deg, #0a0a0e 0%, #111114 100%)' }}>
-        <div className="container text-center">
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-white mb-4">Browse & Book Artists</h1>
-          <p className="text-gray-400 max-w-2xl mx-auto">
-            Discover India's top-tier talent for your next event. Filter by category and instantly book the perfect performer.
-          </p>
-        </div>
-      </section>
+      <div className="pt-16">
+        <IntentSection />
+      </div>
+
 
       {/* FILTER SECTION */}
-      <section className="py-6 sticky top-[80px] z-40 border-b border-[rgba(255,255,255,0.05)] shadow-lg" style={{ padding: '20px 0', background: '#111114' }}>
+      <section className="py-6 sticky top-[80px] z-40 border-b border-[rgba(255,255,255,0.05)] shadow-lg" style={{ padding: '20px 0', background: '#0a0a0a' }}>
         <div className="container">
           <div className="flex items-center gap-md" style={{ overflowX: 'auto', paddingBottom: '8px', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
             <div className="flex items-center gap-sm text-[#d4a843]" style={{ fontWeight: 'bold', textTransform: 'uppercase', fontSize: '0.875rem', flexShrink: 0, marginRight: '8px' }}>
@@ -104,7 +101,7 @@ function ArtistsContent() {
       </section>
 
       {/* ARTISTS LISTING */}
-      <section className="section bg-[#0a0a0f] min-h-[60vh]">
+      <section className="section bg-[#000000] min-h-[60vh]">
         <div className="container">
           {loading ? (
             <div className="grid-4">
@@ -235,7 +232,7 @@ function ArtistsContent() {
 
 export default function ArtistsPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-[#0a0a0f] flex items-center justify-center text-[#d4a843] animate-pulse">Loading Artists...</div>}>
+    <Suspense fallback={<div className="min-h-screen bg-[#000000] flex items-center justify-center text-[#d4a843] animate-pulse">Loading Artists...</div>}>
       <ArtistsContent />
     </Suspense>
   );

@@ -14,7 +14,7 @@
 
 /* ─── TOP BAR ────────────────────────────────────────────── */
 .topBar {
-  background: #1a1a2e;
+  background: #000000;
   border-bottom: 1px solid rgba(255,255,255,0.06);
   padding: 10px 0;
 }
@@ -74,9 +74,14 @@
 }
 
 .logoImg {
-  height: 50px;
+  height: 85px;
   width: auto;
   object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.logo:hover .logoImg {
+  transform: scale(1.05);
 }
 
 .topRight {
@@ -146,7 +151,7 @@
 }
 
 .mobileLogoImg {
-  height: 36px;
+  height: 48px;
   width: auto;
 }
 
@@ -226,4 +231,10 @@
 @keyframes slideDown {
   from { opacity: 0; transform: translateY(-10px); }
   to   { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 480px) {
+  .mobileMenu {
+    padding: var(--space-md) var(--space-md);
+  }
 }

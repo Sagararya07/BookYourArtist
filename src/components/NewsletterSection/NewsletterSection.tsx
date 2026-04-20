@@ -8,13 +8,39 @@ export default function NewsletterSection() {
   const [email, setEmail] = useState("");
   const [subscribed, setSubscribed] = useState(false);
 
-  const handleSubscribe = () => {
-    if (email.trim()) {
-      setSubscribed(true);
-      setTimeout(() => {
-        setSubscribed(false);
-        setEmail("");
-      }, 3000);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubscribe = async () => {
+    if (!email.trim() || !email.includes('@')) {
+      setError("Please enter a valid email address");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await fetch("/api/newsletter", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      
+      if (data.success) {
+        setSubscribed(true);
+        setTimeout(() => {
+          setSubscribed(false);
+          setEmail("");
+        }, 5000);
+      } else {
+        setError(data.error || "Failed to subscribe");
+      }
+    } catch (err) {
+      setError("An error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -60,6 +86,7 @@ export default function NewsletterSection() {
                   <div className={styles.inputWrap}>
                     <FaEnvelope className={styles.inputIcon} />
                     <input
+                      suppressHydrationWarning
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
@@ -67,13 +94,20 @@ export default function NewsletterSection() {
                       placeholder="Enter your email address"
                       className={styles.input}
                       aria-label="Email address"
+                      disabled={loading}
                     />
                   </div>
-                  <button onClick={handleSubscribe} className={styles.submitBtn}>
-                    <span>Subscribe</span>
+                  <button
+                    suppressHydrationWarning
+                    onClick={handleSubscribe}
+                    className={styles.submitBtn}
+                    disabled={loading}
+                  >
+                    <span>{loading ? "Subscribing..." : "Subscribe"}</span>
                     <FaPaperPlane className={styles.submitIcon} />
                   </button>
                 </div>
+                {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
                 <p className={styles.disclaimer}>
                   🔒 No spam, unsubscribe at any time. Your privacy matters.
                 </p>

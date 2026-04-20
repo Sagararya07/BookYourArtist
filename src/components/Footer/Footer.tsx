@@ -72,7 +72,7 @@ export default function Footer() {
               </li>
               <li>
                 <FaPhoneAlt className={styles.contactIcon} />
-                <a href="tel:+918956059005" className={styles.footerLink}>+91 89560 59005</a>
+                <a href="tel:+918887929860" className={styles.footerLink}>+91 88879 29860</a>
               </li>
               <li>
                 <FaWhatsapp className={styles.contactIcon} />

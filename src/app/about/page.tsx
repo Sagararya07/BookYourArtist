@@ -1,18 +1,13 @@
 import Link from "next/link";
 import { FaStar, FaMusic, FaHandshake, FaHeart, FaGlobeAsia, FaGem, FaUsers, FaAward, FaArrowRight } from "react-icons/fa";
 import styles from "./about.module.css";
+import StatsBar from "./StatsBar";
 
 
 
 
 
-/* ── Stats data ──────────────────────────────────────── */
-const stats = [
-  { value: "500+", label: "Events Delivered" },
-  { value: "200+", label: "Artists Onboard" },
-  { value: "50+", label: "Cities Covered" },
-  { value: "98%", label: "Client Satisfaction" },
-];
+
 
 /* ── Values data ─────────────────────────────────────── */
 const values = [
@@ -66,16 +61,7 @@ export default function AboutPage() {
       </section>
 
       {/* ═══════════════════ STATS BAR ═══════════════════ */}
-      <section className={styles.statsBar}>
-        <div className={`container ${styles.statsGrid}`}>
-          {stats.map((s, i) => (
-            <div key={i} className={styles.statItem}>
-              <span className={styles.statValue}>{s.value}</span>
-              <span className={styles.statLabel}>{s.label}</span>
-            </div>
-          ))}
-        </div>
-      </section>
+      <StatsBar />
 
       {/* ═══════════════════ OUR STORY ═══════════════════ */}
       <section className={styles.storySection}>
