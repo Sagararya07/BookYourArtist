@@ -286,7 +286,121 @@ export default function AdminDashboard() {
     }
   };
 
+  // --- TRENDING HANDLERS ---
+  const handleTrendingFormChange = (e: any) => {
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    setTrendingForm({ ...trendingForm, [e.target.name]: value });
+  };
+
+  const openNewTrendingForm = () => {
+    setEditingTrendingId(null);
+    setTrendingForm({ name: '', imageUrl: '', order: '0', isActive: true });
+    setTrendingFormOpen(true);
+  };
+
+  const openEditTrendingForm = (artist: any) => {
+    setEditingTrendingId(artist.id);
+    setTrendingForm({
+      name: artist.name,
+      imageUrl: artist.imageUrl || '',
+      order: artist.order?.toString() || '0',
+      isActive: artist.isActive,
+    });
+    setTrendingFormOpen(true);
+  };
+
+  const saveTrending = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const url = editingTrendingId ? `/api/admin/trending/${editingTrendingId}` : '/api/admin/trending';
+    const method = editingTrendingId ? 'PUT' : 'POST';
+    try {
+      const compressedImageUrl = await compressImage(trendingForm.imageUrl, 600);
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+        body: JSON.stringify({ ...trendingForm, imageUrl: compressedImageUrl }),
+      });
+      if (res.ok) {
+        setTrendingFormOpen(false);
+        fetchArtists();
+      } else {
+        alert('Failed to save trending artist');
+      }
+    } catch {
+      alert('Error saving trending artist');
+    }
+    setLoading(false);
+  };
+
+  const deleteTrending = async (id: number) => {
+    if (!confirm('Delete this trending artist?')) return;
+    try {
+      const res = await fetch(`/api/admin/trending/${id}`, {
+        method: 'DELETE',
+        headers: { 'x-admin-token': token },
+      });
+      if (res.ok) fetchArtists();
+      else alert('Failed to delete');
+    } catch {
+      alert('Error deleting');
+    }
+  };
+
+  // --- EXCLUSIVE HANDLERS ---
+  const handleExclusiveFormChange = (e: any) => {
+    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+    setExclusiveForm({ ...exclusiveForm, [e.target.name]: value });
+  };
+
+  const openNewExclusiveForm = () => {
+    setEditingExclusiveId(null);
+    setExclusiveForm({ name: '', category: 'Singer', location: 'Mumbai', bio: '', price: 'On Request', imageUrl: '', rating: '5', order: '0', isActive: true });
+    setExclusiveFormOpen(true);
+  };
+
+  const openEditExclusiveForm = (artist: any) => {
+    setEditingExclusiveId(artist.id);
+    setExclusiveForm({
+      name: artist.name,
+      category: artist.category || 'Singer',
+      location: artist.location || 'Mumbai',
+      bio: artist.bio || '',
+      price: artist.price || 'On Request',
+      imageUrl: artist.imageUrl || '',
+      rating: artist.rating?.toString() || '5',
+      order: artist.order?.toString() || '0',
+      isActive: artist.isActive,
+    });
+    setExclusiveFormOpen(true);
+  };
+
+  const saveExclusive = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
+    const url = editingExclusiveId ? `/api/admin/exclusive/${editingExclusiveId}` : '/api/admin/exclusive';
+    const method = editingExclusiveId ? 'PUT' : 'POST';
+    try {
+      const compressedImageUrl = await compressImage(exclusiveForm.imageUrl, 600);
+      const res = await fetch(url, {
+        method,
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+        body: JSON.stringify({ ...exclusiveForm, imageUrl: compressedImageUrl }),
+      });
+      if (res.ok) {
+        setExclusiveFormOpen(false);
+        fetchArtists();
+      } else {
+        alert('Failed to save exclusive artist');
+      }
+    } catch {
+      alert('Error saving exclusive artist');
+    }
+    setLoading(false);
+  };
+
   // --- LOGIN SCREEN ---
+
   if (!isLoggedIn) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f] p-4">
