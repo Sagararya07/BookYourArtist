@@ -43,7 +43,7 @@ export default function AdminDashboard() {
   const [editingArtistId, setEditingArtistId] = useState<number | null>(null);
   const [artistForm, setArtistForm] = useState({
     name: '', category: '', location: '', price: '', imageUrl: '', rating: '', bio: '',
-    isExclusive: false, isFeatured: false, isActive: true
+    isExclusive: false, isFeatured: false, isTrending: false, isActive: true
   });
 
   // Testimonial Form State
