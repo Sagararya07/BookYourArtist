@@ -11,7 +11,7 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  padding: 8rem 0 6rem;
+  padding: 6rem 0 4rem;
 }
 
 .heroOverlay {
@@ -190,7 +190,7 @@
 }
 
 .storyImageSecondary {
-  margin-top: 2rem;
+  align-self: flex-end;
 }
 
 .experienceBadge {
@@ -585,20 +585,18 @@
 .founderCard {
   position: relative;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 2.5rem;
-  max-width: 700px;
+  flex-direction: row;
+  align-items: stretch; /* stretch so left col matches paragraph height */
+  gap: 4rem;
+  max-width: 1100px;
   width: 100%;
   background: rgba(255,255,255,0.02);
   border: 1px solid rgba(212, 168, 67, 0.18);
   border-radius: 32px;
-  padding: 4rem 3rem;
-  text-align: center;
+  padding: 4rem;
   overflow: hidden;
   backdrop-filter: blur(12px);
   box-shadow: 0 40px 80px rgba(0,0,0,0.5), 0 0 60px rgba(212,168,67,0.05);
-  animation: cardFloating 5s ease-in-out infinite;
   transition: border-color 0.4s ease, box-shadow 0.4s ease;
 }
 
@@ -665,9 +663,9 @@
 }
 
 .founderAvatarRing {
-  width: 220px;
-  height: 220px;
-  border-radius: 50%;
+  width: 280px;
+  height: 420px; /* tall full-body portrait */
+  border-radius: 24px; /* rectangular rounded corners for full-body shot */
   padding: 4px;
   background: conic-gradient(
     from 0deg,
@@ -677,19 +675,18 @@
     #d4a843 75%,
     #b8860b 100%
   );
-  /* No rotation — static gold ring */
-  box-shadow: 0 0 40px rgba(212,168,67,0.35);
+  box-shadow: 0 0 48px rgba(212,168,67,0.4), 0 20px 40px rgba(0,0,0,0.5);
   transition: box-shadow 0.4s ease;
 }
 
 .founderAvatarRing:hover {
-  box-shadow: 0 0 60px rgba(212,168,67,0.55), 0 0 100px rgba(212,168,67,0.2);
+  box-shadow: 0 0 70px rgba(212,168,67,0.6), 0 0 120px rgba(212,168,67,0.25), 0 24px 48px rgba(0,0,0,0.6);
 }
 
 .founderAvatarInner {
   width: 100%;
   height: 100%;
-  border-radius: 50%;
+  border-radius: 21px; /* match outer rectangle */
   overflow: hidden;
   background: #0a0a0f;
   border: 3px solid #0a0a0f;
@@ -753,11 +750,63 @@
   box-shadow: 0 4px 20px rgba(212,168,67,0.4);
 }
 
-/* Founder text info */
-.founderInfo {
+/* Left column: avatar + social */
+.founderLeft {
   display: flex;
   flex-direction: column;
   align-items: center;
+  justify-content: space-between; /* avatar top, socials bottom */
+  gap: 2rem;
+  flex-shrink: 0;
+  width: 296px;
+}
+
+/* Right column: text */
+.founderRight {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Social Links */
+.founderSocial {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+}
+
+.socialLink {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.6rem 1.2rem;
+  border-radius: 99px;
+  background: rgba(212, 168, 67, 0.07);
+  border: 1px solid rgba(212, 168, 67, 0.2);
+  color: #d4a843;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: all 0.25s ease;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+}
+
+.socialLink:hover {
+  background: rgba(212, 168, 67, 0.18);
+  border-color: rgba(212, 168, 67, 0.5);
+  transform: translateX(4px);
+  box-shadow: 0 4px 16px rgba(212, 168, 67, 0.2);
+}
+
+/* Founder text info — now left-aligned */
+.founderInfo {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
   gap: 0.75rem;
 }
 
@@ -778,20 +827,24 @@
   display: block;
 }
 
-.founderBio {
-  font-size: 1rem;
-  color: var(--text-secondary);
-  line-height: 1.8;
-  max-width: 480px;
+.founderBioWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
   margin: 0.5rem 0;
+}
+
+.founderBio {
+  font-size: 0.95rem;
+  color: var(--text-secondary);
+  line-height: 1.85;
 }
 
 .founderTags {
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  justify-content: center;
-  margin-top: 0.5rem;
+  margin-top: 0.75rem;
 }
 
 .founderTag {
@@ -811,9 +864,35 @@
   border-color: rgba(212,168,67,0.5);
 }
 
-@media (max-width: 768px) {
-  .founderCard { padding: 3rem 1.5rem; }
-  .founderAvatarRing { width: 180px; height: 180px; }
+@media (max-width: 900px) {
+  .founderCard {
+    flex-direction: column;
+    align-items: center;
+    padding: 3rem 2rem;
+    gap: 2.5rem;
+  }
+
+  .founderLeft {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .founderRight {
+    align-items: center;
+    text-align: center;
+  }
+
+  .founderTags {
+    justify-content: center;
+  }
+
+  .founderSocial {
+    flex-direction: row;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .founderAvatarRing { width: 220px; height: 300px; border-radius: 18px; }
 }
 
 

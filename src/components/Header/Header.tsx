@@ -9,7 +9,7 @@ import styles from './Header.module.css';
 const navLinks = [
   { href: '/', label: 'Home' },
   { href: '/about', label: 'About' },
-  { href: '/artists', label: 'Book Now' },
+  { href: '/artists', label: 'Book Artists' },
   { href: '/contact', label: 'Contact Us' },
 ];
 

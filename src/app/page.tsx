@@ -11,6 +11,8 @@ import {
 import BookingModal from '@/components/BookingModal/BookingModal';
 import FeaturedArtistsCarousel from '@/components/FeaturedArtistsCarousel/FeaturedArtistsCarousel';
 import IntentSection from '@/components/IntentSection/IntentSection';
+import TrendingSection from '@/components/TrendingSection/TrendingSection';
+import ExclusiveArtists from '@/components/ExclusiveArtists/ExclusiveArtists';
 import styles from './home.module.css';
 
 /* ── Scroll-triggered animation hook ────────────────── */
@@ -139,37 +141,38 @@ export default function Home() {
       {/* ═══════════════════ INTENT SECTION ═══════════════════ */}
       <IntentSection />
 
-      {/* ═══════════════════ FEATURED ARTISTS CAROUSEL ═══════════════════ */}
-      <FeaturedArtistsCarousel />
-
-      {/* ═══════════════════ SERVICES SECTION ═══════════════════ */}
+      {/* ═══════════════════ SERVICES SECTION (ARTIST CATEGORY) ═══════════════════ */}
       <section className={styles.servicesSection} ref={servicesRef}>
         <div className="container">
-          <div className={`section-header ${styles.animateOnScroll}`}>
-            <span className="section-tag">Services</span>
-            <h2 className="section-title">Music Artist Services</h2>
+          <div className="section-header">
+            <span className="section-tag">Categories</span>
+            <h2 className="section-title">Artist Category</h2>
             <p className="section-subtitle">
-              Experience soulful performances tailored for your event.
+              Explore our wide range of professional talent for any occasion.
             </p>
           </div>
         </div>
 
-        <div className={styles.marqueeWrap}>
-          <div className={styles.marqueeTrack}>
+        <div className={styles.categoryMarquee}>
+          <div className={styles.categoryTrack}>
             {doubledServices.map((service, index) => (
-              <div key={index} className={styles.serviceCard}>
-                <span className={styles.serviceCardNum}>{service.num}</span>
-                <div className={styles.serviceCardIcon}>{service.icon}</div>
-                <h3 className={styles.serviceCardTitle}>{service.title}</h3>
-                <p className={styles.serviceCardDesc}>{service.desc}</p>
-                <Link href="/about" className={`btn btn-primary btn-sm ${styles.serviceCardBtn}`}>
-                  Know More
-                </Link>
+              <div key={index} className={styles.categoryItem}>
+                <div className={styles.categoryIcon}>{service.icon}</div>
+                <span className={styles.categoryName}>{service.title}</span>
               </div>
             ))}
           </div>
         </div>
       </section>
+
+      {/* ═══════════════════ TRENDING ARTISTS SECTION ═══════════════════ */}
+      <TrendingSection />
+
+      {/* ═══════════════════ EXCLUSIVE ARTISTS BOOK FLIP ═══════════════════ */}
+      <ExclusiveArtists />
+
+      {/* ═══════════════════ FEATURED ARTISTS CAROUSEL ═══════════════════ */}
+      <FeaturedArtistsCarousel />
 
       {/* ═══════════════════ ABOUT / EXPERIENCE ═══════════════════ */}
       <section className={styles.aboutSection} ref={aboutRef}>

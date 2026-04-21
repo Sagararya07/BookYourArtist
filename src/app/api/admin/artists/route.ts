@@ -15,7 +15,7 @@ export async function GET(req: NextRequest) {
 
   try {
     const artists = await prisma.artist.findMany({
-      orderBy: [{ isExclusive: 'desc' }, { isFeatured: 'desc' }, { createdAt: 'desc' }],
+      orderBy: [{ isTrending: 'desc' }, { isExclusive: 'desc' }, { isFeatured: 'desc' }, { createdAt: 'desc' }],
     });
     return NextResponse.json({ success: true, data: artists });
   } catch (err) {
@@ -34,7 +34,7 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const {
       name, category, location, bio, price,
-      imageUrl, isExclusive, isFeatured, isActive,
+      imageUrl, isExclusive, isFeatured, isTrending, isActive,
       rating, eventsCount, videoUrl,
     } = body;
 
@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
         imageUrl: imageUrl || '/images/placeholder-artist.jpg',
         isExclusive: isExclusive ?? false,
         isFeatured: isFeatured ?? false,
+        isTrending: isTrending ?? false,
         isActive: isActive ?? true,
         rating: rating ? parseFloat(rating) : 4.5,
         eventsCount: eventsCount ? parseInt(eventsCount) : 0,

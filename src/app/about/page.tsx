@@ -21,9 +21,18 @@ const values = [
 const founder = {
   name: "Abhishek Pandey",
   role: "Founder & CEO",
-  image: "/owner.jpg",
-  bio: "Visionary leader with 10+ years in artist management and event production. Abhishek founded Artistvibes with a passion for connecting extraordinary talent with extraordinary events across India.",
+  image: "/founder.jpg",
+  bio: [
+    "Abhishek Pandey is a leading name in the live entertainment and artist management industry, known for delivering exceptional musical experiences and professionally curated events. As the founder of Artistvibes Entertainment, he has established a strong presence in managing artists, organizing concerts, and executing high-impact events across India and internationally.",
+    "With years of industry experience, Abhishek specializes in artist bookings, live concerts, college shows, and corporate entertainment solutions. His ability to understand audience preferences and match them with the right talent has made him a trusted partner for event organizers and brands.",
+    "From managing national tours to international performances, Abhishek has worked closely with renowned artists and emerging talents, ensuring smooth execution and memorable performances. His strong network, attention to detail, and commitment to excellence set him apart in the entertainment space.",
+  ],
   tags: ["Artist Management", "Event Production", "Pan-India Network"],
+  social: {
+    instagram: "https://www.instagram.com/abhishek_pandey_guru?igsh=MWxqa281Z2RtYXZheA%3D%3D&utm_source=qr",
+    facebook: "https://www.facebook.com/share/18UZasCmiX/?mibextid=wwXIfr",
+    email: "mailto:Artistmanagerabhishek@gmail.com",
+  },
 };
 
 export default function AboutPage() {
@@ -191,32 +200,61 @@ export default function AboutPage() {
             </p>
           </div>
 
-          {/* Founder Spotlight */}
+          {/* Founder Spotlight — Horizontal Layout */}
           <div className={styles.founderWrap}>
             <div className={styles.founderCard}>
-              {/* Decorative rings */}
+              {/* Decorative orbs */}
               <div className={styles.founderRingOuter} />
               <div className={styles.founderRingInner} />
 
-              {/* Circle Photo */}
-              <div className={styles.founderAvatarWrap}>
-                <div className={styles.founderAvatarRing}>
-                  <div className={styles.founderAvatarInner}>
-                    <img
-                      src={founder.image}
-                      alt={founder.name}
-                      className={styles.founderAvatar}
-                    />
+              {/* LEFT: Photo + Social Links */}
+              <div className={styles.founderLeft}>
+                <div className={styles.founderAvatarWrap}>
+                  <div className={styles.founderAvatarRing}>
+                    <div className={styles.founderAvatarInner}>
+                      <img
+                        src={founder.image}
+                        alt={founder.name}
+                        className={styles.founderAvatar}
+                      />
+                    </div>
                   </div>
+                  <div className={styles.founderBadge}>Founder</div>
                 </div>
-                <div className={styles.founderBadge}>Founder</div>
+
+                {/* Social Links */}
+                <div className={styles.founderSocial}>
+                  <a href={founder.social.instagram} target="_blank" rel="noopener noreferrer" className={styles.socialLink} aria-label="Instagram">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+                    </svg>
+                    Instagram
+                  </a>
+                  <a href={founder.social.facebook} target="_blank" rel="noopener noreferrer" className={styles.socialLink} aria-label="Facebook">
+                    <svg viewBox="0 0 24 24" fill="currentColor" width="20" height="20">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                    Facebook
+                  </a>
+                  <a href={founder.social.email} className={styles.socialLink} aria-label="Email">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" width="20" height="20">
+                      <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/>
+                      <polyline points="22,6 12,13 2,6"/>
+                    </svg>
+                    Email Us
+                  </a>
+                </div>
               </div>
 
-              {/* Info */}
-              <div className={styles.founderInfo}>
+              {/* RIGHT: Name, Bio, Tags */}
+              <div className={styles.founderRight}>
                 <h3 className={styles.founderName}>{founder.name}</h3>
                 <span className={styles.founderRole}>{founder.role}</span>
-                <p className={styles.founderBio}>{founder.bio}</p>
+                <div className={styles.founderBioWrap}>
+                  {founder.bio.map((para, i) => (
+                    <p key={i} className={styles.founderBio}>{para}</p>
+                  ))}
+                </div>
                 <div className={styles.founderTags}>
                   {founder.tags.map((tag) => (
                     <span key={tag} className={styles.founderTag}>{tag}</span>

@@ -1,9 +1,11 @@
 'use client';
 
+import React from 'react';
 import { FaTimes, FaStar, FaMapMarkerAlt, FaVideo } from 'react-icons/fa';
+import { Artist } from '@/types/artist';
 
 interface Props {
-  artist: any;
+  artist: Artist | null;
   onClose: () => void;
   onBook: () => void;
 }
@@ -12,9 +14,9 @@ export default function ArtistDetailsModal({ artist, onClose, onBook }: Props) {
   if (!artist) return null;
 
   return (
-    <div className="modal-overlay" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal animate-slideUp" style={{ padding: 0, overflow: 'hidden' }}>
-        <button className="modal-close" onClick={onClose} aria-label="Close" style={{ zIndex: 10 }}>
+    <div className="modal-overlay" onClick={(e: React.MouseEvent) => e.target === e.currentTarget && onClose()}>
+      <div className="modal animate-slideUp" style={{ padding: 0, overflowY: 'auto', maxHeight: '85vh', width: '90%', maxWidth: '500px' } as React.CSSProperties}>
+        <button className="modal-close" onClick={onClose} aria-label="Close" style={{ zIndex: 10, position: 'absolute', top: '12px', right: '12px' }}>
           <FaTimes />
         </button>
 
@@ -22,7 +24,7 @@ export default function ArtistDetailsModal({ artist, onClose, onBook }: Props) {
           {/* Image Header */}
           <div className="relative w-full" style={{ background: '#0a0a0f' }}>
             <img 
-              src={artist.imageUrl.startsWith('/images/') ? (
+              src={artist.imageUrl?.startsWith('/images/') ? (
                 artist.category === 'DJ' ? 'https://images.unsplash.com/photo-1571266028243-3716f02d2d2e?q=80&w=600&auto=format&fit=crop' :
                 artist.category === 'Singer' ? 'https://images.unsplash.com/photo-1516280440502-12f8650f9689?q=80&w=600&auto=format&fit=crop' :
                 artist.category === 'Band' ? 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=600&auto=format&fit=crop' :
@@ -31,18 +33,18 @@ export default function ArtistDetailsModal({ artist, onClose, onBook }: Props) {
               ) : artist.imageUrl} 
               alt={artist.name} 
               className="w-full"
-              style={{ display: 'block', maxHeight: '420px', objectFit: 'contain', objectPosition: 'center top' }}
+              style={{ display: 'block', height: '320px', objectFit: 'cover', objectPosition: 'center 20%' } as React.CSSProperties}
             />
             {artist.isExclusive && (
               <div className="absolute top-4 left-4 bg-[#d4a843] text-black font-bold px-3 py-1 rounded-full text-xs uppercase tracking-wider shadow-lg">
                 Exclusive
               </div>
             )}
-            <div className="absolute inset-0 bg-gradient-to-t from-[var(--bg-secondary)] to-transparent"></div>
+            <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, var(--bg-secondary), transparent)' }}></div>
           </div>
 
           {/* Details Content */}
-          <div className="p-6 sm:p-8 pt-0 -mt-8 relative z-1">
+          <div className="p-6 sm:p-8 pt-0 -mt-8 relative z-10">
             <div className="text-[#d4a843] font-bold tracking-widest uppercase text-xs mb-1">{artist.category}</div>
             <h2 className="font-display text-3xl text-white font-bold mb-3">{artist.name}</h2>
             
@@ -82,3 +84,4 @@ export default function ArtistDetailsModal({ artist, onClose, onBook }: Props) {
     </div>
   );
 }
+

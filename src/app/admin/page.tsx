@@ -29,7 +29,7 @@ const compressImage = (base64Str: string, maxWidth = 500): Promise<string> => {
 export default function AdminDashboard() {
   const [token, setToken] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeTab, setActiveTab] = useState<'artists' | 'testimonials' | 'subscribers'>('artists');
+  const [activeTab, setActiveTab] = useState<'featured' | 'testimonials' | 'subscribers' | 'trending' | 'exclusive'>('featured');
   
   const [artists, setArtists] = useState<any[]>([]);
   const [testimonials, setTestimonials] = useState<any[]>([]);
@@ -52,6 +52,20 @@ export default function AdminDashboard() {
   const [testiForm, setTestiForm] = useState({
     name: '', role: '', content: '', rating: '5', imageUrl: '', isActive: true
   });
+  // Trending Form State
+  const [trendingFormOpen, setTrendingFormOpen] = useState(false);
+  const [editingTrendingId, setEditingTrendingId] = useState<number | null>(null);
+  const [trendingForm, setTrendingForm] = useState({
+    name: '', imageUrl: '', order: '0', isActive: true
+  });
+
+  // Exclusive Form State
+  const [exclusiveFormOpen, setExclusiveFormOpen] = useState(false);
+  const [editingExclusiveId, setEditingExclusiveId] = useState<number | null>(null);
+  const [exclusiveForm, setExclusiveForm] = useState({
+    name: '', category: 'Singer', location: 'Mumbai', bio: '', price: 'On Request',
+    imageUrl: '', rating: '5', order: '0', isActive: true
+  });
 
   // Login handler
   const handleLogin = async (e: React.FormEvent) => {
@@ -66,9 +80,9 @@ export default function AdminDashboard() {
       if (res.ok) {
         setIsLoggedIn(true);
         const data = await res.json();
-        setArtists(data.data);
-        fetchTestimonials(); // Fetch testimonials on login
-        fetchSubscribers(); // Fetch subscribers on login
+        fetchArtists();
+        fetchTestimonials();
+        fetchSubscribers();
       } else {
         setError('Invalid password');
       }
@@ -110,6 +124,20 @@ export default function AdminDashboard() {
     setSubscribers([]);
   };
 
+  const deleteSubscriber = async (id: number) => {
+    if (!confirm('Remove this subscriber from the list?')) return;
+    try {
+      const res = await fetch(`/api/admin/subscribers/${id}`, {
+        method: 'DELETE',
+        headers: { 'x-admin-token': token },
+      });
+      if (res.ok) fetchSubscribers();
+      else alert('Failed to delete subscriber');
+    } catch {
+      alert('Error deleting subscriber');
+    }
+  };
+
   // --- ARTIST HANDLERS ---
   const handleArtistFormChange = (e: any) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
@@ -118,7 +146,13 @@ export default function AdminDashboard() {
 
   const openNewArtistForm = () => {
     setEditingArtistId(null);
-    setArtistForm({ name: '', category: '', location: '', price: '', imageUrl: '', rating: '', bio: '', isExclusive: false, isFeatured: false, isActive: true });
+    setArtistForm({ 
+      name: '', category: '', location: '', price: '', imageUrl: '', rating: '5', bio: '', 
+      isExclusive: activeTab === 'exclusive', 
+      isFeatured: activeTab === 'featured', 
+      isTrending: activeTab === 'trending', 
+      isActive: true 
+    });
     setArtistFormOpen(true);
   };
 
@@ -127,7 +161,7 @@ export default function AdminDashboard() {
     setArtistForm({
       name: artist.name, category: artist.category, location: artist.location, price: artist.price,
       imageUrl: artist.imageUrl || '', rating: artist.rating || '', bio: artist.bio || '',
-      isExclusive: artist.isExclusive, isFeatured: artist.isFeatured, isActive: artist.isActive
+      isExclusive: artist.isExclusive, isFeatured: artist.isFeatured, isTrending: artist.isTrending, isActive: artist.isActive
     });
     setArtistFormOpen(true);
   };
@@ -238,6 +272,20 @@ export default function AdminDashboard() {
     }
   };
 
+  const deleteExclusive = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this exclusive artist?')) return;
+    try {
+      const res = await fetch(`/api/admin/exclusive/${id}`, {
+        method: 'DELETE',
+        headers: { 'x-admin-token': token }
+      });
+      if (res.ok) fetchArtists();
+      else alert('Failed to delete');
+    } catch {
+      alert('Error deleting');
+    }
+  };
+
   // --- LOGIN SCREEN ---
   if (!isLoggedIn) {
     return (
@@ -281,10 +329,10 @@ export default function AdminDashboard() {
       {/* Tabs */}
       <div className="flex gap-4 mb-6 border-b border-[rgba(255,255,255,0.05)] pb-2">
         <button 
-          onClick={() => setActiveTab('artists')} 
-          className={`px-4 py-2 font-bold text-lg border-b-2 transition-all ${activeTab === 'artists' ? 'text-[#d4a843] border-[#d4a843]' : 'text-gray-500 border-transparent hover:text-gray-300'}`}
+          onClick={() => setActiveTab('featured')} 
+          className={`px-4 py-2 font-bold text-lg border-b-2 transition-all ${activeTab === 'featured' ? 'text-[#d4a843] border-[#d4a843]' : 'text-gray-500 border-transparent hover:text-gray-300'}`}
         >
-          Artists ({artists.length})
+          Featured Artists ({artists.filter(a => a.isFeatured).length})
         </button>
         <button 
           onClick={() => setActiveTab('testimonials')} 
@@ -298,13 +346,25 @@ export default function AdminDashboard() {
         >
           Subscribers ({subscribers.length})
         </button>
+        <button 
+          onClick={() => setActiveTab('trending')} 
+          className={`px-4 py-2 font-bold text-lg border-b-2 transition-all ${activeTab === 'trending' ? 'text-[#d4a843] border-[#d4a843]' : 'text-gray-500 border-transparent hover:text-gray-300'}`}
+        >
+          Trending ({artists.filter(a => a.isTrending).length})
+        </button>
+        <button 
+          onClick={() => setActiveTab('exclusive')} 
+          className={`px-4 py-2 font-bold text-lg border-b-2 transition-all ${activeTab === 'exclusive' ? 'text-[#d4a843] border-[#d4a843]' : 'text-gray-500 border-transparent hover:text-gray-300'}`}
+        >
+          Exclusive ({artists.filter(a => a.isExclusive).length})
+        </button>
       </div>
 
-      {/* --- ARTISTS TAB --- */}
-      {activeTab === 'artists' && (
+      {/* --- FEATURED ARTISTS TAB --- */}
+      {activeTab === 'featured' && (
         <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
           <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-white">Manage Artists</h2>
+            <h2 className="text-xl font-bold text-white">Manage Featured Artists</h2>
             <button onClick={openNewArtistForm} className="btn btn-primary btn-sm"><FaPlus /> Add New Artist</button>
           </div>
           
@@ -321,7 +381,7 @@ export default function AdminDashboard() {
                   </tr>
                 </thead>
                 <tbody>
-                  {artists.map((artist) => (
+                  {artists.filter(a => a.isFeatured).map((artist) => (
                     <tr key={artist.id} className="border-b border-[rgba(255,255,255,0.05)] hover:bg-[#1a1a2e]/50 transition-colors">
                       <td className="px-6 py-4 font-medium text-white">{artist.name}</td>
                       <td className="px-6 py-4">{artist.category}</td>
@@ -343,8 +403,8 @@ export default function AdminDashboard() {
                       </td>
                     </tr>
                   ))}
-                  {artists.length === 0 && (
-                    <tr><td colSpan={5} className="text-center py-8 text-gray-500">No artists found.</td></tr>
+                  {artists.filter(a => a.isFeatured).length === 0 && (
+                    <tr><td colSpan={5} className="text-center py-8 text-gray-500">No featured artists found.</td></tr>
                   )}
                 </tbody>
               </table>
@@ -414,6 +474,7 @@ export default function AdminDashboard() {
                     <th className="px-6 py-4">#</th>
                     <th className="px-6 py-4">Email Address</th>
                     <th className="px-6 py-4">Subscribed Date</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -422,10 +483,121 @@ export default function AdminDashboard() {
                       <td className="px-6 py-4 text-gray-500">{index + 1}</td>
                       <td className="px-6 py-4 font-medium text-white">{sub.email}</td>
                       <td className="px-6 py-4">{new Date(sub.createdAt).toLocaleDateString()} at {new Date(sub.createdAt).toLocaleTimeString()}</td>
+                      <td className="px-6 py-4 text-right">
+                        <button onClick={() => deleteSubscriber(sub.id)} className="text-red-500 hover:text-red-400" title="Remove subscriber"><FaTrash size={16} /></button>
+                      </td>
                     </tr>
                   ))}
                   {subscribers.length === 0 && (
-                    <tr><td colSpan={3} className="text-center py-8 text-gray-500">No subscribers found yet.</td></tr>
+                    <tr><td colSpan={4} className="text-center py-8 text-gray-500">No subscribers found yet.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- TRENDING TAB --- */}
+      {activeTab === 'trending' && (
+        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-white">Manage Trending Artists</h2>
+            <button onClick={openNewArtistForm} className="btn btn-primary btn-sm"><FaPlus /> Add Trending Artist</button>
+          </div>
+          
+          <div className="bg-[#14141f] rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)]">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-gray-400">
+                <thead className="bg-[#1a1a2e] text-xs uppercase text-gray-300">
+                  <tr>
+                    <th className="px-6 py-4">Name</th>
+                    <th className="px-6 py-4">Category</th>
+                    <th className="px-6 py-4">Location</th>
+                    <th className="px-6 py-4">Status / Badges</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {artists.filter(a => a.isTrending).map((artist) => (
+                    <tr key={artist.id} className="border-b border-[rgba(255,255,255,0.05)] hover:bg-[#1a1a2e]/50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-white">{artist.name}</td>
+                      <td className="px-6 py-4">{artist.category}</td>
+                      <td className="px-6 py-4">{artist.location}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2 flex-wrap">
+                          {artist.isExclusive && <span className="badge badge-gold"><FaCrown /> Exclusive</span>}
+                          {artist.isFeatured && <span className="badge badge-purple"><FaStar /> Featured</span>}
+                          {artist.isTrending && <span className="badge bg-orange-500/10 text-orange-500 border-orange-500/30">Trending</span>}
+                          {artist.isActive ? (
+                            <span className="badge badge-success">Active</span>
+                          ) : (
+                            <span className="badge bg-red-500/10 text-red-500 border-red-500/30">Inactive</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button onClick={() => openEditArtistForm(artist)} className="text-blue-400 hover:text-blue-300 mr-4"><FaEdit size={18} /></button>
+                        <button onClick={() => deleteArtist(artist.id)} className="text-red-500 hover:text-red-400"><FaTrash size={18} /></button>
+                      </td>
+                    </tr>
+                  ))}
+                  {artists.filter(a => a.isTrending).length === 0 && (
+                    <tr><td colSpan={5} className="text-center py-8 text-gray-500">No trending artists found.</td></tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* --- EXCLUSIVE TAB --- */}
+      {activeTab === 'exclusive' && (
+        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
+          <div className="flex justify-between items-center">
+            <h2 className="text-xl font-bold text-white">Manage Exclusive Artists</h2>
+            <button onClick={openNewArtistForm} className="btn btn-primary btn-sm"><FaPlus /> Add Exclusive Artist</button>
+          </div>
+          
+          <div className="bg-[#14141f] rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)]">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-gray-400">
+                <thead className="bg-[#1a1a2e] text-xs uppercase text-gray-300">
+                  <tr>
+                    <th className="px-6 py-4">Name</th>
+                    <th className="px-6 py-4">Category</th>
+                    <th className="px-6 py-4">Location</th>
+                    <th className="px-6 py-4">Status / Badges</th>
+                    <th className="px-6 py-4 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {artists.filter(a => a.isExclusive).map((artist) => (
+                    <tr key={artist.id} className="border-b border-[rgba(255,255,255,0.05)] hover:bg-[#1a1a2e]/50 transition-colors">
+                      <td className="px-6 py-4 font-medium text-white">{artist.name}</td>
+                      <td className="px-6 py-4">{artist.category}</td>
+                      <td className="px-6 py-4">{artist.location}</td>
+                      <td className="px-6 py-4">
+                        <div className="flex gap-2 flex-wrap">
+                          {artist.isExclusive && <span className="badge badge-gold"><FaCrown /> Exclusive</span>}
+                          {artist.isFeatured && <span className="badge badge-purple"><FaStar /> Featured</span>}
+                          {artist.isTrending && <span className="badge bg-orange-500/10 text-orange-500 border-orange-500/30">Trending</span>}
+                          {artist.isActive ? (
+                            <span className="badge badge-success">Active</span>
+                          ) : (
+                            <span className="badge bg-red-500/10 text-red-500 border-red-500/30">Inactive</span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-6 py-4 text-right">
+                        <button onClick={() => openEditArtistForm(artist)} className="text-blue-400 hover:text-blue-300 mr-4"><FaEdit size={18} /></button>
+                        <button onClick={() => deleteArtist(artist.id)} className="text-red-500 hover:text-red-400"><FaTrash size={18} /></button>
+                      </td>
+                    </tr>
+                  ))}
+                  {artists.filter(a => a.isExclusive).length === 0 && (
+                    <tr><td colSpan={5} className="text-center py-8 text-gray-500">No exclusive artists found.</td></tr>
                   )}
                 </tbody>
               </table>
@@ -493,6 +665,10 @@ export default function AdminDashboard() {
                   <span className="text-sm font-medium text-white">Featured Artist</span>
                 </label>
                 <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" name="isTrending" checked={artistForm.isTrending} onChange={handleArtistFormChange} className="w-4 h-4 accent-[#d4a843]" />
+                  <span className="text-sm font-medium text-white">Trending Artist</span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer">
                   <input type="checkbox" name="isActive" checked={artistForm.isActive} onChange={handleArtistFormChange} className="w-4 h-4 accent-[#d4a843]" />
                   <span className="text-sm font-medium text-white">Active</span>
                 </label>
@@ -547,6 +723,107 @@ export default function AdminDashboard() {
               <div className="flex gap-4 mt-6">
                 <button type="button" onClick={() => setTestiFormOpen(false)} className="btn btn-ghost flex-1">Cancel</button>
                 <button type="submit" className="btn btn-primary flex-1" disabled={loading}>{loading ? 'Saving...' : 'Save Testimonial'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* --- ADD/EDIT TRENDING MODAL --- */}
+      {trendingFormOpen && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2 className="modal-title mb-6">{editingTrendingId ? 'Edit Trending Artist' : 'Add Trending Artist'}</h2>
+            
+            <form onSubmit={saveTrending} className="flex flex-col gap-4">
+              <div className="form-group">
+                <label className="form-label">Name *</label>
+                <input name="name" className="form-control" value={trendingForm.name} onChange={handleTrendingFormChange} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Photo URL / Base64 *</label>
+                <input name="imageUrl" className="form-control" placeholder="https://..." value={trendingForm.imageUrl} onChange={handleTrendingFormChange} required />
+              </div>
+              <div className="form-group">
+                <label className="form-label">Display Order (0, 1, 2...)</label>
+                <input name="order" type="number" className="form-control" value={trendingForm.order} onChange={handleTrendingFormChange} />
+              </div>
+
+              <div className="p-4 bg-[#1a1a2e] border border-[rgba(255,255,255,0.05)] rounded-lg flex flex-col gap-3 mt-2">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" name="isActive" checked={trendingForm.isActive} onChange={handleTrendingFormChange} className="w-4 h-4 accent-[#d4a843]" />
+                  <span className="text-sm font-medium text-white">Active (Visible in collage)</span>
+                </label>
+              </div>
+
+              <div className="flex gap-4 mt-6">
+                <button type="button" onClick={() => setTrendingFormOpen(false)} className="btn btn-ghost flex-1">Cancel</button>
+                <button type="submit" className="btn btn-primary flex-1" disabled={loading}>{loading ? 'Saving...' : 'Save Trending Artist'}</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* --- ADD/EDIT EXCLUSIVE MODAL --- */}
+      {exclusiveFormOpen && (
+        <div className="modal-overlay">
+          <div className="modal">
+            <h2 className="modal-title mb-6">{editingExclusiveId ? 'Edit Exclusive Artist' : 'Add Exclusive Artist'}</h2>
+            <form onSubmit={saveExclusive} className="flex flex-col gap-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div className="form-group mb-0">
+                  <label className="form-label">Name *</label>
+                  <input name="name" className="form-control" value={exclusiveForm.name} onChange={handleExclusiveFormChange} required />
+                </div>
+                <div className="form-group mb-0">
+                  <label className="form-label">Category *</label>
+                  <select name="category" className="form-control" value={exclusiveForm.category} onChange={handleExclusiveFormChange} required>
+                    <option value="Singer">Singer</option>
+                    <option value="DJ">DJ</option>
+                    <option value="Dancer">Dancer</option>
+                    <option value="Comedian">Comedian</option>
+                    <option value="Band">Band</option>
+                    <option value="Anchor">Anchor</option>
+                    <option value="Musician">Musician</option>
+                    <option value="Magician">Magician</option>
+                    <option value="Stand-up Comic">Stand-up Comic</option>
+                  </select>
+                </div>
+                <div className="form-group mb-0">
+                  <label className="form-label">Location</label>
+                  <input name="location" className="form-control" value={exclusiveForm.location} onChange={handleExclusiveFormChange} />
+                </div>
+                <div className="form-group mb-0">
+                  <label className="form-label">Starting Price</label>
+                  <input name="price" className="form-control" placeholder="e.g. ₹5,00,000 onwards" value={exclusiveForm.price} onChange={handleExclusiveFormChange} />
+                </div>
+                <div className="form-group mb-0">
+                  <label className="form-label">Rating (1-5)</label>
+                  <input name="rating" type="number" step="0.1" min="1" max="5" className="form-control" value={exclusiveForm.rating} onChange={handleExclusiveFormChange} />
+                </div>
+                <div className="form-group mb-0">
+                  <label className="form-label">Display Order</label>
+                  <input name="order" type="number" className="form-control" value={exclusiveForm.order} onChange={handleExclusiveFormChange} />
+                </div>
+                <div className="form-group mb-0 col-span-2">
+                  <label className="form-label">Bio / Description</label>
+                  <textarea name="bio" className="form-control" rows={3} placeholder="Artist bio shown on the book page..." value={exclusiveForm.bio} onChange={handleExclusiveFormChange}></textarea>
+                </div>
+                <div className="form-group mb-0 col-span-2">
+                  <label className="form-label">Photo URL *</label>
+                  <input name="imageUrl" className="form-control" placeholder="https://..." value={exclusiveForm.imageUrl} onChange={handleExclusiveFormChange} required />
+                  {exclusiveForm.imageUrl && <img src={exclusiveForm.imageUrl} alt="preview" className="mt-2 h-32 object-cover rounded-lg border border-gray-700" />}
+                </div>
+              </div>
+              <div className="p-4 bg-[#1a1a2e] border border-[rgba(255,255,255,0.05)] rounded-lg flex flex-col gap-3 mt-2">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" name="isActive" checked={exclusiveForm.isActive} onChange={handleExclusiveFormChange} className="w-4 h-4 accent-[#d4a843]" />
+                  <span className="text-sm font-medium text-white">Active (Visible on homepage)</span>
+                </label>
+              </div>
+              <div className="flex gap-4 mt-6">
+                <button type="button" onClick={() => setExclusiveFormOpen(false)} className="btn btn-ghost flex-1">Cancel</button>
+                <button type="submit" className="btn btn-primary flex-1" disabled={loading}>{loading ? 'Saving...' : 'Save Exclusive Artist'}</button>
               </div>
             </form>
           </div>

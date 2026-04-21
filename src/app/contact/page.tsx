@@ -170,9 +170,9 @@ export default function ContactPage() {
                   <FaClock className={styles.hoursIcon} />
                   <div>
                     <div className={styles.hoursTitle}>Business Hours</div>
-                    <div className={styles.hoursRow}><span>Mon – Fri</span><span>10:00 AM – 8:00 PM</span></div>
-                    <div className={styles.hoursRow}><span>Saturday</span><span>11:00 AM – 6:00 PM</span></div>
-                    <div className={styles.hoursRow}><span>Sunday</span><span className={styles.closed}>By Appointment</span></div>
+                    <div className={styles.hoursRow}><span className={styles.day}>Mon – Fri</span><span className={styles.time}>10:00 AM – 8:00 PM</span></div>
+                    <div className={styles.hoursRow}><span className={styles.day}>Saturday</span><span className={styles.time}>11:00 AM – 6:00 PM</span></div>
+                    <div className={styles.hoursRow}><span className={styles.day}>Sunday</span><span className={`${styles.time} ${styles.closed}`}>By Appointment</span></div>
                   </div>
                 </div>
 

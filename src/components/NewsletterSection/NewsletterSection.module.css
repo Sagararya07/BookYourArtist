@@ -51,6 +51,41 @@
   padding: 4rem;
   position: relative;
   overflow: hidden;
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+
+.card:hover, .card:active {
+  border-color: rgba(212, 168, 67, 0.4);
+}
+
+.shine {
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(
+    120deg,
+    transparent,
+    rgba(212, 168, 67, 0.2),
+    transparent
+  );
+  transform: skewX(-25deg);
+  pointer-events: none;
+  z-index: 5;
+}
+
+.card:hover .shine, .card:active .shine {
+  animation: goldShine 0.8s ease-in-out forwards;
+}
+
+@keyframes goldShine {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 200%;
+  }
 }
 
 .card::before {

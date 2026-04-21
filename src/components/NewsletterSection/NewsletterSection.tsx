@@ -52,6 +52,7 @@ export default function NewsletterSection() {
 
       <div className={`container ${styles.inner}`}>
         <div className={styles.card}>
+          <div className={styles.shine} />
           {/* Left content */}
           <div className={styles.textSide}>
             <div className={styles.iconWrap}>

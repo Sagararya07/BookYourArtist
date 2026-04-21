@@ -17,10 +17,12 @@ model Artist {
   imageUrl    String   @default("/images/placeholder-artist.jpg")
   isExclusive Boolean  @default(false)
   isFeatured  Boolean  @default(false)
+  isTrending  Boolean  @default(false)
   isActive    Boolean  @default(true)
   rating      Float    @default(4.5)
   eventsCount Int      @default(0)
   videoUrl    String   @default("")
+  order       Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -62,5 +64,28 @@ model Testimonial {
 model NewsletterSubscriber {
   id        Int      @id @default(autoincrement())
   email     String   @unique
+  createdAt DateTime @default(now())
+}
+
+model TrendingArtist {
+  id        Int      @id @default(autoincrement())
+  name      String
+  imageUrl  String
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model ExclusiveArtist {
+  id        Int      @id @default(autoincrement())
+  name      String
+  category  String   @default("Singer")
+  location  String   @default("Mumbai")
+  bio       String   @default("")
+  price     String   @default("On Request")
+  imageUrl  String
+  rating    Float    @default(5.0)
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 }
