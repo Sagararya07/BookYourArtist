@@ -179,7 +179,7 @@
 
 /* Mobile menu */
 .mobileMenu {
-  background: #1a1a2e;
+  background: #000000;
   border-top: 1px solid var(--orange);
   padding: var(--space-md) var(--space-xl);
   display: flex;
