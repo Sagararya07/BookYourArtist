@@ -115,14 +115,14 @@ export default function AboutPage() {
                 <div className={styles.highlightItem}>
                   <FaStar className={styles.highlightIcon} />
                   <div>
-                    <h4>Curated Excellence</h4>
+                    <h3>Curated Excellence</h3>
                     <p>Every artist is vetted for quality and professionalism.</p>
                   </div>
                 </div>
                 <div className={styles.highlightItem}>
                   <FaMusic className={styles.highlightIcon} />
                   <div>
-                    <h4>End-to-End Management</h4>
+                    <h3>End-to-End Management</h3>
                     <p>From booking to stage setup, we handle everything seamlessly.</p>
                   </div>
                 </div>

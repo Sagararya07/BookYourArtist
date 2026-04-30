@@ -27,35 +27,81 @@ export default function TrendingSection() {
     fetchTrending();
   }, []);
 
-  const displayArtists = artists.slice(0, 5);
+  const [centerIndex, setCenterIndex] = useState(0);
 
-  if (displayArtists.length === 0) return null;
+  useEffect(() => {
+    if (artists.length === 0) return;
+    const interval = setInterval(() => {
+      setCenterIndex((prev) => (prev + 1) % artists.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [artists.length]);
 
-  const positions = [
-    styles.topLeft,
-    styles.topRight,
-    styles.center,
-    styles.bottomLeft,
-    styles.bottomRight,
-  ];
+  // 4 corner frames are fixed (artists 0-3), center cycles through all artists
+  const corners = artists.slice(0, 4);
+  const centerArtist = artists.length > 0 ? artists[centerIndex] : null;
+
+  if (!centerArtist) return null;
 
   return (
     <section className={styles.trendingSection}>
       <div className="container">
         <div className={styles.contentWrapper}>
           <div className={styles.textContent}>
-            <h2 className={styles.trendingTitle}>
-              Trending <span className={styles.yellowText}>ArtistVibes</span> Artists
-            </h2>
+            <div className={styles.header}>
+              <div className={styles.tagLine}>
+                <div className={styles.tagDash} />
+                <span className={styles.tag}>Trending Now</span>
+                <div className={styles.tagDash} />
+              </div>
+              <h2 className={styles.title}>
+                Trending <span className={styles.highlight}>Artists</span>
+              </h2>
+              <p className={styles.subtitle}>
+                The most sought-after performers making waves across India's live event scene.
+              </p>
+            </div>
           </div>
 
           <div className={styles.collageGrid}>
-            {displayArtists.map((artist, index) => (
-              <div key={artist.id} className={`${styles.artistFrame} ${positions[index]}`}>
-                <img src={artist.imageUrl} alt={artist.name} />
+            {/* Top Left */}
+            {corners[0] && (
+              <div className={`${styles.artistFrame} ${styles.topLeft}`}>
+                <img src={corners[0].imageUrl} alt={corners[0].name} />
                 <div className={styles.neonGlow}></div>
               </div>
-            ))}
+            )}
+            {/* Top Right */}
+            {corners[1] && (
+              <div className={`${styles.artistFrame} ${styles.topRight}`}>
+                <img src={corners[1].imageUrl} alt={corners[1].name} />
+                <div className={styles.neonGlow}></div>
+              </div>
+            )}
+            {/* CENTER — cycles through all artists */}
+            <div className={`${styles.artistFrame} ${styles.center}`}>
+              <img
+                key={centerArtist.id}
+                src={centerArtist.imageUrl}
+                alt={centerArtist.name}
+                className={styles.fadeImg}
+              />
+              <div className={styles.neonGlow}></div>
+            </div>
+            {/* Bottom Left */}
+            {corners[2] && (
+              <div className={`${styles.artistFrame} ${styles.bottomLeft}`}>
+                <img src={corners[2].imageUrl} alt={corners[2].name} />
+                <div className={styles.neonGlow}></div>
+              </div>
+            )}
+            {/* Bottom Right */}
+            {corners[3] && (
+              <div className={`${styles.artistFrame} ${styles.bottomRight}`}>
+                <img src={corners[3].imageUrl} alt={corners[3].name} />
+                <div className={styles.neonGlow}></div>
+              </div>
+            )}
           </div>
         </div>
       </div>

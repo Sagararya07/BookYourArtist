@@ -101,7 +101,7 @@ export default function NewsletterSection() {
                   <button
                     suppressHydrationWarning
                     onClick={handleSubscribe}
-                    className={styles.submitBtn}
+                    className={`btn ${styles.submitBtn}`}
                     disabled={loading}
                   >
                     <span>{loading ? "Subscribing..." : "Subscribe"}</span>

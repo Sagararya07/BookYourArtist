@@ -88,7 +88,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className={styles.bottom}>
-          <p>© {year} Artistvibes Entertainment. All rights reserved.</p>
+          <p>© 2026 <a href="https://www.cypherswift.com/" target="_blank" rel="noopener noreferrer" className={styles.footerLink}>Cypher Swift InfoTech</a>. All Rights Reserved</p>
           <p>Made with ♥ in Mumbai, India</p>
         </div>
       </div>

@@ -1,228 +1,214 @@
 'use client';
-
-import { useState, useEffect, useRef, useCallback, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { FaStar, FaRedo, FaSlidersH } from 'react-icons/fa';
+import { FaStar, FaRedo, FaFire, FaCrown, FaUsers, FaMapMarkerAlt, FaArrowRight } from 'react-icons/fa';
+import { BsStarFill } from 'react-icons/bs';
 import BookingModal from '@/components/BookingModal/BookingModal';
 import ArtistDetailsModal from '@/components/ArtistDetailsModal/ArtistDetailsModal';
-
 import IntentSection from '@/components/IntentSection/IntentSection';
+import s from './artists.module.css';
 
-/* ── TYPES ─────────────────────────────────────────────── */
-interface ArtistData {
-  id: number;
-  name: string;
-  category: string;
-  location: string;
-  bio: string;
-  price: string;
-  imageUrl: string;
-  isExclusive: boolean;
-  isFeatured: boolean;
-  isTrending: boolean;
-  isActive: boolean;
-  rating: number;
-  eventsCount: number;
-  videoUrl?: string;
+interface Artist {
+  id:number; name:string; category:string; location:string; bio:string;
+  price:string; imageUrl:string; isExclusive:boolean; isFeatured:boolean;
+  isTrending:boolean; isActive:boolean; rating:number; eventsCount:number; videoUrl?:string;
 }
-
-type RowType = 'trending' | 'exclusive' | 'featured';
-
-interface RowState {
-  data: ArtistData[];
-  loading: boolean;
-  error: string | null;
-}
+type RowType = 'trending'|'exclusive'|'featured';
+type SectionType = 'ALL'|RowType;
+interface RowState { data:Artist[]; loading:boolean; error:string|null; }
 
 const CATEGORIES = [
-  'ALL', 'DJ', 'SINGER', 'DANCER', 'COMEDIAN',
-  'BAND', 'ANCHOR', 'MUSICIAN', 'MAGICIAN', 'STAND-UP COMIC',
+  { label: 'ALL',          icon: '🎭' },
+  { label: 'DJ',           icon: '🎧' },
+  { label: 'SINGER',       icon: '🎤' },
+  { label: 'DANCER',       icon: '💃' },
+  { label: 'COMEDIAN',     icon: '😂' },
+  { label: 'BAND',         icon: '🎸' },
+  { label: 'ANCHOR',       icon: '🎙️' },
+  { label: 'MUSICIAN',     icon: '🎹' },
+  { label: 'MAGICIAN',     icon: '🪄' },
+  { label: 'STAND-UP',     icon: '🎭' },
+];
+const SECTION_TABS:{id:SectionType;label:string;icon:React.ReactNode;color:string}[] = [
+  {id:'ALL',      label:'All Artists', icon:<FaUsers />,   color:'#ffffff'},
+  {id:'trending', label:'Trending',    icon:<FaFire />,    color:'#ff6b35'},
+  {id:'exclusive',label:'Exclusive',   icon:<FaCrown />,   color:'#d4a843'},
+  {id:'featured', label:'Featured',    icon:<BsStarFill />,color:'#a78bfa'},
+];
+const ROW_CONFIG = [
+  {type:'trending'  as RowType, tag:'TRENDING',  title:'Trending Artists',  subtitle:"The most sought-after performers making waves across India's live event scene."},
+  {type:'exclusive' as RowType, tag:'EXCLUSIVE', title:'Exclusive Elite',   subtitle:'Premium artists managed exclusively by ArtistVibes Entertainment.'},
+  {type:'featured'  as RowType, tag:'FEATURED',  title:'Featured Picks',    subtitle:'Our hand-picked selection of top-tier talent for your high-profile celebrations.'},
 ];
 
-const ROW_CONFIG: { type: RowType; tag: string; title: string; subtitle: string }[] = [
-  {
-    type: 'trending',
-    tag: 'TRENDING',
-    title: 'Trending Artists',
-    subtitle: 'The most sought-after performers making waves across India\'s live event scene.',
-  },
-  {
-    type: 'exclusive',
-    tag: 'EXCLUSIVE',
-    title: 'Exclusive Elite',
-    subtitle: 'Premium artists managed exclusively by ArtistVibes Entertainment.',
-  },
-  {
-    type: 'featured',
-    tag: 'FEATURED',
-    title: 'Featured Picks',
-    subtitle: 'Our hand-picked selection of top-tier talent for your high-profile celebrations.',
-  },
-];
-
-/* ── HELPER: Get artist initials ───────────────────────── */
-function getInitials(name: string): string {
-  return name
-    .split(' ')
-    .slice(0, 2)
-    .map((w) => w[0])
-    .join('')
-    .toUpperCase();
+function initials(n:string){return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+function price(p:string|null|undefined){
+  if(!p||p.trim()===''||p==='On Request') return 'On Request';
+  const n=parseInt(p.replace(/[^0-9]/g,''));
+  return !isNaN(n)&&n>0?`From ₹${n.toLocaleString('en-IN')}`:p;
 }
 
-/* ── HELPER: Format price ──────────────────────────────── */
-function formatPrice(price: string | null | undefined): string {
-  if (!price || price.trim() === '' || price === 'On Request') return 'On Request';
-  // If it's just a number, format it
-  const numericVal = parseInt(price.replace(/[^0-9]/g, ''));
-  if (!isNaN(numericVal) && numericVal > 0) return `From ₹${numericVal.toLocaleString('en-IN')}`;
-  return price;
-}
+/* ── TRENDING: collage of 5 images with auto-cycling ── */
+function TrendingLayout({artists,onView,onBook,loading,error,onRetry}:{
+  artists:Artist[];loading:boolean;error:string|null;onRetry:()=>void;
+  onView:(a:Artist)=>void;onBook:(a:Artist)=>void;
+}){
+  const [startIndex, setStartIndex] = useState(0);
 
-/* ══════════════════════════════════════════════════════════
-   SKELETON CARD
-   ══════════════════════════════════════════════════════════ */
-function SkeletonCard() {
+  useEffect(() => {
+    if (artists.length === 0) return;
+    const interval = setInterval(() => {
+      setStartIndex((prev) => (prev + 1) % artists.length);
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [artists.length]);
+
+  if(loading) return <div style={{textAlign:'center',padding:'3rem',color:'rgba(255,255,255,0.3)'}}>Loading...</div>;
+  if(error) return <div className="discovery-row__error"><p>⚠️ {error}</p><button className="discovery-btn discovery-btn--retry" onClick={onRetry}><FaRedo/> Retry</button></div>;
+  if(!artists.length) return <div className="discovery-row__empty">No trending artists found.</div>;
+
+  const displayArtists: Artist[] = [];
+  for (let i = 0; i < 5; i++) {
+    if (artists.length > 0) {
+      displayArtists.push(artists[(startIndex + i) % artists.length]);
+    }
+  }
+  const positions = [s.collageTL, s.collageTR, s.collageCenter, s.collageBL, s.collageBR];
   return (
-    <div className="discovery-card discovery-card--skeleton">
-      <div className="discovery-card__image-skeleton" />
-      <div className="discovery-card__body-skeleton">
-        <div className="skeleton-line skeleton-line--sm" />
-        <div className="skeleton-line skeleton-line--md" />
-        <div className="skeleton-line skeleton-line--xs" />
-        <div className="skeleton-line skeleton-line--lg" />
-        <div className="skeleton-btns">
-          <div className="skeleton-btn" />
-          <div className="skeleton-btn" />
+    <div className={s.trendingWrap}>
+      <div className={s.exclHeading}>
+        <div className={s.exclHeadingLine}/>
+        <div className={s.exclHeadingText}>
+          <span className={s.exclHeadingPill}><FaFire style={{fontSize:8}}/> Trending Now</span>
+          <h2 className={s.exclHeadingTitle}>Trending <span>Artists</span></h2>
         </div>
+        <div className={s.exclHeadingLine}/>
+      </div>
+      <div className={s.collageGrid}>
+        {displayArtists.map((a,i)=>{
+          const hasImg = a.imageUrl&&!a.imageUrl.startsWith('/images/');
+          return (
+            <div key={i} className={positions[i]||s.collageTL}>
+              <div className={s.collageFrame}>
+                {hasImg
+                  ? <img key={a.id} src={a.imageUrl} alt={a.name} loading="lazy" className={s.collageFadeImg}/>
+                  : <div className={s.collagePlaceholder}>{initials(a.name)}</div>}
+                <div className={s.collageOverlay}>
+                  <div className={s.collageCat}>{a.category}</div>
+                  <div className={s.collageName}>{a.name}</div>
+                  <div className={s.collageBtns}>
+                    <button className={s.collageBtnView} onClick={()=>onView(a)}>View</button>
+                    <button className={s.collageBtnBook} onClick={()=>onBook(a)}>Book Now</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          );
+        })}
       </div>
     </div>
   );
 }
 
-/* ══════════════════════════════════════════════════════════
-   ARTIST CARD (180×280)
-   ══════════════════════════════════════════════════════════ */
-function ArtistCard({
-  artist,
-  onView,
-  onBook,
-}: {
-  artist: ArtistData;
-  onView: () => void;
-  onBook: () => void;
-}) {
-  const [imgError, setImgError] = useState(false);
-  const hasValidImage = artist.imageUrl && !artist.imageUrl.startsWith('/images/') && !imgError;
+/* ── EXCLUSIVE: premium book flip ── */
+function ExclusiveLayout({artists,onView,onBook,loading,error,onRetry}:{
+  artists:Artist[];loading:boolean;error:string|null;onRetry:()=>void;
+  onView:(a:Artist)=>void;onBook:(a:Artist)=>void;
+}){
+  const [cur,setCur]=useState(0);
+  const [visible,setVisible]=useState(true);
+  const [animKey,setAnimKey]=useState(0);
+  const total=artists.length;
+  const navigate=(dir:'next'|'prev')=>{
+    setVisible(false);
+    setAnimKey(k=>k+1);
+    setTimeout(()=>{ setCur(c=>dir==='next'?(c+1)%total:(c-1+total)%total); setVisible(true); },220);
+  };
 
-  return (
-    <div className="discovery-card group">
-      {/* Image Area — top 55% */}
-      <div className="discovery-card__image">
-        {hasValidImage ? (
-          <img
-            src={artist.imageUrl}
-            alt={artist.name}
-            onError={() => setImgError(true)}
-            loading="lazy"
-          />
-        ) : (
-          <div className="discovery-card__placeholder">
-            <span>{getInitials(artist.name)}</span>
-          </div>
-        )}
-        {/* Category Badge */}
-        <span className="discovery-card__badge">{artist.category.toUpperCase()}</span>
-      </div>
+  useEffect(() => {
+    if (total <= 1) return;
+    const interval = setInterval(() => {
+      setVisible(false);
+      setAnimKey(k=>k+1);
+      setTimeout(()=>{ setCur(c=>(c+1)%total); setVisible(true); },220);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [total]);
 
-      {/* Info Area — flex:1 */}
-      <div className="discovery-card__body">
-        <div className="discovery-card__category">{artist.category.toUpperCase()}</div>
-        <h3 className="discovery-card__name group-hover:text-[#d4a843] transition-colors">{artist.name}</h3>
-        <div className="discovery-card__meta">
-          <span className="discovery-card__rating">
-            <FaStar /> {artist.rating}
-          </span>
-          <span className="discovery-card__dot">•</span>
-          <span className="discovery-card__location">{artist.location}</span>
-        </div>
-        <div className="discovery-card__price">{formatPrice(artist.price)}</div>
-        <div className="discovery-card__actions">
-          <button className="discovery-btn discovery-btn--outline" onClick={onView}>View</button>
-          <button className="discovery-btn discovery-btn--gold" onClick={onBook}>Book Now</button>
-        </div>
-      </div>
+  if(loading) return (
+    <div className={s.exclLoadingWrap}>
+      <div className={s.exclSkeleton}/>
     </div>
   );
-}
-
-/* ══════════════════════════════════════════════════════════
-   ARTIST ROW (independently scrollable)
-   ══════════════════════════════════════════════════════════ */
-function ArtistRow({
-  config,
-  state,
-  onRetry,
-  onView,
-  onBook,
-}: {
-  config: typeof ROW_CONFIG[0];
-  state: RowState;
-  onRetry: () => void;
-  onView: (artist: ArtistData) => void;
-  onBook: (artist: ArtistData) => void;
-}) {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
+  if(error) return <div className="discovery-row__error"><p>⚠️ {error}</p><button className="discovery-btn discovery-btn--retry" onClick={onRetry}><FaRedo/> Retry</button></div>;
+  if(!artists.length) return <div className="discovery-row__empty">No exclusive artists found.</div>;
+  const a=artists[cur];
+  const hasImg=a.imageUrl&&!a.imageUrl.startsWith('/images/');
   return (
-    <div className="discovery-row relative">
-      {/* Decorative gradient behind row header */}
-      <div className="absolute -top-10 -left-10 w-40 h-40 bg-[#d4a843]/5 blur-[80px] rounded-full pointer-events-none"></div>
-      
-      {/* Row Header */}
-      <div className="discovery-row__header relative z-10">
-        <div className="discovery-row__header-left">
-          <span className="discovery-row__tag shadow-[0_0_10px_rgba(212,168,67,0.1)]">{config.tag}</span>
-          <h2 className="discovery-row__title">{config.title}</h2>
+    <div className={s.exclusiveWrap}>
+      {/* Heading */}
+      <div className={s.exclHeading}>
+        <div className={s.exclHeadingLine}/>
+        <div className={s.exclHeadingText}>
+          <span className={s.exclHeadingPill}><FaCrown style={{fontSize:8}}/> Exclusive Elite</span>
+          <h2 className={s.exclHeadingTitle}>Premium <span>Artists</span></h2>
         </div>
-        <a href="/artists" className="discovery-row__see-all">See All →</a>
+        <div className={s.exclHeadingLine}/>
       </div>
 
-      {/* Loading State */}
-      {state.loading && (
-        <div className="discovery-row__scroll hide-scrollbar relative z-10">
-          {[...Array(6)].map((_, i) => (
-            <SkeletonCard key={i} />
-          ))}
-        </div>
-      )}
-
-      {/* Error State */}
-      {!state.loading && state.error && (
-        <div className="discovery-row__error relative z-10">
-          <p>⚠️ {state.error}</p>
-          <button className="discovery-btn discovery-btn--retry" onClick={onRetry}>
-            <FaRedo /> Retry
+      <div className={s.exclCardWrap}>
+        {total>1&&(
+          <button className={`${s.navBtn} ${s.navBtnLeft}`} onClick={()=>navigate('prev')} aria-label="Previous">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
           </button>
+        )}
+        <div
+          key={animKey}
+          style={{opacity:visible?1:0,transform:visible?'translateY(0)':'translateY(10px)',transition:'opacity 0.22s ease,transform 0.22s ease',animation:'cardFadeUp 0.5s cubic-bezier(0.22,1,0.36,1) both'}}
+        >
+          <div className={s.exclusiveCard}>
+            {/* Left: image */}
+            <div className={s.exclusiveLeft}>
+              {hasImg
+                ?<img src={a.imageUrl} alt={a.name}/>
+                :<div className={s.exclusivePlaceholder}>{initials(a.name)}</div>}
+              {/* Gradient overlay for image */}
+              <div className={s.exclImgOverlay}/>
+              <div className={s.exclusivePageNum}>
+                {String(cur+1).padStart(2,'0')}<span>/{String(total).padStart(2,'0')}</span>
+              </div>
+            </div>
+            {/* Right: info */}
+            <div className={s.exclusiveRight}>
+              <span className={s.exclusiveCatPill}>{a.category}</span>
+              <h2 className={s.exclusiveName}>{a.name}</h2>
+              <div className={s.exclusiveMeta}>
+                <span><FaMapMarkerAlt style={{color:'#d4a843',fontSize:11}}/>{a.location}</span>
+                <span><FaStar style={{color:'#d4a843',fontSize:11}}/>{a.rating}.0 Rating</span>
+              </div>
+              {a.bio&&<p className={s.exclusiveBio}>{a.bio.slice(0,140)}{a.bio.length>140?'…':''}</p>}
+              <div className={s.exclusivePriceLabel}>Starting From</div>
+              <div className={s.exclusivePrice}>{price(a.price)}</div>
+              <div className={s.exclusiveBtns}>
+                <button className={s.exclusiveBtnView} onClick={()=>onView(a)}>View Profile</button>
+                <button className={s.exclusiveBtnBook} onClick={()=>onBook(a)}>Book This Artist <FaArrowRight style={{fontSize:11}}/></button>
+              </div>
+            </div>
+          </div>
         </div>
-      )}
+        {total>1&&(
+          <button className={`${s.navBtn} ${s.navBtnRight}`} onClick={()=>navigate('next')} aria-label="Next">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+          </button>
+        )}
+      </div>
 
-      {/* Empty State */}
-      {!state.loading && !state.error && state.data.length === 0 && (
-        <div className="discovery-row__empty relative z-10">
-          No artists available
-        </div>
-      )}
-
-      {/* Data */}
-      {!state.loading && !state.error && state.data.length > 0 && (
-        <div ref={scrollRef} className="discovery-row__scroll hide-scrollbar relative z-10 pt-2 pb-6">
-          {state.data.map((artist) => (
-            <ArtistCard
-              key={artist.id}
-              artist={artist}
-              onView={() => onView(artist)}
-              onBook={() => onBook(artist)}
+      {total>1&&(
+        <div className={s.exclDots}>
+          {artists.map((_,i)=>(
+            <button key={i} className={`${s.exclDot} ${i===cur?s.exclDotActive:''}`}
+              onClick={()=>{setVisible(false);setAnimKey(k=>k+1);setTimeout(()=>{setCur(i);setVisible(true);},220);}}
+              aria-label={`Artist ${i+1}`}
             />
           ))}
         </div>
@@ -231,193 +217,304 @@ function ArtistRow({
   );
 }
 
-/* ══════════════════════════════════════════════════════════
-   MAIN CONTENT
-   ══════════════════════════════════════════════════════════ */
-function ArtistsDiscoveryContent() {
-  const searchParams = useSearchParams();
-  const router = useRouter();
-  const urlCategory = searchParams.get('category')?.toUpperCase() || 'ALL';
-
-  const [activeCategory, setActiveCategory] = useState(urlCategory);
-  const [rows, setRows] = useState<Record<RowType, RowState>>({
-    trending: { data: [], loading: true, error: null },
-    exclusive: { data: [], loading: true, error: null },
-    featured: { data: [], loading: true, error: null },
-  });
-
-  // Modals
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedArtist, setSelectedArtist] = useState<{ id?: number; name?: string } | null>(null);
-  const [viewModalOpen, setViewModalOpen] = useState(false);
-  const [viewArtist, setViewArtist] = useState<any>(null);
-
-  /* ── Fetch a single row ─────────────────────────────── */
-  const fetchRow = useCallback(async (type: RowType, category: string) => {
-    setRows((prev) => ({
-      ...prev,
-      [type]: { ...prev[type], loading: true, error: null },
-    }));
-
-    try {
-      const catParam = category !== 'ALL' ? `?category=${encodeURIComponent(category)}` : '';
-      const res = await fetch(`/api/discovery/${type}${catParam}`);
-      if (!res.ok) throw new Error(`Failed to load ${type} artists`);
-      const json = await res.json();
-      if (!json.success) throw new Error(json.message || `Failed to load ${type} artists`);
-
-      setRows((prev) => ({
-        ...prev,
-        [type]: { data: json.data, loading: false, error: null },
-      }));
-    } catch (err: any) {
-      setRows((prev) => ({
-        ...prev,
-        [type]: { data: [], loading: false, error: err.message || 'Something went wrong' },
-      }));
-    }
-  }, []);
-
-  /* ── Fetch all 3 rows in parallel ───────────────────── */
-  const fetchAllRows = useCallback(
-    (category: string) => {
-      fetchRow('trending', category);
-      fetchRow('exclusive', category);
-      fetchRow('featured', category);
-    },
-    [fetchRow]
-  );
+/* ── FEATURED: premium full-bleed cards ── */
+function FeaturedLayout({artists,onView,onBook,loading,error,onRetry}:{
+  artists:Artist[];loading:boolean;error:string|null;onRetry:()=>void;
+  onView:(a:Artist)=>void;onBook:(a:Artist)=>void;
+}){
+  const [cur,setCur]=useState(0);
+  const [animKey,setAnimKey]=useState(0);
+  const visible=3;
+  const max=Math.max(0,artists.length-visible);
+  const navigate=(dir:'next'|'prev')=>{
+    setAnimKey(k=>k+1);
+    setCur(c=>dir==='next'?Math.min(max,c+1):Math.max(0,c-1));
+  };
 
   useEffect(() => {
-    fetchAllRows(activeCategory);
-  }, [activeCategory, fetchAllRows]);
+    if (max <= 0) return;
+    const interval = setInterval(() => {
+      setAnimKey(k=>k+1);
+      setCur(c => c >= max ? 0 : c + 1);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [max]);
 
-  /* ── Category handler ───────────────────────────────── */
-  const handleCategory = (cat: string) => {
-    setActiveCategory(cat);
-    router.push(cat === 'ALL' ? '/artists' : `/artists?category=${encodeURIComponent(cat)}`);
-  };
+  if(loading) return (
+    <div className={s.featLoadingGrid}>
+      {[0,1,2].map(i=>(<div key={i} className={s.featSkeleton} style={{animationDelay:`${i*0.15}s`}}/>))}
+    </div>
+  );
+  if(error) return <div className="discovery-row__error"><p>⚠️ {error}</p><button className="discovery-btn discovery-btn--retry" onClick={onRetry}><FaRedo/> Retry</button></div>;
+  if(!artists.length) return <div className="discovery-row__empty">No featured artists found.</div>;
+  const shown=artists.slice(cur,cur+visible);
+  return (
+    <div className={s.featuredWrap}>
+      {/* Section heading */}
+      <div className={s.featHeading}>
+        <div className={s.featHeadingLine}/>
+        <div className={s.featHeadingText}>
+          <span className={s.featHeadingPill}>★ Hand-Picked</span>
+          <h2 className={s.featHeadingTitle}>Featured <span>Artists</span></h2>
+        </div>
+        <div className={s.featHeadingLine}/>
+      </div>
 
-  /* ── Modal handlers ─────────────────────────────────── */
-  const openBooking = (artist: ArtistData) => {
-    setSelectedArtist({ id: artist.id, name: artist.name });
-    setModalOpen(true);
-  };
+      <div className={s.featCarouselWrap}>
+        {/* Left nav */}
+        <button
+          className={`${s.featNavBtn} ${s.featNavLeft}`}
+          onClick={()=>navigate('prev')}
+          disabled={cur===0}
+          aria-label="Previous"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M15 18l-6-6 6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </button>
 
-  const openView = (artist: ArtistData) => {
-    setViewArtist(artist);
-    setViewModalOpen(true);
-  };
+        {/* Cards */}
+        <div className={s.featuredRow} key={animKey}>
+          {shown.map((a,i)=>{
+            const hasImg=a.imageUrl&&!a.imageUrl.startsWith('/images/');
+            return (
+              <div key={a.id} className={s.featCard} style={{animationDelay:`${i*0.1}s`}}>
+                {/* Full-bleed background */}
+                <div className={s.featBg}>
+                  {hasImg
+                    ?<img src={a.imageUrl} alt={a.name} loading="lazy"/>
+                    :<div className={s.featBgFallback}>{initials(a.name)}</div>}
+                </div>
+                {/* Gradient overlays */}
+                <div className={s.featGradTop}/>
+                <div className={s.featGradBot}/>
+                {/* Shimmer sweep */}
+                <div className={s.featShimmer}/>
+                {/* Rating badge */}
+                <div className={s.featRatingBadge}>
+                  <FaStar style={{fontSize:9,color:'#d4a843'}}/>
+                  <span>{a.rating}.0</span>
+                </div>
+                {/* Category pill top-left */}
+                <span className={s.featCatPill}>{a.category}</span>
+                {/* Bottom content */}
+                <div className={s.featContent}>
+                  <h3 className={s.featName}>{a.name}</h3>
+                  {a.location&&(
+                    <div className={s.featLocation}>
+                      <FaMapMarkerAlt style={{fontSize:10,color:'#d4a843',flexShrink:0}}/>
+                      <span>{a.location}</span>
+                    </div>
+                  )}
+                  <div className={s.featPriceRow}>
+                    <span className={s.featPriceLabel}>From</span>
+                    <span className={s.featPriceVal}>{price(a.price)}</span>
+                  </div>
+                  <div className={s.featBtns}>
+                    <button className={s.featBtnView} onClick={()=>onView(a)}>View Profile</button>
+                    <button className={s.featBtnBook} onClick={()=>onBook(a)}>Book Now</button>
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* Right nav */}
+        <button
+          className={`${s.featNavBtn} ${s.featNavRight}`}
+          onClick={()=>navigate('next')}
+          disabled={cur>=max}
+          aria-label="Next"
+        >
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none"><path d="M9 18l6-6-6-6" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+        </button>
+      </div>
+
+      {/* Dots */}
+      {artists.length>visible&&(
+        <div className={s.featDots}>
+          {Array.from({length:max+1}).map((_,i)=>(
+            <button
+              key={i}
+              className={`${s.featDot} ${i===cur?s.featDotActive:''}`}
+              onClick={()=>{setAnimKey(k=>k+1);setCur(i);}}
+              aria-label={`Page ${i+1}`}
+            />
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* ── MAIN CONTENT ── */
+function ArtistsDiscoveryContent(){
+  const searchParams=useSearchParams();
+  const router=useRouter();
+  const urlCat=searchParams.get('category')?.toUpperCase()||'ALL';
+  const [activeSection,setActiveSection]=useState<SectionType>('ALL');
+  const [activeCategory,setActiveCategory]=useState(urlCat);
+  const [sectionVisible,setSectionVisible]=useState(true);
+  const [rows,setRows]=useState<Record<RowType,RowState>>({
+    trending:{data:[],loading:true,error:null},
+    exclusive:{data:[],loading:true,error:null},
+    featured:{data:[],loading:true,error:null},
+  });
+  const [modalOpen,setModalOpen]=useState(false);
+  const [selectedArtist,setSelectedArtist]=useState<{id?:number;name?:string}|null>(null);
+  const [viewModalOpen,setViewModalOpen]=useState(false);
+  const [viewArtist,setViewArtist]=useState<any>(null);
+
+  const fetchRow=useCallback(async(type:RowType,cat:string)=>{
+    setRows(p=>({...p,[type]:{...p[type],loading:true,error:null}}));
+    try{
+      const q=cat!=='ALL'?`?category=${encodeURIComponent(cat)}`:'';
+      const res=await fetch(`/api/discovery/${type}${q}`);
+      if(!res.ok) throw new Error(`Failed to load ${type}`);
+      const json=await res.json();
+      if(!json.success) throw new Error(json.message);
+      setRows(p=>({...p,[type]:{data:json.data,loading:false,error:null}}));
+    }catch(e:any){
+      setRows(p=>({...p,[type]:{data:[],loading:false,error:e.message}}));
+    }
+  },[]);
+
+  const fetchAll=useCallback((cat:string)=>{
+    fetchRow('trending',cat); fetchRow('exclusive',cat); fetchRow('featured',cat);
+  },[fetchRow]);
+
+  useEffect(()=>{fetchAll(activeCategory);},[activeCategory,fetchAll]);
+
+  const handleCat=(cat:string)=>{ setActiveCategory(cat); router.push(cat==='ALL'?'/artists':`/artists?category=${encodeURIComponent(cat)}`); };
+  const handleSection=(sec:SectionType)=>{ setSectionVisible(false); setTimeout(()=>{setActiveSection(sec);setSectionVisible(true);},200); };
+  const openBooking=(a:Artist)=>{ setSelectedArtist({id:a.id,name:a.name}); setModalOpen(true); };
+  const openView=(a:Artist)=>{ setViewArtist(a); setViewModalOpen(true); };
+
+  const visibleRows = activeSection==='ALL' ? ROW_CONFIG : ROW_CONFIG.filter(r=>r.type===activeSection);
 
   return (
     <>
-      {/* ═══ HERO SECTION ═══ */}
-      <section className="relative pt-[110px] pb-16 md:pt-[120px] md:pb-20 overflow-hidden bg-[#000000]">
+      {/* HERO */}
+      <section className="relative overflow-hidden bg-[#000000]" style={{ paddingTop: '80px' }}>
         <div className="absolute top-0 left-0 w-full h-full pointer-events-none -z-10">
-          <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[80%] bg-[#d4a843]/10 blur-[150px] rounded-full animate-pulse" />
-          <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[70%] bg-[#ff4d4d]/5 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
+          <div className="absolute top-[-20%] left-[-10%] w-[60%] h-[80%] bg-[#d4a843]/10 blur-[150px] rounded-full animate-pulse"/>
+          <div className="absolute bottom-[-20%] right-[-10%] w-[50%] h-[70%] bg-[#ff4d4d]/5 blur-[120px] rounded-full animate-pulse" style={{animationDelay:'1s'}}/>
         </div>
-
         <div className="container relative z-10 text-center">
           <div className="inline-flex items-center gap-3 px-6 py-2 rounded-full border border-white/10 bg-white/5 backdrop-blur-md mb-6 animate-fadeIn">
-            <span className="w-2 h-2 rounded-full bg-[#d4a843] animate-ping" />
+            <span className="w-2 h-2 rounded-full bg-[#d4a843] animate-ping"/>
             <span className="text-[10px] font-black uppercase tracking-[4px] text-white/70">Premium Talent Roster</span>
           </div>
-          
           <h1 className="font-display text-4xl sm:text-5xl md:text-7xl font-black text-white tracking-tighter uppercase mb-8 leading-[1] animate-slideUp">
             Browse &amp;&nbsp;<span className="text-gradient">Book Artists</span>
           </h1>
-
-          <div className="flex justify-center gap-4 animate-fadeIn" style={{ animationDelay: '300ms' }}>
-            <div className="w-24 h-1 bg-gradient-to-r from-transparent to-[#d4a843] rounded-full" />
-            <div className="w-24 h-1 bg-gradient-to-l from-transparent to-[#d4a843] rounded-full" />
+          <div className="flex justify-center gap-4 animate-fadeIn" style={{animationDelay:'300ms'}}>
+            <div className="w-24 h-1 bg-gradient-to-r from-transparent to-[#d4a843] rounded-full"/>
+            <div className="w-24 h-1 bg-gradient-to-l from-transparent to-[#d4a843] rounded-full"/>
           </div>
         </div>
       </section>
 
-      {/* ═══ FILTER & INTENT SECTION ═══ */}
-      <section className="bg-[#050505] border-y border-white/5">
-        <div className="container py-12">
-          <IntentSection />
+      {/* INTENT */}
+      <section className="bg-[#050505] border-y border-white/5" style={{paddingTop:0}}>
+        <div className="container" style={{paddingTop:0}}>
+          <div style={{marginTop:'-2rem'}}><IntentSection/></div>
         </div>
       </section>
 
-      {/* ═══ CATEGORY FILTER BAR ═══ */}
-      <section className="discovery-filter shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
-        <div className="container">
-          <div className="discovery-filter__inner">
-            {/* Filter icon */}
-            <span className="discovery-filter__icon" aria-hidden="true">
-              <FaSlidersH />
-            </span>
-            {/* Divider */}
-            <span className="discovery-filter__divider" />
-            {/* Pills */}
-            {CATEGORIES.map((cat) => (
-              <button
-                key={cat}
-                onClick={() => handleCategory(cat)}
-                className={`discovery-filter__pill ${activeCategory === cat ? 'discovery-filter__pill--active' : ''}`}
-              >
-                {cat}
-              </button>
-            ))}
+      {/* STICKY FILTER */}
+      <section className={s.stickyNav}>
+        <div className="container" style={{padding:'0 2rem'}}>
+          {/* Section Tabs */}
+          <div className={s.tabBar}>
+            {SECTION_TABS.map(tab=>{
+              const isActive=activeSection===tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  onClick={()=>handleSection(tab.id)}
+                  className={`${s.tabBtn} ${isActive?s.tabBtnActive:''}`}
+                  style={{'--tab-color':tab.color} as React.CSSProperties}
+                >
+                  <span className={s.tabIcon}>{tab.icon}</span>
+                  <span className={s.tabLabel}>{tab.label}</span>
+                  {isActive&&<span className={s.tabActiveDot}/>}
+                </button>
+              );
+            })}
+          </div>
+
+          {/* Category Pills */}
+          <div className={s.filterBar}>
+            <div className={s.filterLabel}>
+              <FaUsers style={{fontSize:10, opacity:0.6}} />
+              <span>Filter by Type</span>
+            </div>
+            <div className={s.filterDivider} />
+            <div className={s.filterPills}>
+              {CATEGORIES.map(cat => {
+                const isActive = activeCategory === cat.label;
+                return (
+                  <button
+                    key={cat.label}
+                    onClick={() => handleCat(cat.label)}
+                    className={`${s.filterPill} ${isActive ? s.filterPillActive : ''}`}
+                  >
+                    <span>{cat.icon}</span>
+                    <span>{cat.label}</span>
+                    {isActive && <span className={s.filterPillDot} />}
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </section>
 
-      {/* ═══ 3 ROWS ═══ */}
-      <section className="discovery-section">
-        <div className="container">
-          {ROW_CONFIG.map((config) => (
-            <ArtistRow
-              key={config.type}
-              config={config}
-              state={rows[config.type]}
-              onRetry={() => fetchRow(config.type, activeCategory)}
-              onView={openView}
-              onBook={openBooking}
-            />
-          ))}
+      {/* CONTENT */}
+      <section style={{background:'#000',minHeight:'80vh',padding:'48px 0 80px'}}>
+        <div className="container" style={{opacity:sectionVisible?1:0,transform:sectionVisible?'translateY(0)':'translateY(16px)',transition:'opacity 0.25s ease,transform 0.25s ease'}}>
+          {visibleRows.map(cfg=>{
+            const accentColors:Record<string,string>={trending:'#ff6b35',exclusive:'#d4a843',featured:'#a78bfa'};
+            const color=accentColors[cfg.type];
+            return (
+              <div key={cfg.type} style={{marginBottom:64}}>
+                {cfg.type==='trending'&&(
+                  <TrendingLayout artists={rows.trending.data} loading={rows.trending.loading}
+                    error={rows.trending.error} onRetry={()=>fetchRow('trending',activeCategory)}
+                    onView={openView} onBook={openBooking}/>
+                )}
+                {cfg.type==='exclusive'&&(
+                  <ExclusiveLayout artists={rows.exclusive.data} loading={rows.exclusive.loading}
+                    error={rows.exclusive.error} onRetry={()=>fetchRow('exclusive',activeCategory)}
+                    onView={openView} onBook={openBooking}/>
+                )}
+                {cfg.type==='featured'&&(
+                  <FeaturedLayout artists={rows.featured.data} loading={rows.featured.loading}
+                    error={rows.featured.error} onRetry={()=>fetchRow('featured',activeCategory)}
+                    onView={openView} onBook={openBooking}/>
+                )}
+              </div>
+            );
+          })}
         </div>
       </section>
 
-      {/* ═══ MODALS ═══ */}
-      {viewModalOpen && viewArtist && (
-        <ArtistDetailsModal
-          artist={viewArtist}
-          onClose={() => setViewModalOpen(false)}
-          onBook={() => {
-            setViewModalOpen(false);
-            openBooking(viewArtist);
-          }}
-        />
+      {viewModalOpen&&viewArtist&&(
+        <ArtistDetailsModal artist={viewArtist} onClose={()=>setViewModalOpen(false)}
+          onBook={()=>{setViewModalOpen(false);openBooking(viewArtist);}}/>
       )}
-
-      {modalOpen && (
-        <BookingModal
-          onClose={() => setModalOpen(false)}
-          artistName={selectedArtist?.name}
-          artistId={selectedArtist?.id}
-        />
+      {modalOpen&&(
+        <BookingModal onClose={()=>setModalOpen(false)}
+          artistName={selectedArtist?.name} artistId={selectedArtist?.id}/>
       )}
     </>
   );
 }
 
-/* ══════════════════════════════════════════════════════════
-   PAGE EXPORT
-   ══════════════════════════════════════════════════════════ */
-export default function ArtistsPage() {
+export default function ArtistsPage(){
   return (
-    <Suspense
-      fallback={
-        <div className="min-h-screen bg-[#000] flex items-center justify-center">
-          <div className="text-[#d4a843] animate-pulse text-lg tracking-widest uppercase">Loading...</div>
-        </div>
-      }
-    >
-      <ArtistsDiscoveryContent />
+    <Suspense fallback={<div className="min-h-screen bg-[#000] flex items-center justify-center"><div className="text-[#d4a843] animate-pulse text-lg tracking-widest uppercase">Loading...</div></div>}>
+      <ArtistsDiscoveryContent/>
     </Suspense>
   );
 }

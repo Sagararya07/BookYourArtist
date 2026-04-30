@@ -31,12 +31,13 @@
   --orange-glow:      rgba(184, 134, 11, 0.3);
   --orange-gradient:  linear-gradient(135deg, #8b6914 0%, #b8860b 40%, #daa520 70%, #f1c40f 100%);
 
-  /* Keep gold variables as aliases for backwards compatibility */
-  --gold:             #b8860b;
-  --gold-light:       #daa520;
-  --gold-dark:        #8b6914;
-  --gold-glow:        rgba(184, 134, 11, 0.3);
-  --gold-gradient:    linear-gradient(135deg, #8b6914 0%, #b8860b 40%, #daa520 70%, #f1c40f 100%);
+  /* Magic / AI Colors (Google Gemini Style) */
+  --ai-gradient: linear-gradient(90deg, #4285f4, #9b72cb, #d96570, #f4b400, #4285f4);
+  --ai-glow: rgba(155, 114, 203, 0.4);
+  --ai-glow-subtle: rgba(155, 114, 203, 0.15);
+  --ai-border: linear-gradient(90deg, #4285f4, #9b72cb, #d96570, #9b72cb, #4285f4);
+  --ai-border-subtle: rgba(155, 114, 203, 0.3);
+  --ai-border-glow: rgba(155, 114, 203, 0.1);
 
 
 
@@ -247,19 +248,65 @@ p {
   cursor: pointer;
   white-space: nowrap;
   position: relative;
-  overflow: hidden;
+  z-index: 0;
 }
 
-.btn::after {
+/* ─── Google AI / Gemini Flowing Edge ─── */
+.btn::before {
   content: '';
   position: absolute;
-  inset: 0;
-  background: rgba(255,255,255,0.08);
-  opacity: 0;
-  transition: opacity var(--transition-fast);
+  inset: -2px;
+  padding: 2.5px; /* Slightly thicker for AI glow */
+  background: var(--ai-border);
+  background-size: 300% 300%;
+  border-radius: inherit;
+  
+  /* Masking trick to show ONLY the edge */
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0; /* Invisible by default */
+  transition: opacity 0.1s ease;
+  z-index: 2;
+  pointer-events: none;
 }
 
-.btn:hover::after { opacity: 1; }
+.btn:hover::before,
+.btn:active::before {
+  opacity: 1 !important;
+  animation: :global(aiFlow) 2s linear infinite !important;
+  transition: opacity 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  background: var(--ai-gradient) !important;
+  background-size: 200% auto !important;
+  animation: :global(aiFlow) 1.5s linear infinite !important;
+  color: #fff !important;
+  transform: translateY(0);
+}
+
+/* Ensure animation stops when not hovered/active */
+.btn:not(:hover):not(:active)::before {
+  animation: none !important;
+  opacity: 0 !important;
+}
+
+@keyframes aiFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+/* Global animation class for easy access */
+.ai-animate {
+  animation: aiFlow 3s linear infinite !important;
+}
 
 /* Primary — Orange */
 .btn-primary {
@@ -273,7 +320,21 @@ p {
   background: #c0c0c0;
   color: #333;
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(192, 192, 192, 0.4);
+}
+
+.btn-primary:hover {
+  background: var(--orange) !important;
+  color: #fff !important;
+  box-shadow: 0 0 25px var(--orange-glow);
+  transform: translateY(-2px);
+}
+
+.btn-primary:active {
+  background: var(--ai-gradient) !important;
+  background-size: 200% auto !important;
+  color: #fff !important;
+  box-shadow: 0 0 40px var(--ai-glow);
+  animation: :global(aiFlow) 1.5s linear infinite !important;
 }
 
 .btn-primary:active {
@@ -368,6 +429,12 @@ p {
   border-color: var(--border-gold);
   transform: translateY(-6px);
   box-shadow: 0 12px 40px rgba(230, 126, 34, 0.15);
+}
+
+.artist-card:active {
+  transform: translateY(-2px) scale(0.97);
+  box-shadow: 0 4px 20px rgba(212,168,67,0.3), inset 0 0 20px rgba(212,168,67,0.06);
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
 }
 
 .artist-card-image {
@@ -709,6 +776,38 @@ textarea.form-control {
 
 @keyframes spin {
   to { transform: rotate(360deg); }
+}
+
+/* ── Card press ripple ── */
+@keyframes cardRipple {
+  0%   { transform:scale(0);   opacity:0.55; }
+  70%  { transform:scale(2.5); opacity:0.18; }
+  100% { transform:scale(3.5); opacity:0; }
+}
+
+/* ── Gold Card Animations ── */
+@keyframes goldGlowPulse {
+  0%, 100% {
+    box-shadow:
+      0 0 12px rgba(212,168,67,0.25),
+      0 0 28px rgba(212,168,67,0.10),
+      0 8px 32px rgba(0,0,0,0.55);
+    border-color: rgba(212,168,67,0.28);
+  }
+  50% {
+    box-shadow:
+      0 0 22px rgba(212,168,67,0.55),
+      0 0 55px rgba(212,168,67,0.22),
+      0 8px 32px rgba(0,0,0,0.55);
+    border-color: rgba(212,168,67,0.65);
+  }
+}
+
+@keyframes goldShimmerSweep {
+  0%   { transform: translateX(-160%) skewX(-18deg); opacity: 0; }
+  15%  { opacity: 1; }
+  85%  { opacity: 1; }
+  100% { transform: translateX(360%) skewX(-18deg); opacity: 0; }
 }
 
 /* Animation classes */
@@ -1107,12 +1206,21 @@ textarea.form-control {
 .discovery-filter__inner {
   display: flex;
   align-items: center;
+  gap: 16px;
+  width: 100%;
+}
+
+.discovery-filter__pills {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   gap: 10px;
+  flex: 1;
   overflow-x: auto;
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
-.discovery-filter__inner::-webkit-scrollbar { display: none; }
+.discovery-filter__pills::-webkit-scrollbar { display: none; }
 
 .discovery-filter__pill {
   flex-shrink: 0;
@@ -1645,6 +1753,10 @@ textarea.form-control {
   }
 
   .discovery-filter__inner {
+    gap: 12px;
+  }
+
+  .discovery-filter__pills {
     gap: 8px;
   }
 

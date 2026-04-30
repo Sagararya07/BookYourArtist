@@ -145,7 +145,7 @@
 
 /* ─── OUR STORY ──────────────────────────────────────── */
 .storySection {
-  padding: 6rem 0;
+  padding: 5rem 0;
   background: var(--bg-primary);
 }
 
@@ -282,7 +282,7 @@
 
 /* ─── MISSION & VISION ───────────────────────────────── */
 .missionSection {
-  padding: 6rem 0;
+  padding: 5rem 0;
   background: linear-gradient(180deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
 }
 
@@ -363,7 +363,7 @@
 
 /* ─── VALUES ─────────────────────────────────────────── */
 .valuesSection {
-  padding: 6rem 0;
+  padding: 5rem 0;
   background: var(--bg-primary);
 }
 
@@ -489,7 +489,7 @@
 
 /* ─── TEAM ───────────────────────────────────────────── */
 .teamSection {
-  padding: 6rem 0;
+  padding: 5rem 0;
   background: linear-gradient(180deg, var(--bg-primary) 0%, var(--bg-secondary) 100%);
 }
 
@@ -897,7 +897,7 @@
 
 
 .ctaSection {
-  padding: 6rem 0;
+  padding: 5rem 0;
   background: linear-gradient(135deg, #0a0a0a 0%, #000000 50%, #0a0a0a 100%);
   position: relative;
   overflow: hidden;
@@ -989,7 +989,7 @@
   .valuesSection,
   .teamSection,
   .ctaSection {
-    padding: 3.5rem 0;
+    padding: 2.5rem 0;
   }
 
   .missionGrid {

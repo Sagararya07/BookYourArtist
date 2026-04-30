@@ -44,7 +44,7 @@ export default function Header() {
             <img src="/logo.png" alt="Artistvibes Entertainment" className={styles.logoImg} />
           </Link>
           <div className={styles.topRight}>
-            <Link href="/contact" className={styles.contactBtn}>Contact Us</Link>
+            <Link href="/contact" className={`btn ${styles.contactBtn}`}>Get Started</Link>
           </div>
         </div>
       </div>

@@ -234,11 +234,37 @@
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 20px rgba(184, 134, 11, 0.3);
+  position: relative;
+  z-index: 0;
+}
+
+.submitBtn::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  padding: 2.5px;
+  background: var(--ai-border);
+  background-size: 300% 300%;
+  border-radius: inherit;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.5s ease;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .submitBtn:hover {
   transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(184, 134, 11, 0.45);
+  box-shadow: 0 8px 30px var(--ai-glow);
+}
+
+.submitBtn:hover::before,
+.submitBtn:active::before {
+  opacity: 1;
+  animation: :global(aiFlow) 2s linear infinite;
 }
 
 .submitBtn:active {

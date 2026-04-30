@@ -7,7 +7,7 @@ export async function GET() {
       prisma.artist.findMany({
         where: { isTrending: true, isActive: true },
         orderBy: { order: 'asc' },
-        take: 5, // We only need 5 for the collage
+        // no take limit — fetch all trending artists for cycling
       })
     );
     return NextResponse.json({ success: true, data: trendingArtists });

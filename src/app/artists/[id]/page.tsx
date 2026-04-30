@@ -48,7 +48,7 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
   }
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] pt-32 pb-20">
+    <div className="min-h-screen bg-[#0a0a0f] pt-40 md:pt-48 pb-20">
       <div className="container max-w-6xl mx-auto">
         <button onClick={() => router.push('/artists')} className="flex items-center gap-2 text-gray-400 hover:text-[#d4a843] mb-8 transition-colors font-semibold">
           <FaArrowLeft /> Back to Artists
@@ -96,7 +96,7 @@ export default function ArtistDetailPage({ params }: { params: Promise<{ id: str
               </div>
             </div>
 
-            <h3 className="text-white font-display text-2xl mb-4">About the Artist</h3>
+            <h2 className="text-white font-display text-2xl mb-4">About the Artist</h2>
             <p className="text-gray-300 text-lg leading-relaxed mb-10">
               {artist.bio || "Experience a mesmerizing performance that brings emotions to life. This artist specializes in delivering top-tier entertainment tailored to make your event unforgettable. From intimate gatherings to grand stage performances, they bring unparalleled energy and professionalism. Book now to secure your date and elevate your event!"}
             </p>

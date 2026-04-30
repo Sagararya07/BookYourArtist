@@ -213,7 +213,7 @@
 
 /* ─── SERVICES SECTION ───────────────────────────────── */
 .servicesSection {
-  padding: 8rem 0 6rem;
+  padding: 5rem 0 3rem;
   background: linear-gradient(180deg, #000000 0%, #111111 50%, #000000 100%);
   position: relative;
   overflow: hidden;
@@ -306,7 +306,7 @@
 
 /* ─── ABOUT / EXPERIENCE SECTION ─────────────────────── */
 .aboutSection {
-  padding: 7rem 0;
+  padding: 5rem 0;
   background: linear-gradient(180deg, #000000 0%, #0a0a0a 100%);
   position: relative;
   overflow: hidden;
@@ -494,7 +494,7 @@
 
 /* ─── TESTIMONIALS SECTION ───────────────────────────── */
 .testimonialsSection {
-  padding: 7rem 0;
+  padding: 5rem 0;
   background: linear-gradient(180deg, #000000 0%, #0f0f0f 50%, #000000 100%);
   position: relative;
   overflow: hidden;
@@ -685,11 +685,11 @@
   }
 
   .servicesSection {
-    padding: 4rem 0;
+    padding: 3rem 0;
   }
 
   .aboutSection {
-    padding: 4rem 0;
+    padding: 3rem 0;
   }
 
   .aboutGrid {
@@ -701,7 +701,7 @@
   }
 
   .testimonialsSection {
-    padding: 4rem 0;
+    padding: 3rem 0;
   }
 }
 
@@ -726,15 +726,15 @@
   }
 
   .servicesSection {
-    padding: 3rem 0;
+    padding: 2.5rem 0;
   }
 
   .aboutSection {
-    padding: 3rem 0;
+    padding: 2.5rem 0;
   }
 
   .testimonialsSection {
-    padding: 3rem 0;
+    padding: 2.5rem 0;
   }
 
   .testimonialCard {

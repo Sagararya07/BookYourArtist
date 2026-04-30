@@ -70,6 +70,8 @@ export default function Home() {
   const aboutRef = useScrollAnimation();
   const testimonialsRef = useScrollAnimation();
 
+  const gridRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     async function fetchTestimonials() {
       try {
@@ -82,6 +84,23 @@ export default function Home() {
     }
     fetchTestimonials();
   }, []);
+
+  useEffect(() => {
+    if (testimonials.length <= 1) return;
+    const interval = setInterval(() => {
+      if (gridRef.current) {
+        const grid = gridRef.current;
+        const { scrollLeft, scrollWidth, clientWidth } = grid;
+        
+        if (scrollLeft + clientWidth >= scrollWidth - 20) {
+          grid.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          grid.scrollBy({ left: 400, behavior: 'smooth' });
+        }
+      }
+    }, 4000);
+    return () => clearInterval(interval);
+  }, [testimonials]);
 
   const openBooking = useCallback((artist?: { id: number; name: string }) => {
     setSelectedArtist(artist ? { id: artist.id, name: artist.name } : null);
@@ -212,7 +231,7 @@ export default function Home() {
                 <div className={styles.aboutFeatureItem}>
                   <FaStar className={styles.aboutFeatureIcon} />
                   <div>
-                    <h4>Professional Artists</h4>
+                    <h3>Professional Artists</h3>
                     <p>
                       Curated talent that meets the highest standards of the
                       industry, ensuring your event goes flawlessly.
@@ -222,7 +241,7 @@ export default function Home() {
                 <div className={styles.aboutFeatureItem}>
                   <FaMusic className={styles.aboutFeatureIcon} />
                   <div>
-                    <h4>Passionate Performances</h4>
+                    <h3>Passionate Performances</h3>
                     <p>
                       Every song, every beat is delivered with unmatched passion
                       to make your moments truly memorable.
@@ -250,7 +269,7 @@ export default function Home() {
             </p>
           </div>
 
-          <div className={styles.testimonialsGrid}>
+          <div className={styles.testimonialsGrid} ref={gridRef}>
             {testimonials.length > 0 ? testimonials.map((t, index) => (
               <div
                 key={t.id}

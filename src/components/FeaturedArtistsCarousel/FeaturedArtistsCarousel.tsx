@@ -39,19 +39,30 @@ export default function FeaturedArtistsCarousel() {
   const prev = () => setCurrent((c) => Math.max(0, c - 1));
   const next = () => setCurrent((c) => Math.min(maxIndex, c + 1));
 
+  useEffect(() => {
+    if (artists.length <= visibleCount) return;
+    const interval = setInterval(() => {
+      setCurrent((c) => (c >= maxIndex ? 0 : c + 1));
+    }, 3000);
+    return () => clearInterval(interval);
+  }, [artists.length, maxIndex, visibleCount]);
+
   const visibleArtists = artists.slice(current, current + visibleCount);
 
   return (
     <section className={styles.carouselSection}>
       <div className="container">
         {/* Header */}
-        <div className={styles.carouselHeader}>
-          <div className={styles.carouselTagLine}>
-            <div className={styles.carouselTagDash} />
-            <span className={styles.carouselTag}>Discover Talent</span>
+        <div className={styles.header}>
+          <div className={styles.tagLine}>
+            <div className={styles.tagDash} />
+            <span className={styles.tag}>Discover Talent</span>
+            <div className={styles.tagDash} />
           </div>
-          <h2 className={styles.carouselTitle}>Featured Artists</h2>
-          <p className={styles.carouselSubtitle}>
+          <h2 className={styles.title}>
+            Featured <span className={styles.highlight}>Artists</span>
+          </h2>
+          <p className={styles.subtitle}>
             Bring your events to the next level with the best artists — book top
             musicians, live singers, DJs, comedians, motivational speakers,
             emcees and more.

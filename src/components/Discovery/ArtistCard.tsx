@@ -56,10 +56,10 @@ export default function ArtistCard({ artist, onView, onBook }: ArtistCardProps) 
             : 'On Request'}
         </div>
         <div className={styles.cardButtons}>
-          <button className={styles.btnView} onClick={() => onView?.(artist)}>
+          <button className={`btn ${styles.btnView}`} onClick={() => onView?.(artist)}>
             View
           </button>
-          <button className={styles.btnBook} onClick={() => onBook?.(artist)}>
+          <button className={`btn ${styles.btnBook}`} onClick={() => onBook?.(artist)}>
             Book Now
           </button>
         </div>
