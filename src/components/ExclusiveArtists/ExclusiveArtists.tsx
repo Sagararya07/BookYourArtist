@@ -97,7 +97,7 @@ export default function ExclusiveArtists() {
         <div className={styles.bookContainer}>
           {/* Left Nav */}
           <button
-            className={`btn ${styles.navBtn} ${styles.navBtnLeft}`}
+            className={`${styles.navBtn} ${styles.navBtnLeft}`}
             onClick={() => navigate('prev')}
             disabled={flipping}
             aria-label="Previous artist"
@@ -159,7 +159,7 @@ export default function ExclusiveArtists() {
                     <span className={styles.priceValue}>{artist.price}</span>
                   </div>
 
-                  <a href="/artists" className={`btn ${styles.bookBtn}`}>
+                  <a href="/artists" className={`${styles.bookBtn}`}>
                     Book This Artist
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none">
                       <path d="M5 12h14M12 5l7 7-7 7" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
@@ -175,7 +175,7 @@ export default function ExclusiveArtists() {
 
           {/* Right Nav */}
           <button
-            className={`btn ${styles.navBtn} ${styles.navBtnRight}`}
+            className={`${styles.navBtn} ${styles.navBtnRight}`}
             onClick={() => navigate('next')}
             disabled={flipping}
             aria-label="Next artist"

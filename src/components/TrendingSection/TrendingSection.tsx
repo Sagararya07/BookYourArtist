@@ -27,21 +27,24 @@ export default function TrendingSection() {
     fetchTrending();
   }, []);
 
-  const [centerIndex, setCenterIndex] = useState(0);
+  const [startIndex, setStartIndex] = useState(0);
 
   useEffect(() => {
     if (artists.length === 0) return;
     const interval = setInterval(() => {
-      setCenterIndex((prev) => (prev + 1) % artists.length);
+      setStartIndex((prev) => (prev + 1) % artists.length);
     }, 3000);
     return () => clearInterval(interval);
   }, [artists.length]);
 
-  // 4 corner frames are fixed (artists 0-3), center cycles through all artists
-  const corners = artists.slice(0, 4);
-  const centerArtist = artists.length > 0 ? artists[centerIndex] : null;
+  const displayArtists: TrendingArtist[] = [];
+  for (let i = 0; i < 5; i++) {
+    if (artists.length > 0) {
+      displayArtists.push(artists[(startIndex + i) % artists.length]);
+    }
+  }
 
-  if (!centerArtist) return null;
+  if (displayArtists.length === 0) return null;
 
   return (
     <section className={styles.trendingSection}>
@@ -65,40 +68,37 @@ export default function TrendingSection() {
 
           <div className={styles.collageGrid}>
             {/* Top Left */}
-            {corners[0] && (
+            {displayArtists[0] && (
               <div className={`${styles.artistFrame} ${styles.topLeft}`}>
-                <img src={corners[0].imageUrl} alt={corners[0].name} />
+                <img key={displayArtists[0].id} src={displayArtists[0].imageUrl} alt={displayArtists[0].name} className={styles.fadeImg} />
                 <div className={styles.neonGlow}></div>
               </div>
             )}
             {/* Top Right */}
-            {corners[1] && (
+            {displayArtists[1] && (
               <div className={`${styles.artistFrame} ${styles.topRight}`}>
-                <img src={corners[1].imageUrl} alt={corners[1].name} />
+                <img key={displayArtists[1].id} src={displayArtists[1].imageUrl} alt={displayArtists[1].name} className={styles.fadeImg} />
                 <div className={styles.neonGlow}></div>
               </div>
             )}
             {/* CENTER — cycles through all artists */}
-            <div className={`${styles.artistFrame} ${styles.center}`}>
-              <img
-                key={centerArtist.id}
-                src={centerArtist.imageUrl}
-                alt={centerArtist.name}
-                className={styles.fadeImg}
-              />
-              <div className={styles.neonGlow}></div>
-            </div>
+            {displayArtists[2] && (
+              <div className={`${styles.artistFrame} ${styles.center}`}>
+                <img key={displayArtists[2].id} src={displayArtists[2].imageUrl} alt={displayArtists[2].name} className={styles.fadeImg} />
+                <div className={styles.neonGlow}></div>
+              </div>
+            )}
             {/* Bottom Left */}
-            {corners[2] && (
+            {displayArtists[3] && (
               <div className={`${styles.artistFrame} ${styles.bottomLeft}`}>
-                <img src={corners[2].imageUrl} alt={corners[2].name} />
+                <img key={displayArtists[3].id} src={displayArtists[3].imageUrl} alt={displayArtists[3].name} className={styles.fadeImg} />
                 <div className={styles.neonGlow}></div>
               </div>
             )}
             {/* Bottom Right */}
-            {corners[3] && (
+            {displayArtists[4] && (
               <div className={`${styles.artistFrame} ${styles.bottomRight}`}>
-                <img src={corners[3].imageUrl} alt={corners[3].name} />
+                <img key={displayArtists[4].id} src={displayArtists[4].imageUrl} alt={displayArtists[4].name} className={styles.fadeImg} />
                 <div className={styles.neonGlow}></div>
               </div>
             )}

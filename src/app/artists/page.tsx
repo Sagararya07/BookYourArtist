@@ -442,31 +442,6 @@ function ArtistsDiscoveryContent(){
               );
             })}
           </div>
-
-          {/* Category Pills */}
-          <div className={s.filterBar}>
-            <div className={s.filterLabel}>
-              <FaUsers style={{fontSize:10, opacity:0.6}} />
-              <span>Filter by Type</span>
-            </div>
-            <div className={s.filterDivider} />
-            <div className={s.filterPills}>
-              {CATEGORIES.map(cat => {
-                const isActive = activeCategory === cat.label;
-                return (
-                  <button
-                    key={cat.label}
-                    onClick={() => handleCat(cat.label)}
-                    className={`${s.filterPill} ${isActive ? s.filterPillActive : ''}`}
-                  >
-                    <span>{cat.icon}</span>
-                    <span>{cat.label}</span>
-                    {isActive && <span className={s.filterPillDot} />}
-                  </button>
-                );
-              })}
-            </div>
-          </div>
         </div>
       </section>
 

@@ -250,7 +250,7 @@ export default function Home() {
                 </div>
               </div>
 
-              <Link href="/about" className="btn btn-secondary rounded-full">
+              <Link href="/about" className="btn btn-secondary">
                 Discover More
               </Link>
             </div>

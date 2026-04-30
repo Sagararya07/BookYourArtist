@@ -32,12 +32,12 @@
   --orange-gradient:  linear-gradient(135deg, #8b6914 0%, #b8860b 40%, #daa520 70%, #f1c40f 100%);
 
   /* Magic / AI Colors (Google Gemini Style) */
-  --ai-gradient: linear-gradient(90deg, #4285f4, #9b72cb, #d96570, #f4b400, #4285f4);
-  --ai-glow: rgba(155, 114, 203, 0.4);
-  --ai-glow-subtle: rgba(155, 114, 203, 0.15);
-  --ai-border: linear-gradient(90deg, #4285f4, #9b72cb, #d96570, #9b72cb, #4285f4);
-  --ai-border-subtle: rgba(155, 114, 203, 0.3);
-  --ai-border-glow: rgba(155, 114, 203, 0.1);
+  --ai-gradient: conic-gradient(from 0deg, #4285f4, #ea4335, #fbbc05, #34a853, #4285f4);
+  --ai-glow: rgba(66, 133, 244, 0.4);
+  --ai-glow-subtle: rgba(66, 133, 244, 0.15);
+  --ai-border: conic-gradient(from 0deg, #4285f4, #ea4335, #fbbc05, #34a853, #4285f4);
+  --ai-border-subtle: rgba(66, 133, 244, 0.3);
+  --ai-border-glow: rgba(66, 133, 244, 0.1);
 
 
 
@@ -234,150 +234,166 @@ p {
 }
 
 /* ─── BUTTONS ────────────────────────────────────────────── */
+/* ─── Premium AI Mode Pill Button ─── */
 .btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
-  padding: 14px 32px;
+  gap: 10px;
+  padding: 14px 36px;
   font-size: 0.95rem;
-  font-weight: 600;
-  border-radius: var(--radius-sm);
-  transition: all var(--transition-base);
+  font-weight: 700;
+  border-radius: 8px; /* Changed to rounded rectangle */
+  background: transparent; /* Background handled by ::after */
+  color: #fff;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   letter-spacing: 0.02em;
   cursor: pointer;
   white-space: nowrap;
   position: relative;
-  z-index: 0;
+  z-index: 1;
+  overflow: hidden; /* This clips the rotating background */
 }
 
-/* ─── Google AI / Gemini Flowing Edge ─── */
+/* The rotating gradient layer */
 .btn::before {
   content: '';
   position: absolute;
-  inset: -2px;
-  padding: 2.5px; /* Slightly thicker for AI glow */
+  width: 150%;
+  height: 400%;
+  top: -150%;
+  left: -25%;
   background: var(--ai-border);
-  background-size: 300% 300%;
-  border-radius: inherit;
-  
-  /* Masking trick to show ONLY the edge */
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
-  opacity: 0; /* Invisible by default */
-  transition: opacity 0.1s ease;
-  z-index: 2;
-  pointer-events: none;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: -2;
+}
+
+/* The white button face layer */
+.btn::after {
+  content: '';
+  position: absolute;
+  inset: 2px; /* Border thickness */
+  background: #111; /* Default dark */
+  border-radius: 8px; /* Match button radius */
+  z-index: -1;
+  transition: background 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(66, 133, 244, 0.2);
+  color: #000 !important;
+}
+
+.btn:hover::after {
+  background: #C0C0C0 !important; /* Silver on hover */
 }
 
 .btn:hover::before,
 .btn:active::before {
-  opacity: 1 !important;
-  animation: :global(aiFlow) 2s linear infinite !important;
-  transition: opacity 0.3s ease;
-}
-
-.btn:hover {
-  transform: translateY(-2px);
+  opacity: 1;
+  animation: aiRotate 3s linear infinite;
 }
 
 .btn:active {
-  background: var(--ai-gradient) !important;
-  background-size: 200% auto !important;
-  animation: :global(aiFlow) 1.5s linear infinite !important;
-  color: #fff !important;
-  transform: translateY(0);
+  transform: translateY(0) scale(0.98);
+  color: #000 !important;
 }
 
-/* Ensure animation stops when not hovered/active */
-.btn:not(:hover):not(:active)::before {
-  animation: none !important;
-  opacity: 0 !important;
+.btn:active::after {
+  background: #C0C0C0 !important; /* Silver on touch */
 }
 
-@keyframes aiFlow {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
+@keyframes aiRotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 
-/* Global animation class for easy access */
 .ai-animate {
-  animation: aiFlow 3s linear infinite !important;
+  animation: aiRotate 3s linear infinite !important;
 }
 
-/* Primary — Orange */
+/* Primary — Solid Gold Button */
 .btn-primary {
-  background: var(--orange);
   color: #fff;
-  box-shadow: 0 4px 20px var(--orange-glow);
-  border: 2px solid var(--orange);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.btn-primary::after {
+  background: var(--orange-gradient);
+  inset: 0; /* Remove border gap for solid button */
 }
 
 .btn-primary:hover {
-  background: #c0c0c0;
-  color: #333;
-  transform: translateY(-2px);
+  box-shadow: 0 10px 30px var(--orange-glow);
 }
 
-.btn-primary:hover {
-  background: var(--orange) !important;
-  color: #fff !important;
-  box-shadow: 0 0 25px var(--orange-glow);
-  transform: translateY(-2px);
+.btn-primary:hover::after {
+  inset: 2px; /* Reveal border on hover */
+  background: #C0C0C0 !important;
 }
 
-.btn-primary:active {
-  background: var(--ai-gradient) !important;
-  background-size: 200% auto !important;
-  color: #fff !important;
-  box-shadow: 0 0 40px var(--ai-glow);
-  animation: :global(aiFlow) 1.5s linear infinite !important;
-}
 
-.btn-primary:active {
-  transform: translateY(0);
-}
 
-/* Secondary — Outline orange */
+/* Secondary — Dark with Gold Outline */
 .btn-secondary {
-  background: transparent;
-  color: var(--orange);
-  border: 2px solid var(--orange);
+  color: var(--gold-primary);
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.btn-secondary::after {
+  background: #000;
+  inset: 2px; /* Leaves a 2px border gap */
+}
+
+.btn-secondary::before {
+  background: var(--gold-primary);
+  opacity: 1;
+}
+
+.btn-secondary:hover::before {
+  background: var(--ai-border);
+  opacity: 1;
 }
 
 .btn-secondary:hover {
-  background: #c0c0c0;
-  color: #333;
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px rgba(192, 192, 192, 0.4);
+  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+}
+
+.btn-secondary:hover::before {
+  /* Iridescent animation takes over on hover */
+  background: var(--ai-border);
+  opacity: 1;
 }
 
 /* Ghost — Dark glass */
 .btn-ghost {
-  background: var(--bg-glass);
+  background: rgba(255, 255, 255, 0.04);
   color: var(--text-primary);
   border: 1px solid var(--border);
   backdrop-filter: blur(10px);
 }
 
 .btn-ghost:hover {
-  background: var(--bg-glass-hover);
-  border-color: var(--border-hover);
-  transform: translateY(-2px);
+  background: #ffffff !important;
+  color: #000 !important;
+  border-color: transparent;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 30px rgba(255, 255, 255, 0.2);
 }
 
 /* Danger */
 .btn-danger {
-  background: var(--error);
+  background: #ef4444;
   color: #fff;
 }
 
 .btn-danger:hover {
-  background: #dc2626;
-  transform: translateY(-2px);
+  background: #ffffff !important;
+  color: #ef4444 !important;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 8px 30px rgba(239, 68, 68, 0.3);
 }
 
 /* Sizes */

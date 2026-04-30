@@ -223,52 +223,69 @@
   gap: 0.6rem;
   width: 100%;
   padding: 1rem 2rem;
-  background: var(--orange-gradient);
+  background: transparent;
   color: #fff;
   font-family: var(--font-body);
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: 0.03em;
   border: none;
-  border-radius: 0.75rem;
+  border-radius: 8px;
   cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 20px rgba(184, 134, 11, 0.3);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
   position: relative;
-  z-index: 0;
+  z-index: 1;
+  overflow: hidden;
 }
 
 .submitBtn::before {
   content: '';
   position: absolute;
-  inset: -2px;
-  padding: 2.5px;
+  width: 150%;
+  height: 450%;
+  top: -175%;
+  left: -25%;
   background: var(--ai-border);
-  background-size: 300% 300%;
-  border-radius: inherit;
-  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-  -webkit-mask-composite: xor;
-  mask-composite: exclude;
   opacity: 0;
   transition: opacity 0.5s ease;
-  z-index: 2;
-  pointer-events: none;
+  z-index: -2;
+}
+
+.submitBtn::after {
+  content: '';
+  position: absolute;
+  inset: 0; /* solid fill */
+  background: var(--orange-gradient);
+  border-radius: 8px;
+  z-index: -1;
+  transition: background 0.3s ease;
 }
 
 .submitBtn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 30px var(--ai-glow);
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 10px 30px var(--orange-glow);
+  color: #000 !important;
+}
+
+.submitBtn:hover::after {
+  inset: 2px;
+  background: #C0C0C0 !important;
 }
 
 .submitBtn:hover::before,
 .submitBtn:active::before {
   opacity: 1;
-  animation: :global(aiFlow) 2s linear infinite;
+  animation: :global(aiRotate) 3s linear infinite;
 }
 
 .submitBtn:active {
   transform: translateY(0);
+  color: #000 !important;
+}
+
+.submitBtn:active::after {
+  background: #C0C0C0 !important;
 }
 
 .submitIcon {
