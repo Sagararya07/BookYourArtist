@@ -283,6 +283,28 @@
 .collageOverlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(0,0,0,0.92) 0%,rgba(0,0,0,0.3) 45%,transparent 70%); display:flex; flex-direction:column; justify-content:flex-end; padding:14px; opacity:0; transition:opacity 0.3s ease; }
 .collageFrame:hover .collageOverlay { opacity:1; }
 .collageName { font-weight:800; font-size:15px; color:#fff; margin-bottom:2px; }
+.collageCatPill {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  z-index: 3;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: #d4a843;
+  border: 1px solid rgba(212,168,67,0.4);
+  border-radius: 4px;
+  padding: 3px 8px;
+  background: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(4px);
+  pointer-events: none;
+  transition: all 0.3s ease;
+}
+.collageFrame:hover .collageCatPill {
+  background: rgba(212, 168, 67, 0.2);
+  border-color: rgba(212, 168, 67, 0.7);
+}
 .collageCat { font-size:9px; font-weight:800; letter-spacing:0.18em; text-transform:uppercase; color:#d4a843; margin-bottom:10px; }
 .collageBtns { display:flex; gap:6px; }
 .collageBtnView { flex:1; padding:7px 0; font-size:10px; font-weight:800; border-radius:8px; background:rgba(255,255,255,0.1); color:#fff; border:1px solid rgba(255,255,255,0.25); cursor:pointer; text-transform:uppercase; letter-spacing:0.06em; transition:background 0.2s; }
@@ -623,6 +645,74 @@
 @keyframes ping {
   0%,100% { transform:scale(1); opacity:1; }
   50%      { transform:scale(1.6); opacity:0.5; }
+}
+
+.filterPillIcon {
+  font-size: 14px;
+  filter: grayscale(1) opacity(0.5);
+  transition: all 0.3s ease;
+}
+.filterPillActive .filterPillIcon {
+  filter: grayscale(0) opacity(1);
+  transform: scale(1.2);
+}
+
+.featuredFilterBtn {
+  background: rgba(167, 139, 250, 0.08) !important;
+  border: 1px solid rgba(167, 139, 250, 0.2) !important;
+  color: #a78bfa !important;
+  padding: 8px 20px !important;
+  transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1) !important;
+  gap: 8px !important;
+  overflow: hidden;
+}
+
+.featuredFilterBtn span {
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.featuredFilterBtn:hover {
+  background: rgba(167, 139, 250, 0.15) !important;
+  border-color: rgba(167, 139, 250, 0.5) !important;
+  box-shadow: 
+    0 0 20px rgba(167, 139, 250, 0.25),
+    0 0 40px rgba(167, 139, 250, 0.1);
+  transform: translateY(-2px) scale(1.05) !important;
+}
+
+.featuredFilterBtnActive {
+  background: rgba(167, 139, 250, 0.25) !important;
+  border-color: #a78bfa !important;
+  box-shadow: 0 0 25px rgba(167, 139, 250, 0.4) !important;
+}
+
+/* Magic purple liquid border for featured button */
+.featuredFilterBtn::after {
+  content: '';
+  position: absolute;
+  inset: -1.5px;
+  padding: 1.5px;
+  background: linear-gradient(
+    90deg,
+    #a78bfa, #c084fc, #818cf8, #c084fc, #a78bfa
+  );
+  background-size: 300% 300%;
+  border-radius: inherit;
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.featuredFilterBtn:hover::after,
+.featuredFilterBtnActive::after {
+  opacity: 0.8;
+  animation: goldFlow 3s linear infinite;
 }
 
 .sectionLabel { display:flex; align-items:center; gap:12px; margin-bottom:28px; }

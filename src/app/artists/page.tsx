@@ -93,8 +93,11 @@ function TrendingLayout({artists,onView,onBook,loading,error,onRetry}:{
                 {hasImg
                   ? <img key={a.id} src={a.imageUrl} alt={a.name} loading="lazy" className={s.collageFadeImg}/>
                   : <div className={s.collagePlaceholder}>{initials(a.name)}</div>}
+                
+                {/* Category pill top-left - always visible */}
+                <span className={s.collageCatPill}>{a.category}</span>
+
                 <div className={s.collageOverlay}>
-                  <div className={s.collageCat}>{a.category}</div>
                   <div className={s.collageName}>{a.name}</div>
                   <div className={s.collageBtns}>
                     <button className={s.collageBtnView} onClick={()=>onView(a)}>View</button>
@@ -442,6 +445,32 @@ function ArtistsDiscoveryContent(){
               );
             })}
           </div>
+
+          {/* Category Filter Bar - Hidden on 'ALL' section */}
+          {activeSection !== 'ALL' && (
+            <div className={s.filterBar} style={{ marginTop: '0', borderTop: 'none', background: 'transparent' }}>
+              <div className={s.filterLabel}>
+                <FaStar style={{ fontSize: 10, color: '#d4a843' }} /> Filter By
+              </div>
+              <div className={s.filterDivider} />
+              <div className={s.filterPills}>
+                {CATEGORIES.map(cat => {
+                  const isCatActive = activeCategory === cat.label;
+                  return (
+                    <button
+                      key={cat.label}
+                      onClick={() => handleCat(cat.label)}
+                      className={`${s.filterPill} ${isCatActive ? s.filterPillActive : ''}`}
+                    >
+                      <span className={s.filterPillIcon}>{cat.icon}</span>
+                      {cat.label}
+                      {isCatActive && <span className={s.filterPillDot} />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
