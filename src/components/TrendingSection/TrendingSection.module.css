@@ -1,0 +1,230 @@
+.trendingSection {
+  padding: 8rem 0;
+  background: #000000;
+  position: relative;
+  overflow: hidden;
+}
+
+.contentWrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rem;
+}
+
+.collageGrid {
+  position: relative;
+  width: 100%;
+  max-width: 1000px;
+  height: 600px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.artistFrame {
+  position: absolute;
+  border-radius: 20px;
+  overflow: hidden;
+  border: 2px solid rgba(212,168,67,0.35);
+  box-shadow: 0 0 14px rgba(212,168,67,0.18);
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+  cursor: pointer;
+}
+
+.artistFrame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.fadeImg {
+  animation: imgFadeIn 0.8s ease-in-out;
+}
+
+@keyframes imgFadeIn {
+  from { opacity: 0; transform: scale(1.05); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+.neonGlow {
+  position: absolute;
+  inset: -8px;
+  border-radius: 24px;
+  background: transparent;
+  box-shadow: 0 0 0 rgba(212,168,67,0);
+  pointer-events: none;
+  z-index: 1;
+  transition: box-shadow 0.4s ease;
+}
+
+.artistFrame:hover .neonGlow {
+  box-shadow: inset 0 0 20px rgba(212,168,67,0.4),
+              0 0 30px rgba(212,168,67,0.5),
+              0 0 60px rgba(212,168,67,0.25);
+}
+
+/* Positions based on the reference screenshot */
+.center {
+  width: 320px;
+  height: 420px;
+  z-index: 5;
+  transform: scale(1.1);
+  box-shadow: 0 0 40px rgba(212,168,67,0.5);
+}
+
+.topLeft {
+  width: 240px;
+  height: 300px;
+  top: 0;
+  left: 0;
+  z-index: 2;
+  transform: rotate(-5deg);
+}
+
+.topRight {
+  width: 240px;
+  height: 300px;
+  top: 0;
+  right: 0;
+  z-index: 2;
+  transform: rotate(5deg);
+}
+
+.bottomLeft {
+  width: 240px;
+  height: 300px;
+  bottom: 0;
+  left: 50px;
+  z-index: 3;
+  transform: rotate(-3deg);
+}
+
+.bottomRight {
+  width: 240px;
+  height: 300px;
+  bottom: 0;
+  right: 50px;
+  z-index: 3;
+  transform: rotate(3deg);
+}
+
+.artistFrame:hover {
+  transform: scale(1.06) rotate(0deg);
+  z-index: 10;
+  border-color: rgba(212,168,67,0.9);
+  box-shadow: 0 0 30px rgba(212,168,67,0.7),
+              0 0 70px rgba(212,168,67,0.3),
+              0 0 120px rgba(212,168,67,0.1);
+}
+
+.artistFrame:active {
+  transform: scale(0.97) rotate(0deg);
+  z-index: 10;
+  border-color: rgba(212,168,67,1);
+  box-shadow: 0 0 50px rgba(212,168,67,0.9),
+              inset 0 0 20px rgba(212,168,67,0.15);
+  transition: transform 0.1s ease, box-shadow 0.12s ease;
+}
+
+.textContent {
+  text-align: center;
+  z-index: 10;
+}
+
+.tagLine {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+}
+
+.tagDash {
+  width: 40px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, #C9A84C);
+}
+
+.tagDash:last-child {
+  background: linear-gradient(270deg, transparent, #C9A84C);
+}
+
+.tag {
+  color: #C9A84C;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+}
+
+.title {
+  font-family: var(--font-display);
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 1rem;
+  letter-spacing: -0.01em;
+}
+
+.highlight {
+  background: linear-gradient(135deg, #C9A84C, #E8C96A, #C9A84C);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.subtitle {
+  color: #888;
+  font-size: 1rem;
+  max-width: 42ch;
+  margin: 0 auto;
+  line-height: 1.7;
+}
+
+.vectorArt {
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 800;
+  color: #fff;
+  letter-spacing: 5px;
+  margin-bottom: 0.5rem;
+}
+
+.photoEditing {
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: #ff0000;
+  letter-spacing: 10px;
+  text-transform: uppercase;
+  background: rgba(255, 0, 0, 0.1);
+  padding: 5px 20px;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+@media (max-width: 768px) {
+  .collageGrid {
+    height: auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding: 0 1rem;
+  }
+
+  .artistFrame {
+    position: relative;
+    width: 100% !important;
+    height: 250px !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+  }
+
+  .center {
+    grid-column: span 2;
+    height: 350px !important;
+  }
+}
