@@ -48,7 +48,7 @@ export default function AboutPage() {
           className={styles.heroBgImage}
         />
         <div className={`container ${styles.heroContent}`}>
-          <span className={styles.heroTag}>About Artistvibes</span>
+          <span className={styles.heroTag}>About Us</span>
           <h1 className={styles.heroTitle}>
             Crafting Unforgettable <br />
             <span className="text-gradient">Entertainment Experiences</span>

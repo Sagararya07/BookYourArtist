@@ -1,0 +1,165 @@
+/* [project]/Downloads/bookyourartist/bookyourartist/src/components/Footer/Footer.module.css [app-client] (css) */
+.Footer-module__Lg-xka__footer {
+  background: var(--bg-secondary);
+  border-top: 1px solid var(--border);
+  margin-top: auto;
+  padding-top: 0;
+}
+
+.Footer-module__Lg-xka__topBar {
+  background: var(--orange-gradient);
+  height: 3px;
+}
+
+.Footer-module__Lg-xka__grid {
+  gap: var(--space-3xl);
+  padding: var(--space-3xl) 0 var(--space-2xl);
+  grid-template-columns: 1.8fr 1fr 1fr 1.4fr;
+  display: grid;
+}
+
+.Footer-module__Lg-xka__logo {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  margin-bottom: var(--space-md);
+  letter-spacing: -.02em;
+  font-size: 1.6rem;
+  font-weight: 800;
+  display: inline-block;
+}
+
+.Footer-module__Lg-xka__accent {
+  color: var(--orange);
+}
+
+.Footer-module__Lg-xka__logoImg {
+  object-fit: contain;
+  width: auto;
+  height: 100px;
+  margin-bottom: var(--space-md);
+}
+
+.Footer-module__Lg-xka__tagline {
+  color: var(--text-muted);
+  margin-bottom: var(--space-lg);
+  max-width: 280px;
+  font-size: .9rem;
+  line-height: 1.7;
+}
+
+.Footer-module__Lg-xka__socials {
+  gap: 10px;
+  display: flex;
+}
+
+.Footer-module__Lg-xka__socialBtn {
+  border-radius: var(--radius-md);
+  background: var(--bg-glass);
+  border: 1px solid var(--border);
+  width: 38px;
+  height: 38px;
+  color: var(--text-secondary);
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;
+  transition: all .25s;
+  display: flex;
+}
+
+.Footer-module__Lg-xka__socialBtn:hover {
+  background: var(--orange-glow);
+  border-color: var(--border-hover);
+  color: var(--orange);
+  transform: translateY(-3px);
+}
+
+.Footer-module__Lg-xka__socialWhatsapp:hover {
+  color: #25d366;
+  background: #25d3661a;
+  border-color: #25d36666;
+}
+
+.Footer-module__Lg-xka__colTitle {
+  font-family: var(--font-body);
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--orange);
+  margin-bottom: var(--space-lg);
+  font-size: .8rem;
+  font-weight: 700;
+}
+
+.Footer-module__Lg-xka__linkList {
+  flex-direction: column;
+  gap: 10px;
+  display: flex;
+}
+
+.Footer-module__Lg-xka__footerLink {
+  color: var(--text-muted);
+  font-size: .88rem;
+  transition: color .2s;
+}
+
+.Footer-module__Lg-xka__footerLink:hover {
+  color: var(--orange-light);
+}
+
+.Footer-module__Lg-xka__contactList {
+  flex-direction: column;
+  gap: 14px;
+  display: flex;
+}
+
+.Footer-module__Lg-xka__contactList li {
+  color: var(--text-muted);
+  align-items: flex-start;
+  gap: 10px;
+  font-size: .88rem;
+  line-height: 1.5;
+  display: flex;
+}
+
+.Footer-module__Lg-xka__contactIcon {
+  color: var(--orange);
+  flex-shrink: 0;
+  margin-top: 3px;
+  font-size: .9rem;
+}
+
+.Footer-module__Lg-xka__bottom {
+  border-top: 1px solid var(--border);
+  padding: var(--space-lg) 0;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-md);
+  flex-wrap: wrap;
+  display: flex;
+}
+
+.Footer-module__Lg-xka__bottom p {
+  color: var(--text-muted);
+  font-size: .82rem;
+}
+
+@media (max-width: 1024px) {
+  .Footer-module__Lg-xka__grid {
+    gap: var(--space-2xl);
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 600px) {
+  .Footer-module__Lg-xka__grid {
+    gap: var(--space-xl);
+    padding: var(--space-2xl) 0 var(--space-xl);
+    grid-template-columns: 1fr;
+  }
+
+  .Footer-module__Lg-xka__bottom {
+    text-align: center;
+    flex-direction: column;
+  }
+}
+
+/*# sourceMappingURL=0ipn_bookyourartist_bookyourartist_src_components_Footer_Footer_module_css_0w3-wzy._.single.css.map*/

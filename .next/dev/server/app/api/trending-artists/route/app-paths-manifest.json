@@ -1,0 +1,3 @@
+{
+  "/api/trending-artists/route": "app/api/trending-artists/route.js"
+}

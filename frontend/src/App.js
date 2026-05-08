@@ -30,7 +30,7 @@ const App = () => (
     <AuthProvider>
       <Routes>
         <Route path="/" element={<PublicLayout><Home /></PublicLayout>} />
-        <Route path="/about" element={<PublicLayout><About Us /></PublicLayout>} />
+        <Route path="/about" element={<PublicLayout><About /></PublicLayout>} />
         <Route path="/artists" element={<PublicLayout><Artists /></PublicLayout>} />
         <Route path="/contact" element={<PublicLayout><Contact /></PublicLayout>} />
         <Route path="/admin" element={<AdminLogin />} />

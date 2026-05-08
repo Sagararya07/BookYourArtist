@@ -22,7 +22,7 @@ const About = () => (
     <div className="page-hero">
       <div className="container">
         <span className="section-label">Who We Are</span>
-        <h1>About BookYourArtist</h1>
+        <h1>About Us</h1>
         <p>India's trusted platform for professional artist booking</p>
         <div className="gold-divider" />
       </div>

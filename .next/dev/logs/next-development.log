@@ -1,0 +1,8 @@
+{"timestamp":"00:00:01.082","source":"Server","level":"LOG","message":""}
+{"timestamp":"00:00:07.813","source":"Server","level":"LOG","message":"○ Compiling / ..."}
+{"timestamp":"00:00:12.255","source":"Browser","level":"INFO","message":"%cDownload the React DevTools for a better development experience: https://react.dev/link/react-devtools font-weight:bold"}
+{"timestamp":"00:00:15.874","source":"Server","level":"ERROR","message":"⨯ PrismaClientConstructorValidationError: Invalid value undefined for datasource \"db\" provided to PrismaClient constructor.\nIt should have this form: { url: \"CONNECTION_STRING\" }\nRead more at https://pris.ly/d/client-constructor"}
+{"timestamp":"00:00:16.413","source":"Server","level":"ERROR","message":"⨯ PrismaClientConstructorValidationError: Invalid value undefined for datasource \"db\" provided to PrismaClient constructor.\nIt should have this form: { url: \"CONNECTION_STRING\" }\nRead more at https://pris.ly/d/client-constructor"}
+{"timestamp":"00:00:16.441","source":"Server","level":"LOG","message":"○ Compiling /api/trending-artists ..."}
+{"timestamp":"00:00:16.999","source":"Server","level":"ERROR","message":"⨯ PrismaClientConstructorValidationError: Invalid value undefined for datasource \"db\" provided to PrismaClient constructor.\nIt should have this form: { url: \"CONNECTION_STRING\" }\nRead more at https://pris.ly/d/client-constructor"}
+{"timestamp":"00:00:17.240","source":"Server","level":"ERROR","message":"⨯ PrismaClientConstructorValidationError: Invalid value undefined for datasource \"db\" provided to PrismaClient constructor.\nIt should have this form: { url: \"CONNECTION_STRING\" }\nRead more at https://pris.ly/d/client-constructor"}

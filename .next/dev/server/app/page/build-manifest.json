@@ -1,0 +1,22 @@
+{
+  "devFiles": [],
+  "ampDevFiles": [],
+  "polyfillFiles": [
+    "static/chunks/0lo._next_dist_build_polyfills_polyfill-nomodule.js"
+  ],
+  "lowPriorityFiles": [],
+  "rootMainFiles": [
+    "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_0_89hhu._.js",
+    "static/chunks/0lo._next_dist_compiled_next-devtools_index_0d0mgyh.js",
+    "static/chunks/0lo._next_dist_compiled_react-dom_10lthyb._.js",
+    "static/chunks/0lo._next_dist_compiled_react-server-dom-turbopack_0oravvg._.js",
+    "static/chunks/0lo._next_dist_compiled_0g173iz._.js",
+    "static/chunks/0lo._next_dist_client_0lrv4nu._.js",
+    "static/chunks/0lo._next_dist_023knww._.js",
+    "static/chunks/0lo._@swc_helpers_cjs_0ss4dhl._.js",
+    "static/chunks/Downloads_bookyourartist_bookyourartist_0rqeker._.js",
+    "static/chunks/turbopack-Downloads_bookyourartist_bookyourartist_0__vqy1._.js"
+  ],
+  "pages": {},
+  "ampFirstPages": []
+}

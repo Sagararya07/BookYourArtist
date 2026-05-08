@@ -1,0 +1,42 @@
+/* [project]/Downloads/bookyourartist/bookyourartist/src/components/BookingModal/BookingModal.module.css [app-client] (css) */
+.BookingModal-module__Qfwj-q__success {
+  text-align: center;
+  padding: var(--space-xl) 0;
+  align-items: center;
+  gap: var(--space-md);
+  flex-direction: column;
+  display: flex;
+}
+
+.BookingModal-module__Qfwj-q__successIcon {
+  color: var(--success);
+  margin-bottom: var(--space-sm);
+  font-size: 4rem;
+  animation: .4s cubic-bezier(.175, .885, .32, 1.275) BookingModal-module__Qfwj-q__scaleIn;
+}
+
+.BookingModal-module__Qfwj-q__success h3 {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  font-size: 1.8rem;
+}
+
+.BookingModal-module__Qfwj-q__success p {
+  color: var(--text-secondary);
+  max-width: 400px;
+  font-size: 1rem;
+}
+
+@keyframes BookingModal-module__Qfwj-q__scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/*# sourceMappingURL=0mo__bookyourartist_src_components_BookingModal_BookingModal_module_css_0w3-wzy._.single.css.map*/
