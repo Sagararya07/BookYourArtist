@@ -49,7 +49,7 @@ function price(p:string|null|undefined){
 }
 
 /* ── TRENDING: collage of 5 images with auto-cycling ── */
-function TrendingLayout({artists,onView,onBook,loading,error,onRetry}:{
+function TrendingCollage({artists,onView,onBook,loading,error,onRetry}:{
   artists:Artist[];loading:boolean;error:string|null;onRetry:()=>void;
   onView:(a:Artist)=>void;onBook:(a:Artist)=>void;
 }){
@@ -93,8 +93,11 @@ function TrendingLayout({artists,onView,onBook,loading,error,onRetry}:{
                 {hasImg
                   ? <img key={a.id} src={a.imageUrl} alt={a.name} loading="lazy" className={s.collageFadeImg}/>
                   : <div className={s.collagePlaceholder}>{initials(a.name)}</div>}
+                
+                {/* Category pill top-left - always visible */}
+                <span className={s.collageCatPill}>{a.category}</span>
+
                 <div className={s.collageOverlay}>
-                  <div className={s.collageCat}>{a.category}</div>
                   <div className={s.collageName}>{a.name}</div>
                   <div className={s.collageBtns}>
                     <button className={s.collageBtnView} onClick={()=>onView(a)}>View</button>
@@ -106,6 +109,98 @@ function TrendingLayout({artists,onView,onBook,loading,error,onRetry}:{
           );
         })}
       </div>
+    </div>
+  );
+}
+
+/* ── TRENDING: 3-column Grid Gallery ── */
+function TrendingGrid({artists,onView,onBook,loading,error,onRetry}:{
+  artists:Artist[];loading:boolean;error:string|null;onRetry:()=>void;
+  onView:(a:Artist)=>void;onBook:(a:Artist)=>void;
+}){
+  const INITIAL_COUNT = 6; 
+  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
+  
+  const handleToggleView = () => {
+    if (visibleCount >= artists.length) {
+      setVisibleCount(INITIAL_COUNT);
+    } else {
+      setVisibleCount(visibleCount + 6);
+    }
+  };
+
+  if(loading) return <div style={{textAlign:'center',padding:'3rem',color:'rgba(255,255,255,0.3)'}}>Loading...</div>;
+  if(error) return <div className="discovery-row__error"><p>⚠️ {error}</p><button className="discovery-btn discovery-btn--retry" onClick={onRetry}><FaRedo/> Retry</button></div>;
+  if(!artists.length) return <div className="discovery-row__empty">No trending artists found.</div>;
+
+  const displayedItems = artists.slice(0, visibleCount);
+
+  return (
+    <div className={s.sectionContainer}>
+      <div className={s.exclHeading}>
+        <div className={s.exclHeadingLine}/>
+        <div className={s.exclHeadingText}>
+          <span className={s.exclHeadingPill}><FaFire style={{fontSize:8}}/> Trending Now</span>
+          <h2 className={s.exclHeadingTitle}>Trending <span>Artists</span></h2>
+        </div>
+        <div className={s.exclHeadingLine}/>
+      </div>
+
+      {/* 3-Column Grid */}
+      <div className={s.gridContainer}>
+        {displayedItems.map((item, index) => {
+          const hasImg = item.imageUrl && !item.imageUrl.startsWith('/images/');
+          return (
+            <div key={item.id || index} className={s.card}>
+              
+              {/* Top Image Section */}
+              <div className={s.imageWrapper}>
+                {hasImg ? (
+                  <img src={item.imageUrl} alt={item.name} className={s.image} loading="lazy" />
+                ) : (
+                  <div className={s.imagePlaceholder}>{initials(item.name)}</div>
+                )}
+                
+                {/* Floating Badges */}
+                <div className={s.topBadges}>
+                  <span className={s.categoryBadge}>{item.category}</span>
+                  <span className={s.ratingBadge}>★ {item.rating}.0</span>
+                </div>
+                
+                {/* Fade out overlay */}
+                <div className={s.imageOverlay}></div>
+              </div>
+              
+              {/* Bottom Content Section */}
+              <div className={s.cardContent}>
+                <h3 className={s.itemName}>{item.name}</h3>
+                <p className={s.itemLocation}><FaMapMarkerAlt style={{display:'inline',marginRight:4,color:'#d4a843'}}/> {item.location}</p>
+                
+                <div className={s.priceRow}>
+                  <span className={s.priceLabel}>FROM</span>
+                  <span className={s.priceValue}>{price(item.price)}</span>
+                </div>
+
+                {/* Action Buttons */}
+                <div className={s.cardActions}>
+                  <button className={s.btnOutline} onClick={() => onView(item)}>VIEW PROFILE</button>
+                  <button className={s.btnSolid} onClick={() => onBook(item)}>BOOK NOW</button>
+                </div>
+              </div>
+
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Show More / Less */}
+      {artists.length > INITIAL_COUNT && (
+        <div className={s.buttonContainer}>
+          <button onClick={handleToggleView} className={s.toggleButton}>
+            {visibleCount >= artists.length ? 'SHOW LESS' : 'SHOW MORE'}
+          </button>
+        </div>
+      )}
     </div>
   );
 }
@@ -442,6 +537,32 @@ function ArtistsDiscoveryContent(){
               );
             })}
           </div>
+
+          {/* Category Filter Bar - Hidden on 'ALL' section */}
+          {activeSection !== 'ALL' && (
+            <div className={s.filterBar} style={{ marginTop: '0', borderTop: 'none', background: 'transparent' }}>
+              <div className={s.filterLabel}>
+                <FaStar style={{ fontSize: 10, color: '#d4a843' }} /> Filter By
+              </div>
+              <div className={s.filterDivider} />
+              <div className={s.filterPills}>
+                {CATEGORIES.map(cat => {
+                  const isCatActive = activeCategory === cat.label;
+                  return (
+                    <button
+                      key={cat.label}
+                      onClick={() => handleCat(cat.label)}
+                      className={`${s.filterPill} ${isCatActive ? s.filterPillActive : ''}`}
+                    >
+                      <span className={s.filterPillIcon}>{cat.icon}</span>
+                      {cat.label}
+                      {isCatActive && <span className={s.filterPillDot} />}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
         </div>
       </section>
 
@@ -454,9 +575,15 @@ function ArtistsDiscoveryContent(){
             return (
               <div key={cfg.type} style={{marginBottom:64}}>
                 {cfg.type==='trending'&&(
-                  <TrendingLayout artists={rows.trending.data} loading={rows.trending.loading}
-                    error={rows.trending.error} onRetry={()=>fetchRow('trending',activeCategory)}
-                    onView={openView} onBook={openBooking}/>
+                  activeSection === 'trending' && activeCategory === 'ALL' ? (
+                    <TrendingGrid artists={rows.trending.data} loading={rows.trending.loading}
+                      error={rows.trending.error} onRetry={()=>fetchRow('trending',activeCategory)}
+                      onView={openView} onBook={openBooking}/>
+                  ) : (
+                    <TrendingCollage artists={rows.trending.data} loading={rows.trending.loading}
+                      error={rows.trending.error} onRetry={()=>fetchRow('trending',activeCategory)}
+                      onView={openView} onBook={openBooking}/>
+                  )
                 )}
                 {cfg.type==='exclusive'&&(
                   <ExclusiveLayout artists={rows.exclusive.data} loading={rows.exclusive.loading}
