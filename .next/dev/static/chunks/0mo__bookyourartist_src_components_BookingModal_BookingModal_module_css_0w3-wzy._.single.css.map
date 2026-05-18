@@ -1,0 +1,6 @@
+{
+  "version": 3,
+  "sources": [],
+  "sections": [
+    {"offset": {"line": 1, "column": 0}, "map": {"version":3,"sources":["turbopack:///[project]/Downloads/bookyourartist/bookyourartist/src/components/BookingModal/BookingModal.module.css"],"sourcesContent":[".success {\r\n  text-align: center;\r\n  padding: var(--space-xl) 0;\r\n  display: flex;\r\n  flex-direction: column;\r\n  align-items: center;\r\n  gap: var(--space-md);\r\n}\r\n\r\n.successIcon {\r\n  font-size: 4rem;\r\n  color: var(--success);\r\n  margin-bottom: var(--space-sm);\r\n  animation: scaleIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);\r\n}\r\n\r\n.success h3 {\r\n  font-family: var(--font-display);\r\n  font-size: 1.8rem;\r\n  color: var(--text-primary);\r\n}\r\n\r\n.success p {\r\n  color: var(--text-secondary);\r\n  font-size: 1rem;\r\n  max-width: 400px;\r\n}\r\n\r\n@keyframes scaleIn {\r\n  from { transform: scale(0); opacity: 0; }\r\n  to   { transform: scale(1); opacity: 1; }\r\n}\r\n"],"names":[],"mappings":"AAAA;;;;;;;;;AASA;;;;;;;AAOA;;;;;;AAMA;;;;;;AAMA"}}]
+}

@@ -1,0 +1,315 @@
+/* [project]/Downloads/bookyourartist/bookyourartist/src/components/FeaturedArtistsCarousel/FeaturedArtistsCarousel.module.css [app-client] (css) */
+.FeaturedArtistsCarousel-module__GwsKHa__carouselSection {
+  background: #0a0a0a;
+  padding: 5rem 0;
+}
+
+@media (max-width: 768px) {
+  .FeaturedArtistsCarousel-module__GwsKHa__carouselSection {
+    padding: 3rem 0;
+  }
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__header {
+  text-align: center;
+  margin-bottom: 5rem;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__tagLine {
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__tagDash {
+  background: linear-gradient(90deg, #0000, #c9a84c);
+  width: 40px;
+  height: 1px;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__tagDash:last-child {
+  background: linear-gradient(270deg, #0000, #c9a84c);
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__tag {
+  color: #c9a84c;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  font-size: .75rem;
+  font-weight: 700;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__title {
+  font-family: var(--font-display);
+  color: #fff;
+  letter-spacing: -.01em;
+  margin-bottom: 1rem;
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  font-weight: 800;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__highlight {
+  background: linear-gradient(135deg, #c9a84c, #e8c96a, #c9a84c);
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__subtitle {
+  color: #888;
+  max-width: 42ch;
+  margin: 0 auto;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__carouselRow {
+  align-items: center;
+  gap: 1rem;
+  display: flex;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__carouselBtn {
+  cursor: pointer;
+  border: none;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  justify-content: center;
+  align-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  transition: all .2s;
+  display: flex;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__carouselBtnDisabled {
+  color: #fff3;
+  cursor: default;
+  background: #ffffff0a;
+  border: 1px solid #ffffff14;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__carouselBtnPrev {
+  color: #c9a84c;
+  background: #c9a84c1a;
+  border: 1px solid #c9a84c4d;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__carouselBtnPrev:hover {
+  background: #c9a84c2e;
+  box-shadow: 0 0 14px #c9a84c40;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__carouselBtnNext {
+  color: #000;
+  background: linear-gradient(135deg, #c9a84c, #e8c96a);
+  box-shadow: 0 4px 18px #c9a84c66;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__carouselBtnNext:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 24px #c9a84c99;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__carouselCards {
+  flex: 1;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.25rem;
+  display: grid;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__carouselDots {
+  justify-content: center;
+  align-items: center;
+  gap: .5rem;
+  margin-top: 2.5rem;
+  display: flex;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__dot {
+  cursor: pointer;
+  background: #a8b2c04d;
+  border: none;
+  border-radius: 9999px;
+  width: 8px;
+  height: 8px;
+  padding: 0;
+  transition: all .3s;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__dotActive {
+  background: linear-gradient(90deg, #c9a84c, #e8c96a);
+  width: 22px;
+  box-shadow: 0 0 8px #c9a84c80;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistCard {
+  cursor: pointer;
+  -webkit-backdrop-filter: blur(12px);
+  background: #1a1a1a99;
+  border: 1px solid #d4a8432e;
+  border-radius: 2rem;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  min-height: 460px;
+  padding: 4.5rem 1.5rem;
+  transition: all .4s cubic-bezier(.4, 0, .2, 1);
+  animation: 3s ease-in-out infinite FeaturedArtistsCarousel-module__GwsKHa__goldGlowPulse;
+  display: flex;
+  position: relative;
+  overflow: hidden;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistCard:after {
+  content: "";
+  pointer-events: none;
+  z-index: 0;
+  background: linear-gradient(90deg, #0000, #d4a84324, #ffffdc14, #d4a84324, #0000);
+  width: 35%;
+  height: 200%;
+  animation: 4.5s ease-in-out infinite FeaturedArtistsCarousel-module__GwsKHa__goldShimmerSweep;
+  position: absolute;
+  top: -50%;
+  left: -20%;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistCard:hover {
+  background: #222c;
+  transform: translateY(-12px);
+  box-shadow: 0 0 0 1px #c9a84c80, 0 20px 50px #000000b3, 0 0 40px #c9a84c26;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistCard:active {
+  transition: transform .1s, box-shadow .12s;
+  transform: translateY(-3px)scale(.96);
+  box-shadow: 0 0 0 1px #c9a84c99, 0 8px 24px #0009, inset 0 0 22px #c9a84c1a;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistCardGlow {
+  pointer-events: none;
+  opacity: .3;
+  background-image: radial-gradient(at 50% 0, #c9a84c1f 0%, #0000 65%);
+  position: absolute;
+  inset: 0;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistAvatar {
+  width: 180px;
+  height: 180px;
+  margin-bottom: 2.5rem;
+  transition: transform .4s cubic-bezier(.4, 0, .2, 1);
+  position: relative;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistCard:hover .FeaturedArtistsCarousel-module__GwsKHa__artistAvatar {
+  transform: scale(1.05);
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistAvatarRing {
+  background: linear-gradient(135deg, #a8b2c0 0%, #a8b2c04d 50%, #d4dce6 100%);
+  border-radius: 9999px;
+  width: 100%;
+  height: 100%;
+  padding: 3px;
+  transition: all .3s;
+  box-shadow: 0 0 12px #a8b2c026;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistCard:hover .FeaturedArtistsCarousel-module__GwsKHa__artistAvatarRing {
+  background: linear-gradient(135deg, #c9a84c 0%, #d4dce6 50%, #e8c96a 100%);
+  box-shadow: 0 0 20px #c9a84c59, 0 0 6px #c9a84c33;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistAvatarInner {
+  border-radius: 9999px;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistAvatarInner img {
+  object-fit: cover;
+  object-position: center top;
+  filter: brightness(.95);
+  width: 100%;
+  height: 100%;
+  transition: filter .3s;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistCard:hover .FeaturedArtistsCarousel-module__GwsKHa__artistAvatarInner img {
+  filter: brightness(1.08) contrast(1.05);
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistCategory {
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  text-align: center;
+  color: #c9a84c;
+  margin-bottom: .5rem;
+  font-size: .8rem;
+  font-weight: 700;
+  transition: all .3s;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistCard:hover .FeaturedArtistsCarousel-module__GwsKHa__artistCategory {
+  color: #e8c96a;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistName {
+  letter-spacing: .02em;
+  text-align: center;
+  color: #d4dce6;
+  font-size: 1.25rem;
+  font-weight: 600;
+  transition: all .3s;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistCard:hover .FeaturedArtistsCarousel-module__GwsKHa__artistName {
+  color: #fff;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistUnderline {
+  background: linear-gradient(90deg, #c9a84c, #e8c96a);
+  border-radius: 9999px;
+  width: 0;
+  height: 2px;
+  margin-top: .5rem;
+  transition: all .3s;
+}
+
+.FeaturedArtistsCarousel-module__GwsKHa__artistCard:hover .FeaturedArtistsCarousel-module__GwsKHa__artistUnderline {
+  width: 28px;
+  box-shadow: 0 0 6px #c9a84c99;
+}
+
+@media (max-width: 1024px) {
+  .FeaturedArtistsCarousel-module__GwsKHa__carouselCards {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .FeaturedArtistsCarousel-module__GwsKHa__carouselCards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .FeaturedArtistsCarousel-module__GwsKHa__carouselRow {
+    gap: .5rem;
+  }
+
+  .FeaturedArtistsCarousel-module__GwsKHa__carouselBtn {
+    width: 2rem;
+    height: 2rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .FeaturedArtistsCarousel-module__GwsKHa__carouselCards {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*# sourceMappingURL=0d9r_components_FeaturedArtistsCarousel_FeaturedArtistsCarousel_module_css_0w3-wzy._.single.css.map*/

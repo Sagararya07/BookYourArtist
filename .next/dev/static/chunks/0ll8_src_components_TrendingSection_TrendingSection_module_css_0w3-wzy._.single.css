@@ -1,0 +1,231 @@
+/* [project]/Downloads/bookyourartist/bookyourartist/src/components/TrendingSection/TrendingSection.module.css [app-client] (css) */
+.TrendingSection-module__9_F5xa__trendingSection {
+  background: #000;
+  padding: 8rem 0;
+  position: relative;
+  overflow: hidden;
+}
+
+.TrendingSection-module__9_F5xa__contentWrapper {
+  flex-direction: column;
+  align-items: center;
+  gap: 4rem;
+  display: flex;
+}
+
+.TrendingSection-module__9_F5xa__collageGrid {
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 1000px;
+  height: 600px;
+  display: flex;
+  position: relative;
+}
+
+.TrendingSection-module__9_F5xa__artistFrame {
+  cursor: pointer;
+  border: 2px solid #d4a84359;
+  border-radius: 20px;
+  transition: transform .4s, box-shadow .4s, border-color .4s;
+  position: absolute;
+  overflow: hidden;
+  box-shadow: 0 0 14px #d4a8432e;
+}
+
+.TrendingSection-module__9_F5xa__artistFrame img {
+  object-fit: cover;
+  width: 100%;
+  height: 100%;
+}
+
+.TrendingSection-module__9_F5xa__fadeImg {
+  animation: .8s ease-in-out TrendingSection-module__9_F5xa__imgFadeIn;
+}
+
+@keyframes TrendingSection-module__9_F5xa__imgFadeIn {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.TrendingSection-module__9_F5xa__neonGlow {
+  pointer-events: none;
+  z-index: 1;
+  background: none;
+  border-radius: 24px;
+  transition: box-shadow .4s;
+  position: absolute;
+  inset: -8px;
+  box-shadow: 0 0 #d4a84300;
+}
+
+.TrendingSection-module__9_F5xa__artistFrame:hover .TrendingSection-module__9_F5xa__neonGlow {
+  box-shadow: inset 0 0 20px #d4a84366, 0 0 30px #d4a84380, 0 0 60px #d4a84340;
+}
+
+.TrendingSection-module__9_F5xa__center {
+  z-index: 5;
+  width: 320px;
+  height: 420px;
+  transform: scale(1.1);
+  box-shadow: 0 0 40px #d4a84380;
+}
+
+.TrendingSection-module__9_F5xa__topLeft {
+  z-index: 2;
+  width: 240px;
+  height: 300px;
+  top: 0;
+  left: 0;
+  transform: rotate(-5deg);
+}
+
+.TrendingSection-module__9_F5xa__topRight {
+  z-index: 2;
+  width: 240px;
+  height: 300px;
+  top: 0;
+  right: 0;
+  transform: rotate(5deg);
+}
+
+.TrendingSection-module__9_F5xa__bottomLeft {
+  z-index: 3;
+  width: 240px;
+  height: 300px;
+  bottom: 0;
+  left: 50px;
+  transform: rotate(-3deg);
+}
+
+.TrendingSection-module__9_F5xa__bottomRight {
+  z-index: 3;
+  width: 240px;
+  height: 300px;
+  bottom: 0;
+  right: 50px;
+  transform: rotate(3deg);
+}
+
+.TrendingSection-module__9_F5xa__artistFrame:hover {
+  z-index: 10;
+  border-color: #d4a843e6;
+  transform: scale(1.06)rotate(0);
+  box-shadow: 0 0 30px #d4a843b3, 0 0 70px #d4a8434d, 0 0 120px #d4a8431a;
+}
+
+.TrendingSection-module__9_F5xa__artistFrame:active {
+  z-index: 10;
+  border-color: #d4a843;
+  transition: transform .1s, box-shadow .12s;
+  transform: scale(.97)rotate(0);
+  box-shadow: 0 0 50px #d4a843e6, inset 0 0 20px #d4a84326;
+}
+
+.TrendingSection-module__9_F5xa__textContent {
+  text-align: center;
+  z-index: 10;
+}
+
+.TrendingSection-module__9_F5xa__tagLine {
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  display: flex;
+}
+
+.TrendingSection-module__9_F5xa__tagDash {
+  background: linear-gradient(90deg, #0000, #c9a84c);
+  width: 40px;
+  height: 1px;
+}
+
+.TrendingSection-module__9_F5xa__tagDash:last-child {
+  background: linear-gradient(270deg, #0000, #c9a84c);
+}
+
+.TrendingSection-module__9_F5xa__tag {
+  color: #c9a84c;
+  letter-spacing: .3em;
+  text-transform: uppercase;
+  font-size: .75rem;
+  font-weight: 700;
+}
+
+.TrendingSection-module__9_F5xa__title {
+  font-family: var(--font-display);
+  color: #fff;
+  letter-spacing: -.01em;
+  margin-bottom: 1rem;
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
+  font-weight: 800;
+}
+
+.TrendingSection-module__9_F5xa__highlight {
+  background: linear-gradient(135deg, #c9a84c, #e8c96a, #c9a84c);
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.TrendingSection-module__9_F5xa__subtitle {
+  color: #888;
+  max-width: 42ch;
+  margin: 0 auto;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.TrendingSection-module__9_F5xa__vectorArt {
+  color: #fff;
+  letter-spacing: 5px;
+  margin-bottom: .5rem;
+  font-family: Inter, sans-serif;
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  font-weight: 800;
+}
+
+.TrendingSection-module__9_F5xa__photoEditing {
+  color: red;
+  letter-spacing: 10px;
+  text-transform: uppercase;
+  background: #ff00001a;
+  border-radius: 4px;
+  padding: 5px 20px;
+  font-size: 1.2rem;
+  font-weight: 700;
+  display: inline-block;
+}
+
+@media (max-width: 768px) {
+  .TrendingSection-module__9_F5xa__collageGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    height: auto;
+    padding: 0 1rem;
+    display: grid;
+  }
+
+  .TrendingSection-module__9_F5xa__artistFrame {
+    position: relative;
+    width: 100% !important;
+    height: 250px !important;
+    inset: auto !important;
+    transform: none !important;
+  }
+
+  .TrendingSection-module__9_F5xa__center {
+    grid-column: span 2;
+    height: 350px !important;
+  }
+}
+
+/*# sourceMappingURL=0ll8_src_components_TrendingSection_TrendingSection_module_css_0w3-wzy._.single.css.map*/

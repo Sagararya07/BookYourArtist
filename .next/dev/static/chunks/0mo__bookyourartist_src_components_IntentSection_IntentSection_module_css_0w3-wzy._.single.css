@@ -1,0 +1,126 @@
+/* [project]/Downloads/bookyourartist/bookyourartist/src/components/IntentSection/IntentSection.module.css [app-client] (css) */
+.IntentSection-module__0Jrika__intentSection {
+  background: var(--bg-primary);
+  padding: 4rem 0;
+}
+
+.IntentSection-module__0Jrika__intentHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.IntentSection-module__0Jrika__intentTag {
+  background: var(--orange);
+  color: #fff;
+  text-transform: uppercase;
+  border-radius: 4px;
+  margin-bottom: 1rem;
+  padding: 4px 16px;
+  font-size: .8rem;
+  font-weight: 700;
+  display: inline-block;
+}
+
+.IntentSection-module__0Jrika__intentTitle {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  margin-bottom: 1rem;
+  font-size: clamp(2rem, 4vw, 2.8rem);
+  font-weight: 700;
+}
+
+.IntentSection-module__0Jrika__intentSubtitle {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+}
+
+.IntentSection-module__0Jrika__intentGrid {
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1.5rem;
+  display: grid;
+}
+
+.IntentSection-module__0Jrika__intentCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  cursor: pointer;
+  padding: 2.5rem 1.5rem;
+  text-decoration: none;
+  transition: all .35s;
+  display: block;
+  position: relative;
+  overflow: hidden;
+}
+
+.IntentSection-module__0Jrika__intentCard:after {
+  content: "";
+  pointer-events: none;
+  opacity: 0;
+  background: radial-gradient(at 50% 0, #b8860b0f 0%, #0000 60%);
+  transition: opacity .3s;
+  position: absolute;
+  inset: 0;
+}
+
+.IntentSection-module__0Jrika__intentCard:hover {
+  border-color: var(--border-gold);
+  transform: translateY(-6px);
+  box-shadow: 0 12px 40px #b8860b1f;
+}
+
+.IntentSection-module__0Jrika__intentCard:hover:after {
+  opacity: 1;
+}
+
+.IntentSection-module__0Jrika__intentIconWrap {
+  width: 3.5rem;
+  height: 3.5rem;
+  color: var(--orange);
+  background: #b8860b14;
+  border: 1px solid #b8860b33;
+  border-radius: 50%;
+  justify-content: center;
+  align-items: center;
+  margin: 0 auto 1.25rem;
+  font-size: 1.3rem;
+  transition: all .3s;
+  display: flex;
+}
+
+.IntentSection-module__0Jrika__intentCard:hover .IntentSection-module__0Jrika__intentIconWrap {
+  background: var(--orange);
+  color: #fff;
+  border-color: var(--orange);
+  box-shadow: 0 4px 20px #b8860b66;
+}
+
+.IntentSection-module__0Jrika__intentCardTitle {
+  font-family: var(--font-display);
+  color: var(--text-primary);
+  margin-bottom: .75rem;
+  font-size: 1.2rem;
+  font-weight: 700;
+  transition: color .3s;
+}
+
+.IntentSection-module__0Jrika__intentCardDesc {
+  color: var(--text-secondary);
+  font-size: .88rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 1024px) {
+  .IntentSection-module__0Jrika__intentGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 640px) {
+  .IntentSection-module__0Jrika__intentGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/*# sourceMappingURL=0mo__bookyourartist_src_components_IntentSection_IntentSection_module_css_0w3-wzy._.single.css.map*/
