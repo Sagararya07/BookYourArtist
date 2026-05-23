@@ -122,6 +122,7 @@
   transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
   z-index: 10;
   border: 1px solid rgba(255, 255, 255, 0.15);
+  animation: fabFloat 4s ease-in-out infinite;
 }
 
 .fab::before {
@@ -141,6 +142,7 @@
   z-index: 1; /* Lower than icon */
   pointer-events: none;
   filter: brightness(1.2);
+  animation: fabSpin 3s linear infinite;
 }
 
 .fab svg {
@@ -154,6 +156,7 @@
   box-shadow: 0 8px 40px var(--ai-glow);
   background: var(--ai-gradient);
   background-size: 200% auto;
+  animation-play-state: paused;
 }
 
 .fab:hover::before,
@@ -161,7 +164,7 @@
   opacity: 1;
   inset: -5px;
   padding: 5px;
-  animation: :global(aiFlow) 1.5s linear infinite;
+  animation: fabSpin 1.5s linear infinite;
 }
 
 .fabOpen {
@@ -174,22 +177,31 @@
 /* Pulse ring */
 .fabPulse {
   position: absolute;
-  inset: -8px;
+  inset: -4px;
   border-radius: 50%;
-  border: 1px solid var(--ai-border-subtle);
+  border: 2px solid var(--ai-glow);
   opacity: 0;
-  animation: pulseRing 3s ease-out infinite;
+  animation: pulseRing 2.5s cubic-bezier(0.215, 0.610, 0.355, 1) infinite;
 }
 
 @keyframes pulseRing {
-  0%   { transform: scale(0.85); opacity: 0.8; }
-  70%  { transform: scale(1.3);  opacity: 0; }
-  100% { transform: scale(1.3);  opacity: 0; }
+  0%   { transform: scale(0.9); opacity: 0.8; }
+  100% { transform: scale(1.5); opacity: 0; }
+}
+
+@keyframes fabSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+@keyframes fabFloat {
+  0%, 100% { transform: translateY(0px); }
+  50%      { transform: translateY(-8px); }
 }
 
 @media (max-width: 600px) {
   .wrapper {
-    bottom: 20px;
+    bottom: calc(20px + env(safe-area-inset-bottom));
     right: 16px;
   }
 

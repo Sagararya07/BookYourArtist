@@ -43,7 +43,7 @@ function ArtistsContent() {
 
   const handleCategoryClick = (cat: string) => {
     setActiveCategory(cat);
-    router.push(cat === 'All' ? '/artists' : `/artists?category=${encodeURIComponent(cat)}`);
+    router.push(cat === 'All' ? '/artists' : `/artists?category=${encodeURIComponent(cat)}`, { scroll: false });
   };
 
   const openBooking = (artist?: any) => {

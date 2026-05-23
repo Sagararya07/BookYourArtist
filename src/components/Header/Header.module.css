@@ -43,27 +43,29 @@
 .socialIcons {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .socialIcons a {
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.85rem;
-  transition: all 0.2s;
-  color: #fff;
+  font-size: 0.95rem;
+  transition: all 0.3s ease;
+  background: transparent;
+  border: 1px solid rgba(212, 168, 67, 0.4);
+  color: #d4a843;
 }
 
-.socialIcons a:nth-child(1) { background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); } /* Instagram */
-.socialIcons a:nth-child(2) { background: #1877f2; } /* Facebook */
-.socialIcons a:nth-child(3) { background: #ff0000; } /* YouTube */
-
 .socialIcons a:hover {
-  transform: scale(1.15);
+  background: #d4a843;
+  color: #fff;
+  border-color: #d4a843;
+  box-shadow: 0 0 20px rgba(212, 168, 67, 0.6);
+  transform: scale(1.1);
 }
 
 /* Logo */
@@ -116,13 +118,6 @@
   z-index: -2;
 }
 
-.contactBtn:hover::before,
-.contactBtn:active::before {
-  background: var(--ai-border);
-  opacity: 1;
-  animation: :global(aiRotate) 3s linear infinite;
-}
-
 .contactBtn::after {
   content: '';
   position: absolute;
@@ -130,24 +125,31 @@
   background: #000;
   border-radius: 8px;
   z-index: -1;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, inset 0.3s ease;
 }
 
 .contactBtn:hover::before,
 .contactBtn:active::before {
-  background: var(--ai-border);
-  animation: :global(aiRotate) 3s linear infinite;
+  background: conic-gradient(from 0deg, #4285f4, #ea4335, #fbbc05, #34a853, #4285f4);
+  opacity: 1;
+  animation: contactSpin 2s linear infinite;
 }
 
 .contactBtn:hover {
   transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 10px 30px rgba(255, 215, 0, 0.2);
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.3);
   color: #000 !important;
 }
 
 .contactBtn:hover::after,
 .contactBtn:active::after {
-  background: #C0C0C0 !important;
+  background: #ffffff !important;
+  inset: 2.5px;
+}
+
+@keyframes contactSpin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
 }
 
 /* ─── NAV BAR ────────────────────────────────────────────── */

@@ -3,14 +3,14 @@
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useState, useEffect } from 'react';
-import { FaBars, FaTimes, FaInstagram, FaFacebookF, FaYoutube, FaHome, FaInfoCircle, FaUsers, FaEnvelope } from 'react-icons/fa';
+import { FaBars, FaTimes, FaInstagram, FaFacebookF, FaYoutube, FaHome, FaInfoCircle, FaUsers, FaPhoneAlt } from 'react-icons/fa';
 import styles from './Header.module.css';
 
 const navLinks = [
   { href: '/', label: 'Home', icon: <FaHome /> },
   { href: '/about', label: 'About Us', icon: <FaInfoCircle /> },
   { href: '/artists', label: 'Book Artists', icon: <FaUsers /> },
-  { href: '/contact', label: 'Contact Us', icon: <FaEnvelope /> },
+  { href: '/contact', label: 'Contact Us', icon: <FaPhoneAlt /> },
 ];
 
 export default function Header() {

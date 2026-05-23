@@ -205,6 +205,98 @@ function TrendingGrid({artists,onView,onBook,loading,error,onRetry}:{
   );
 }
 
+/* ── EXCLUSIVE: 3-column Grid Gallery ── */
+function ExclusiveGrid({artists,onView,onBook,loading,error,onRetry}:{
+  artists:Artist[];loading:boolean;error:string|null;onRetry:()=>void;
+  onView:(a:Artist)=>void;onBook:(a:Artist)=>void;
+}){
+  const INITIAL_COUNT = 6; 
+  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
+  
+  const handleToggleView = () => {
+    if (visibleCount >= artists.length) {
+      setVisibleCount(INITIAL_COUNT);
+    } else {
+      setVisibleCount(visibleCount + 6);
+    }
+  };
+
+  if(loading) return <div style={{textAlign:'center',padding:'3rem',color:'rgba(255,255,255,0.3)'}}>Loading...</div>;
+  if(error) return <div className="discovery-row__error"><p>⚠️ {error}</p><button className="discovery-btn discovery-btn--retry" onClick={onRetry}><FaRedo/> Retry</button></div>;
+  if(!artists.length) return <div className="discovery-row__empty">No exclusive artists found.</div>;
+
+  const displayedItems = artists.slice(0, visibleCount);
+
+  return (
+    <div className={s.sectionContainer}>
+      <div className={s.exclHeading}>
+        <div className={s.exclHeadingLine}/>
+        <div className={s.exclHeadingText}>
+          <span className={s.exclHeadingPill}><FaCrown style={{fontSize:8}}/> Exclusive Elite</span>
+          <h2 className={s.exclHeadingTitle}>Premium <span>Artists</span></h2>
+        </div>
+        <div className={s.exclHeadingLine}/>
+      </div>
+
+      {/* 3-Column Grid */}
+      <div className={s.gridContainer}>
+        {displayedItems.map((item, index) => {
+          const hasImg = item.imageUrl && !item.imageUrl.startsWith('/images/');
+          return (
+            <div key={item.id || index} className={s.card}>
+              
+              {/* Top Image Section */}
+              <div className={s.imageWrapper}>
+                {hasImg ? (
+                  <img src={item.imageUrl} alt={item.name} className={s.image} loading="lazy" />
+                ) : (
+                  <div className={s.imagePlaceholder}>{initials(item.name)}</div>
+                )}
+                
+                {/* Floating Badges */}
+                <div className={s.topBadges}>
+                  <span className={s.categoryBadge}>{item.category}</span>
+                  <span className={s.ratingBadge}>★ {item.rating}.0</span>
+                </div>
+                
+                {/* Fade out overlay */}
+                <div className={s.imageOverlay}></div>
+              </div>
+              
+              {/* Bottom Content Section */}
+              <div className={s.cardContent}>
+                <h3 className={s.itemName}>{item.name}</h3>
+                <p className={s.itemLocation}><FaMapMarkerAlt style={{display:'inline',marginRight:4,color:'#d4a843'}}/> {item.location}</p>
+                
+                <div className={s.priceRow}>
+                  <span className={s.priceLabel}>FROM</span>
+                  <span className={s.priceValue}>{price(item.price)}</span>
+                </div>
+
+                {/* Action Buttons */}
+                <div className={s.cardActions}>
+                  <button className={s.btnOutline} onClick={() => onView(item)}>VIEW PROFILE</button>
+                  <button className={s.btnSolid} onClick={() => onBook(item)}>BOOK NOW</button>
+                </div>
+              </div>
+
+            </div>
+          );
+        })}
+      </div>
+
+      {/* Show More / Less */}
+      {artists.length > INITIAL_COUNT && (
+        <div className={s.buttonContainer}>
+          <button onClick={handleToggleView} className={s.toggleButton}>
+            {visibleCount >= artists.length ? 'SHOW LESS' : 'SHOW MORE'}
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── EXCLUSIVE: premium book flip ── */
 function ExclusiveLayout({artists,onView,onBook,loading,error,onRetry}:{
   artists:Artist[];loading:boolean;error:string|null;onRetry:()=>void;
@@ -214,6 +306,11 @@ function ExclusiveLayout({artists,onView,onBook,loading,error,onRetry}:{
   const [visible,setVisible]=useState(true);
   const [animKey,setAnimKey]=useState(0);
   const total=artists.length;
+
+  useEffect(() => {
+    setCur(0);
+  }, [artists]);
+
   const navigate=(dir:'next'|'prev')=>{
     setVisible(false);
     setAnimKey(k=>k+1);
@@ -237,7 +334,9 @@ function ExclusiveLayout({artists,onView,onBook,loading,error,onRetry}:{
   );
   if(error) return <div className="discovery-row__error"><p>⚠️ {error}</p><button className="discovery-btn discovery-btn--retry" onClick={onRetry}><FaRedo/> Retry</button></div>;
   if(!artists.length) return <div className="discovery-row__empty">No exclusive artists found.</div>;
-  const a=artists[cur];
+
+  const a=artists[cur] || artists[0];
+  if(!a) return <div className="discovery-row__empty">No exclusive artists found.</div>;
   const hasImg=a.imageUrl&&!a.imageUrl.startsWith('/images/');
   return (
     <div className={s.exclusiveWrap}>
@@ -321,6 +420,11 @@ function FeaturedLayout({artists,onView,onBook,loading,error,onRetry}:{
   const [animKey,setAnimKey]=useState(0);
   const visible=3;
   const max=Math.max(0,artists.length-visible);
+
+  useEffect(() => {
+    setCur(0);
+  }, [artists]);
+
   const navigate=(dir:'next'|'prev')=>{
     setAnimKey(k=>k+1);
     setCur(c=>dir==='next'?Math.min(max,c+1):Math.max(0,c-1));
@@ -571,7 +675,7 @@ function ArtistsDiscoveryContent(){
 
   useEffect(()=>{fetchAll(activeCategory);},[activeCategory,fetchAll]);
 
-  const handleCat=(cat:string)=>{ setActiveCategory(cat); router.push(cat==='ALL'?'/artists':`/artists?category=${encodeURIComponent(cat)}`); };
+  const handleCat=(cat:string)=>{ setActiveCategory(cat); router.push(cat==='ALL'?'/artists':`/artists?category=${encodeURIComponent(cat)}`, { scroll: false }); };
   const handleSection=(sec:SectionType)=>{ setSectionVisible(false); setTimeout(()=>{setActiveSection(sec);setSectionVisible(true);},200); };
   const openBooking=(a:Artist)=>{ setSelectedArtist({id:a.id,name:a.name}); setModalOpen(true); };
   const openView=(a:Artist)=>{ setViewArtist(a); setViewModalOpen(true); };
@@ -678,9 +782,15 @@ function ArtistsDiscoveryContent(){
                   )
                 )}
                 {cfg.type==='exclusive'&&(
-                  <ExclusiveLayout artists={rows.exclusive.data} loading={rows.exclusive.loading}
-                    error={rows.exclusive.error} onRetry={()=>fetchRow('exclusive',activeCategory)}
-                    onView={openView} onBook={openBooking}/>
+                  activeSection === 'exclusive' && activeCategory === 'ALL' ? (
+                    <ExclusiveGrid artists={rows.exclusive.data} loading={rows.exclusive.loading}
+                      error={rows.exclusive.error} onRetry={()=>fetchRow('exclusive',activeCategory)}
+                      onView={openView} onBook={openBooking}/>
+                  ) : (
+                    <ExclusiveLayout artists={rows.exclusive.data} loading={rows.exclusive.loading}
+                      error={rows.exclusive.error} onRetry={()=>fetchRow('exclusive',activeCategory)}
+                      onView={openView} onBook={openBooking}/>
+                  )
                 )}
                 {cfg.type==='featured'&&(
                   activeSection === 'featured' && activeCategory === 'ALL' ? (
