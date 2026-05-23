@@ -1,6 +1,6 @@
 'use client';
 import { useState, useEffect, useCallback, Suspense } from 'react';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { FaStar, FaRedo, FaFire, FaCrown, FaUsers, FaMapMarkerAlt, FaArrowRight } from 'react-icons/fa';
 import { BsStarFill } from 'react-icons/bs';
 import BookingModal from '@/components/BookingModal/BookingModal';
@@ -640,7 +640,6 @@ function FeaturedGrid({artists,onView,onBook,loading,error,onRetry}:{
 /* ── MAIN CONTENT ── */
 function ArtistsDiscoveryContent(){
   const searchParams=useSearchParams();
-  const router=useRouter();
   const urlCat=searchParams.get('category')?.toUpperCase()||'ALL';
   const [activeSection,setActiveSection]=useState<SectionType>('ALL');
   const [activeCategory,setActiveCategory]=useState(urlCat);
@@ -675,7 +674,11 @@ function ArtistsDiscoveryContent(){
 
   useEffect(()=>{fetchAll(activeCategory);},[activeCategory,fetchAll]);
 
-  const handleCat=(cat:string)=>{ setActiveCategory(cat); router.push(cat==='ALL'?'/artists':`/artists?category=${encodeURIComponent(cat)}`, { scroll: false }); };
+  const handleCat=(cat:string)=>{
+    setActiveCategory(cat);
+    const newUrl = cat==='ALL' ? '/artists' : `/artists?category=${encodeURIComponent(cat)}`;
+    window.history.replaceState(null, '', newUrl);
+  };
   const handleSection=(sec:SectionType)=>{ setSectionVisible(false); setTimeout(()=>{setActiveSection(sec);setSectionVisible(true);},200); };
   const openBooking=(a:Artist)=>{ setSelectedArtist({id:a.id,name:a.name}); setModalOpen(true); };
   const openView=(a:Artist)=>{ setViewArtist(a); setViewModalOpen(true); };
