@@ -298,9 +298,9 @@ function ExclusiveGrid({artists,onView,onBook,loading,error,onRetry}:{
 }
 
 /* ── EXCLUSIVE: premium book flip ── */
-function ExclusiveLayout({artists,onView,onBook,loading,error,onRetry}:{
+function ExclusiveLayout({artists,onView,onBook,loading,error,onRetry,hideDots}:{
   artists:Artist[];loading:boolean;error:string|null;onRetry:()=>void;
-  onView:(a:Artist)=>void;onBook:(a:Artist)=>void;
+  onView:(a:Artist)=>void;onBook:(a:Artist)=>void;hideDots?:boolean;
 }){
   const [cur,setCur]=useState(0);
   const [visible,setVisible]=useState(true);
@@ -397,7 +397,7 @@ function ExclusiveLayout({artists,onView,onBook,loading,error,onRetry}:{
         )}
       </div>
 
-      {total>1&&(
+      {total>1&&!hideDots&&(
         <div className={s.exclDots}>
           {artists.map((_,i)=>(
             <button key={i} className={`${s.exclDot} ${i===cur?s.exclDotActive:''}`}
@@ -412,9 +412,9 @@ function ExclusiveLayout({artists,onView,onBook,loading,error,onRetry}:{
 }
 
 /* ── FEATURED: premium full-bleed cards ── */
-function FeaturedLayout({artists,onView,onBook,loading,error,onRetry}:{
+function FeaturedLayout({artists,onView,onBook,loading,error,onRetry,hideDots}:{
   artists:Artist[];loading:boolean;error:string|null;onRetry:()=>void;
-  onView:(a:Artist)=>void;onBook:(a:Artist)=>void;
+  onView:(a:Artist)=>void;onBook:(a:Artist)=>void;hideDots?:boolean;
 }){
   const [cur,setCur]=useState(0);
   const [animKey,setAnimKey]=useState(0);
@@ -529,7 +529,7 @@ function FeaturedLayout({artists,onView,onBook,loading,error,onRetry}:{
       </div>
 
       {/* Dots */}
-      {artists.length>visible&&(
+      {artists.length>visible&&!hideDots&&(
         <div className={s.featDots}>
           {Array.from({length:max+1}).map((_,i)=>(
             <button
@@ -792,7 +792,7 @@ function ArtistsDiscoveryContent(){
                   ) : (
                     <ExclusiveLayout artists={rows.exclusive.data} loading={rows.exclusive.loading}
                       error={rows.exclusive.error} onRetry={()=>fetchRow('exclusive',activeCategory)}
-                      onView={openView} onBook={openBooking}/>
+                      onView={openView} onBook={openBooking} hideDots={activeSection==='ALL'}/>
                   )
                 )}
                 {cfg.type==='featured'&&(
@@ -803,7 +803,7 @@ function ArtistsDiscoveryContent(){
                   ) : (
                     <FeaturedLayout artists={rows.featured.data} loading={rows.featured.loading}
                       error={rows.featured.error} onRetry={()=>fetchRow('featured',activeCategory)}
-                      onView={openView} onBook={openBooking}/>
+                      onView={openView} onBook={openBooking} hideDots={activeSection==='ALL'}/>
                   )
                 )}
               </div>
