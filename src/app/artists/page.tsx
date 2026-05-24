@@ -679,7 +679,7 @@ function ArtistsDiscoveryContent(){
     const newUrl = cat==='ALL' ? '/artists' : `/artists?category=${encodeURIComponent(cat)}`;
     window.history.replaceState(null, '', newUrl);
   };
-  const handleSection=(sec:SectionType)=>{ setSectionVisible(false); setTimeout(()=>{setActiveSection(sec);setSectionVisible(true);},200); };
+  const handleSection=(sec:SectionType)=>{ setSectionVisible(false); setTimeout(()=>{setActiveSection(sec);handleCat('ALL');setSectionVisible(true);},200); };
   const openBooking=(a:Artist)=>{ setSelectedArtist({id:a.id,name:a.name}); setModalOpen(true); };
   const openView=(a:Artist)=>{ setViewArtist(a); setViewModalOpen(true); };
 
