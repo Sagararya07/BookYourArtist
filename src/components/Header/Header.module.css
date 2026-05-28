@@ -381,20 +381,85 @@
 }
 
 .mobileLink {
-  font-size: 1rem;
-  font-weight: 500;
-  color: var(--text-secondary);
+  --tab-color: #ffffff;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
   padding: 12px 16px;
-  border-radius: 4px;
-  transition: all 0.2s ease;
-  border: 1px solid transparent;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.15);
+  background: rgba(0, 0, 0, 0.75);
+  font-size: 14px;
+  font-weight: 800;
+  letter-spacing: 0.11em;
+  text-transform: uppercase;
+  color: var(--tab-color);
+  opacity: 0.75;
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    transform 0.35s cubic-bezier(0.34,1.56,0.64,1),
+    box-shadow 0.3s ease,
+    opacity 0.25s,
+    letter-spacing 0.3s;
+  z-index: 1;
+  text-decoration: none;
+  overflow: hidden;
 }
 
-.mobileLink:hover,
+.mobileLink::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: linear-gradient(105deg,transparent 35%,rgba(255,255,255,0.09) 50%,transparent 65%);
+  transform: translateX(-100%) skewX(-12deg);
+  transition: none;
+  pointer-events: none;
+  z-index: 1;
+}
+.mobileLink:hover::before { animation: navShimmer 0.55s ease forwards; }
+
+.mobileLink:hover:not(.active) {
+  background: rgba(0, 0, 0, 0.9);
+  border-color: rgba(255,255,255,0.3);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.55);
+  opacity: 1;
+  letter-spacing: 0.14em;
+}
+
 .mobileLink.active {
-  color: #333;
-  background: #c0c0c0;
-  border-color: #c0c0c0;
+  background: color-mix(in srgb, var(--tab-color) 16%, #111 84%);
+  border-color: color-mix(in srgb, var(--tab-color) 50%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--tab-color) 30%, transparent),
+    0 0 28px color-mix(in srgb, var(--tab-color) 22%, transparent),
+    0 8px 32px rgba(0,0,0,0.65);
+  transform: translateY(-2px) scale(1.02);
+  opacity: 1;
+  letter-spacing: 0.14em;
+}
+
+.mobileLink.active::after {
+  content: '';
+  position: absolute; inset: -1px;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--tab-color) 0%, transparent),
+    color-mix(in srgb, var(--tab-color) 60%, transparent),
+    color-mix(in srgb, var(--tab-color) 0%, transparent)
+  );
+  background-size: 300% 300%;
+  animation: navBorderFlow 3s ease infinite;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+.mobileLink.active .navIcon {
+  filter: drop-shadow(0 0 10px var(--tab-color));
+  animation: navIconBounce 0.6s cubic-bezier(0.34,1.56,0.64,1);
 }
 
 /* ─── RESPONSIVE ─────────────────────────────────────────── */

@@ -36,7 +36,7 @@ export default function Header() {
           <div className={styles.socialWrap}>
             <div className={styles.socialIcons}>
               <a href="https://instagram.com/artistvibes_entertainment" target="_blank" rel="noreferrer" aria-label="Instagram"><FaInstagram /></a>
-              <a href="https://facebook.com/ArtistvibesEntertainment" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebookF /></a>
+              <a href="https://www.facebook.com/people/Artistvibes-Entertainment/61590622793617/" target="_blank" rel="noreferrer" aria-label="Facebook"><FaFacebookF /></a>
               <a href="https://youtube.com/@ArtistvibesEntertainment" target="_blank" rel="noreferrer" aria-label="YouTube"><FaYoutube /></a>
             </div>
           </div>
@@ -88,16 +88,21 @@ export default function Header() {
       {/* Mobile menu */}
       {menuOpen && (
         <div className={styles.mobileMenu}>
-          {navLinks.map((link) => (
-            <Link
-              key={link.href + link.label}
-              href={link.href}
-              className={`${styles.mobileLink} ${pathname === link.href ? styles.active : ''}`}
-            >
-              <span className={styles.mobileNavIcon}>{link.icon}</span>
-              {link.label}
-            </Link>
-          ))}
+          {navLinks.map((link) => {
+            const isActive = pathname === link.href;
+            return (
+              <Link
+                key={link.href + link.label}
+                href={link.href}
+                className={`${styles.mobileLink} ${isActive ? styles.active : ''}`}
+                onClick={() => setMenuOpen(false)}
+              >
+                <span className={styles.navIcon}>{link.icon}</span>
+                <span className={styles.navLabel}>{link.label}</span>
+                {isActive && <span className={styles.navActiveDot} />}
+              </Link>
+            );
+          })}
         </div>
       )}
     </header>

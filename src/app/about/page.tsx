@@ -30,7 +30,7 @@ const founder = {
   tags: ["Artist Management", "Event Production", "Pan-India Network"],
   social: {
     instagram: "https://www.instagram.com/abhishek_pandey_guru?igsh=MWxqa281Z2RtYXZheA%3D%3D&utm_source=qr",
-    facebook: "https://www.facebook.com/share/18UZasCmiX/?mibextid=wwXIfr",
+    facebook: "https://www.facebook.com/people/Artistvibes-Entertainment/61590622793617/",
     email: "mailto:Artistmanagerabhishek@gmail.com",
   },
 };

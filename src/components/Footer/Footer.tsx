@@ -32,7 +32,7 @@ export default function Footer() {
             </p>
             <div className={styles.socials}>
               <a href="https://instagram.com/artistvibes_entertainment" target="_blank" rel="noreferrer" aria-label="Instagram" className={styles.socialBtn}><FaInstagram /></a>
-              <a href="https://facebook.com/ArtistvibesEntertainment" target="_blank" rel="noreferrer" aria-label="Facebook" className={styles.socialBtn}><FaFacebookF /></a>
+              <a href="https://www.facebook.com/people/Artistvibes-Entertainment/61590622793617/" target="_blank" rel="noreferrer" aria-label="Facebook" className={styles.socialBtn}><FaFacebookF /></a>
               <a href="https://youtube.com/@ArtistvibesEntertainment" target="_blank" rel="noreferrer" aria-label="YouTube" className={styles.socialBtn}><FaYoutube /></a>
               <a href="https://wa.me/918956059005" target="_blank" rel="noreferrer" aria-label="WhatsApp" className={`${styles.socialBtn} ${styles.socialWhatsapp}`}><FaWhatsapp /></a>
             </div>
