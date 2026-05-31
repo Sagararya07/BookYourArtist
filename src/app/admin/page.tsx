@@ -1,7 +1,49 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaStar, FaCrown, FaQuoteLeft } from 'react-icons/fa';
+import { 
+  FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaStar, FaCrown, FaQuoteLeft, 
+  FaSearch, FaUsers, FaEnvelope, FaGlobe, FaFire, FaThLarge 
+} from 'react-icons/fa';
+import './admin.css';
+
+// High-fidelity SVG logo inspired by ArtistVibes (Gold Monogram)
+const LogoSVG = () => (
+  <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+        <stop offset="0%" stopColor="#e8c97a" />
+        <stop offset="50%" stopColor="#c9a84c" />
+        <stop offset="100%" stopColor="#b38f36" />
+      </linearGradient>
+    </defs>
+    {/* Left leg of A and speed lines */}
+    <rect x="5" y="32" width="22" height="7" rx="3.5" fill="url(#goldGrad)" />
+    <rect x="0" y="48" width="30" height="7" rx="3.5" fill="url(#goldGrad)" />
+    <rect x="5" y="64" width="22" height="7" rx="3.5" fill="url(#goldGrad)" />
+    
+    {/* Stylized high-tech AV Monogram */}
+    <path 
+      d="M48 20 L68 80 L88 20" 
+      stroke="url(#goldGrad)" 
+      strokeWidth="10" 
+      strokeLinecap="round" 
+      strokeLinejoin="round" 
+    />
+    <path 
+      d="M35 80 L52 28" 
+      stroke="url(#goldGrad)" 
+      strokeWidth="10" 
+      strokeLinecap="round" 
+    />
+    <path 
+      d="M40 56 H60" 
+      stroke="url(#goldGrad)" 
+      strokeWidth="8" 
+      strokeLinecap="round" 
+    />
+  </svg>
+);
 
 // Helper to compress large base64 images before sending to backend to avoid 413 Payload Too Large
 const compressImage = (base64Str: string, maxWidth = 500): Promise<string> => {
@@ -13,7 +55,7 @@ const compressImage = (base64Str: string, maxWidth = 500): Promise<string> => {
     img.onload = () => {
       const canvas = document.createElement('canvas');
       const ratio = maxWidth / img.width;
-      if (ratio >= 1) return resolve(base64Str); // No need to compress if already small
+      if (ratio >= 1) return resolve(base64Str);
       
       canvas.width = maxWidth;
       canvas.height = img.height * ratio;
@@ -28,8 +70,12 @@ const compressImage = (base64Str: string, maxWidth = 500): Promise<string> => {
 
 export default function AdminDashboard() {
   const [token, setToken] = useState('');
+  const [username, setUsername] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeTab, setActiveTab] = useState<'featured' | 'testimonials' | 'subscribers' | 'trending' | 'exclusive'>('featured');
+  const [activeTab, setActiveTab] = useState<'all' | 'featured' | 'testimonials' | 'subscribers' | 'trending' | 'exclusive'>('all');
+  const [searchTerm, setSearchTerm] = useState('');
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const [artists, setArtists] = useState<any[]>([]);
   const [testimonials, setTestimonials] = useState<any[]>([]);
@@ -37,35 +83,31 @@ export default function AdminDashboard() {
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [toast, setToast] = useState('');
+
+  // Modals state
+  const [showArtistModal, setShowArtistModal] = useState(false);
+  const [showTestimonialModal, setShowTestimonialModal] = useState(false);
+  const [editingId, setEditingId] = useState<number | null>(null);
 
   // Artist Form State
-  const [artistFormOpen, setArtistFormOpen] = useState(false);
-  const [editingArtistId, setEditingArtistId] = useState<number | null>(null);
   const [artistForm, setArtistForm] = useState({
-    name: '', category: '', location: '', price: '', imageUrl: '', rating: '', bio: '',
-    isExclusive: false, isFeatured: false, isTrending: false, isActive: true
+    name: '', category: 'Singer', location: 'Mumbai', price: 'On Request', imageUrl: '', rating: '4.5', bio: '',
+    isExclusive: false, isFeatured: false, isTrending: false, isActive: true, eventsCount: '0', videoUrl: '', order: '0'
   });
 
   // Testimonial Form State
-  const [testiFormOpen, setTestiFormOpen] = useState(false);
-  const [editingTestiId, setEditingTestiId] = useState<number | null>(null);
-  const [testiForm, setTestiForm] = useState({
+  const [testimonialForm, setTestimonialForm] = useState({
     name: '', role: '', content: '', rating: '5', imageUrl: '', isActive: true
   });
-  // Trending Form State
-  const [trendingFormOpen, setTrendingFormOpen] = useState(false);
-  const [editingTrendingId, setEditingTrendingId] = useState<number | null>(null);
-  const [trendingForm, setTrendingForm] = useState({
-    name: '', imageUrl: '', order: '0', isActive: true
-  });
 
-  // Exclusive Form State
-  const [exclusiveFormOpen, setExclusiveFormOpen] = useState(false);
-  const [editingExclusiveId, setEditingExclusiveId] = useState<number | null>(null);
-  const [exclusiveForm, setExclusiveForm] = useState({
-    name: '', category: 'Singer', location: 'Mumbai', bio: '', price: 'On Request',
-    imageUrl: '', rating: '5', order: '0', isActive: true
-  });
+  // Automatically clear toast message
+  useEffect(() => {
+    if (toast) {
+      const timer = setTimeout(() => setToast(''), 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toast]);
 
   // Login handler
   const handleLogin = async (e: React.FormEvent) => {
@@ -79,7 +121,7 @@ export default function AdminDashboard() {
       });
       if (res.ok) {
         setIsLoggedIn(true);
-        const data = await res.json();
+        setToast('Welcome back! Successfully logged into portal.');
         fetchArtists();
         fetchTestimonials();
         fetchSubscribers();
@@ -87,7 +129,7 @@ export default function AdminDashboard() {
         setError('Invalid password');
       }
     } catch {
-      setError('Network error');
+      setError('Network error. Check connection.');
     }
     setLoading(false);
   };
@@ -96,7 +138,7 @@ export default function AdminDashboard() {
     const res = await fetch('/api/admin/artists', { headers: { 'x-admin-token': token } });
     if (res.ok) {
       const data = await res.json();
-      setArtists(data.data);
+      setArtists(data.data || []);
     }
   };
 
@@ -104,7 +146,7 @@ export default function AdminDashboard() {
     const res = await fetch('/api/admin/testimonials', { headers: { 'x-admin-token': token } });
     if (res.ok) {
       const data = await res.json();
-      setTestimonials(data.data);
+      setTestimonials(data.data || []);
     }
   };
 
@@ -112,7 +154,7 @@ export default function AdminDashboard() {
     const res = await fetch('/api/admin/subscribers', { headers: { 'x-admin-token': token } });
     if (res.ok) {
       const data = await res.json();
-      setSubscribers(data.data);
+      setSubscribers(data.data || []);
     }
   };
 
@@ -122,20 +164,7 @@ export default function AdminDashboard() {
     setArtists([]);
     setTestimonials([]);
     setSubscribers([]);
-  };
-
-  const deleteSubscriber = async (id: number) => {
-    if (!confirm('Remove this subscriber from the list?')) return;
-    try {
-      const res = await fetch(`/api/admin/subscribers/${id}`, {
-        method: 'DELETE',
-        headers: { 'x-admin-token': token },
-      });
-      if (res.ok) fetchSubscribers();
-      else alert('Failed to delete subscriber');
-    } catch {
-      alert('Error deleting subscriber');
-    }
+    setToast('Logged out successfully.');
   };
 
   // --- ARTIST HANDLERS ---
@@ -144,38 +173,63 @@ export default function AdminDashboard() {
     setArtistForm({ ...artistForm, [e.target.name]: value });
   };
 
-  const openNewArtistForm = () => {
-    setEditingArtistId(null);
+  const openNewArtistModal = () => {
+    setEditingId(null);
     setArtistForm({ 
-      name: '', category: '', location: '', price: '', imageUrl: '', rating: '5', bio: '', 
+      name: '', 
+      category: 'Singer', 
+      location: 'Mumbai', 
+      price: 'On Request', 
+      imageUrl: '', 
+      rating: '4.5', 
+      bio: '', 
       isExclusive: activeTab === 'exclusive', 
       isFeatured: activeTab === 'featured', 
       isTrending: activeTab === 'trending', 
-      isActive: true 
+      isActive: true,
+      eventsCount: '0',
+      videoUrl: '',
+      order: '0'
     });
-    setArtistFormOpen(true);
+    setShowArtistModal(true);
   };
 
-  const openEditArtistForm = (artist: any) => {
-    setEditingArtistId(artist.id);
+  const openEditArtistModal = (artist: any) => {
+    setEditingId(artist.id);
     setArtistForm({
-      name: artist.name, category: artist.category, location: artist.location, price: artist.price,
-      imageUrl: artist.imageUrl || '', rating: artist.rating || '', bio: artist.bio || '',
-      isExclusive: artist.isExclusive, isFeatured: artist.isFeatured, isTrending: artist.isTrending, isActive: artist.isActive
+      name: artist.name || '',
+      category: artist.category || 'Singer',
+      location: artist.location || 'Mumbai',
+      price: artist.price || 'On Request',
+      imageUrl: artist.imageUrl || '',
+      rating: artist.rating?.toString() || '4.5',
+      bio: artist.bio || '',
+      isExclusive: !!artist.isExclusive,
+      isFeatured: !!artist.isFeatured,
+      isTrending: !!artist.isTrending,
+      isActive: artist.isActive !== false,
+      eventsCount: artist.eventsCount?.toString() || '0',
+      videoUrl: artist.videoUrl || '',
+      order: artist.order?.toString() || '0'
     });
-    setArtistFormOpen(true);
+    setShowArtistModal(true);
   };
 
   const saveArtist = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const url = editingArtistId ? `/api/admin/artists/${editingArtistId}` : '/api/admin/artists';
-    const method = editingArtistId ? 'PUT' : 'POST';
+    const url = editingId ? `/api/admin/artists/${editingId}` : '/api/admin/artists';
+    const method = editingId ? 'PUT' : 'POST';
 
     try {
-      // Compress image if they pasted a massive base64 string
       const compressedImageUrl = await compressImage(artistForm.imageUrl, 600);
-      const payload = { ...artistForm, imageUrl: compressedImageUrl };
+      const payload = { 
+        ...artistForm, 
+        imageUrl: compressedImageUrl,
+        rating: parseFloat(artistForm.rating) || 4.5,
+        eventsCount: parseInt(artistForm.eventsCount) || 0,
+        order: parseInt(artistForm.order) || 0
+      };
 
       const res = await fetch(url, {
         method,
@@ -183,62 +237,74 @@ export default function AdminDashboard() {
         body: JSON.stringify(payload)
       });
       if (res.ok) {
-        setArtistFormOpen(false);
+        setShowArtistModal(false);
+        setToast(editingId ? 'Artist updated successfully!' : 'New artist added successfully!');
         fetchArtists();
       } else {
-        alert('Failed to save artist');
+        alert('Failed to save artist. Please check the inputs.');
       }
     } catch (err) {
-      alert('Error saving artist');
+      alert('Error saving artist.');
     }
     setLoading(false);
   };
 
-  const deleteArtist = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this artist?')) return;
+  const deleteArtist = async (id: number, name: string) => {
+    if (!confirm(`Are you sure you want to delete ${name}? This will remove them permanently.`)) return;
     try {
       const res = await fetch(`/api/admin/artists/${id}`, {
         method: 'DELETE',
         headers: { 'x-admin-token': token }
       });
-      if (res.ok) fetchArtists();
-      else alert('Failed to delete');
+      if (res.ok) {
+        setToast('Artist deleted successfully.');
+        fetchArtists();
+      } else {
+        alert('Failed to delete artist');
+      }
     } catch {
-      alert('Error deleting');
+      alert('Error deleting artist');
     }
   };
 
   // --- TESTIMONIAL HANDLERS ---
   const handleTestiFormChange = (e: any) => {
     const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-    setTestiForm({ ...testiForm, [e.target.name]: value });
+    setTestimonialForm({ ...testimonialForm, [e.target.name]: value });
   };
 
-  const openNewTestiForm = () => {
-    setEditingTestiId(null);
-    setTestiForm({ name: '', role: '', content: '', rating: '5', imageUrl: '', isActive: true });
-    setTestiFormOpen(true);
+  const openNewTestimonialModal = () => {
+    setEditingId(null);
+    setTestimonialForm({ name: '', role: '', content: '', rating: '5', imageUrl: '', isActive: true });
+    setShowTestimonialModal(true);
   };
 
-  const openEditTestiForm = (testi: any) => {
-    setEditingTestiId(testi.id);
-    setTestiForm({
-      name: testi.name, role: testi.role || '', content: testi.content, 
-      rating: testi.rating?.toString() || '5', imageUrl: testi.imageUrl || '', isActive: testi.isActive
+  const openEditTestimonialModal = (testi: any) => {
+    setEditingId(testi.id);
+    setTestimonialForm({
+      name: testi.name || '',
+      role: testi.role || '',
+      content: testi.content || '',
+      rating: testi.rating?.toString() || '5',
+      imageUrl: testi.imageUrl || '',
+      isActive: testi.isActive !== false
     });
-    setTestiFormOpen(true);
+    setShowTestimonialModal(true);
   };
 
   const saveTestimonial = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    const url = editingTestiId ? `/api/admin/testimonials/${editingTestiId}` : '/api/admin/testimonials';
-    const method = editingTestiId ? 'PUT' : 'POST';
+    const url = editingId ? `/api/admin/testimonials/${editingId}` : '/api/admin/testimonials';
+    const method = editingId ? 'PUT' : 'POST';
 
     try {
-      // Compress image if they pasted a massive base64 string
-      const compressedImageUrl = await compressImage(testiForm.imageUrl, 200);
-      const payload = { ...testiForm, imageUrl: compressedImageUrl };
+      const compressedImageUrl = await compressImage(testimonialForm.imageUrl, 200);
+      const payload = { 
+        ...testimonialForm, 
+        imageUrl: compressedImageUrl,
+        rating: parseInt(testimonialForm.rating) || 5
+      };
 
       const res = await fetch(url, {
         method,
@@ -246,7 +312,8 @@ export default function AdminDashboard() {
         body: JSON.stringify(payload)
       });
       if (res.ok) {
-        setTestiFormOpen(false);
+        setShowTestimonialModal(false);
+        setToast(editingId ? 'Testimonial updated!' : 'Testimonial added!');
         fetchTestimonials();
       } else {
         const errorData = await res.json();
@@ -258,539 +325,957 @@ export default function AdminDashboard() {
     setLoading(false);
   };
 
-  const deleteTestimonial = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this testimonial?')) return;
+  const deleteTestimonial = async (id: number, name: string) => {
+    if (!confirm(`Delete testimonial from ${name}?`)) return;
     try {
       const res = await fetch(`/api/admin/testimonials/${id}`, {
         method: 'DELETE',
         headers: { 'x-admin-token': token }
       });
-      if (res.ok) fetchTestimonials();
-      else alert('Failed to delete');
-    } catch {
-      alert('Error deleting');
-    }
-  };
-
-  const deleteExclusive = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this exclusive artist?')) return;
-    try {
-      const res = await fetch(`/api/admin/exclusive/${id}`, {
-        method: 'DELETE',
-        headers: { 'x-admin-token': token }
-      });
-      if (res.ok) fetchArtists();
-      else alert('Failed to delete');
-    } catch {
-      alert('Error deleting');
-    }
-  };
-
-  // --- TRENDING HANDLERS ---
-  const handleTrendingFormChange = (e: any) => {
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-    setTrendingForm({ ...trendingForm, [e.target.name]: value });
-  };
-
-  const openNewTrendingForm = () => {
-    setEditingTrendingId(null);
-    setTrendingForm({ name: '', imageUrl: '', order: '0', isActive: true });
-    setTrendingFormOpen(true);
-  };
-
-  const openEditTrendingForm = (artist: any) => {
-    setEditingTrendingId(artist.id);
-    setTrendingForm({
-      name: artist.name,
-      imageUrl: artist.imageUrl || '',
-      order: artist.order?.toString() || '0',
-      isActive: artist.isActive,
-    });
-    setTrendingFormOpen(true);
-  };
-
-  const saveTrending = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    const url = editingTrendingId ? `/api/admin/trending/${editingTrendingId}` : '/api/admin/trending';
-    const method = editingTrendingId ? 'PUT' : 'POST';
-    try {
-      const compressedImageUrl = await compressImage(trendingForm.imageUrl, 600);
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
-        body: JSON.stringify({ ...trendingForm, imageUrl: compressedImageUrl }),
-      });
       if (res.ok) {
-        setTrendingFormOpen(false);
-        fetchArtists();
+        setToast('Testimonial removed.');
+        fetchTestimonials();
       } else {
-        alert('Failed to save trending artist');
+        alert('Failed to delete testimonial');
       }
     } catch {
-      alert('Error saving trending artist');
+      alert('Error deleting testimonial');
     }
-    setLoading(false);
   };
 
-  const deleteTrending = async (id: number) => {
-    if (!confirm('Delete this trending artist?')) return;
+  // --- SUBSCRIBER HANDLERS ---
+  const deleteSubscriber = async (id: number, email: string) => {
+    if (!confirm(`Remove ${email} from subscribers list?`)) return;
     try {
-      const res = await fetch(`/api/admin/trending/${id}`, {
+      const res = await fetch(`/api/admin/subscribers/${id}`, {
         method: 'DELETE',
         headers: { 'x-admin-token': token },
       });
-      if (res.ok) fetchArtists();
-      else alert('Failed to delete');
-    } catch {
-      alert('Error deleting');
-    }
-  };
-
-  // --- EXCLUSIVE HANDLERS ---
-  const handleExclusiveFormChange = (e: any) => {
-    const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
-    setExclusiveForm({ ...exclusiveForm, [e.target.name]: value });
-  };
-
-  const openNewExclusiveForm = () => {
-    setEditingExclusiveId(null);
-    setExclusiveForm({ name: '', category: 'Singer', location: 'Mumbai', bio: '', price: 'On Request', imageUrl: '', rating: '5', order: '0', isActive: true });
-    setExclusiveFormOpen(true);
-  };
-
-  const openEditExclusiveForm = (artist: any) => {
-    setEditingExclusiveId(artist.id);
-    setExclusiveForm({
-      name: artist.name,
-      category: artist.category || 'Singer',
-      location: artist.location || 'Mumbai',
-      bio: artist.bio || '',
-      price: artist.price || 'On Request',
-      imageUrl: artist.imageUrl || '',
-      rating: artist.rating?.toString() || '5',
-      order: artist.order?.toString() || '0',
-      isActive: artist.isActive,
-    });
-    setExclusiveFormOpen(true);
-  };
-
-  const saveExclusive = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setLoading(true);
-    const url = editingExclusiveId ? `/api/admin/exclusive/${editingExclusiveId}` : '/api/admin/exclusive';
-    const method = editingExclusiveId ? 'PUT' : 'POST';
-    try {
-      const compressedImageUrl = await compressImage(exclusiveForm.imageUrl, 600);
-      const res = await fetch(url, {
-        method,
-        headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
-        body: JSON.stringify({ ...exclusiveForm, imageUrl: compressedImageUrl }),
-      });
       if (res.ok) {
-        setExclusiveFormOpen(false);
-        fetchArtists();
+        setToast('Subscriber removed.');
+        fetchSubscribers();
       } else {
-        alert('Failed to save exclusive artist');
+        alert('Failed to delete subscriber');
       }
     } catch {
-      alert('Error saving exclusive artist');
+      alert('Error deleting subscriber');
     }
-    setLoading(false);
   };
 
-  // --- LOGIN SCREEN ---
+  // --- FILTER ITEMS ---
+  const filteredArtists = artists.filter(artist => {
+    const matchesSearch = 
+      artist.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      artist.category?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      artist.location?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+    if (activeTab === 'all') return matchesSearch;
+    if (activeTab === 'featured') return artist.isFeatured && matchesSearch;
+    if (activeTab === 'trending') return artist.isTrending && matchesSearch;
+    if (activeTab === 'exclusive') return artist.isExclusive && matchesSearch;
+    return matchesSearch;
+  });
 
+  const filteredTestimonials = testimonials.filter(testi => 
+    testi.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    testi.role?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    testi.content?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  const filteredSubscribers = subscribers.filter(sub => 
+    sub.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
+  // --- LOGIN SCREEN ---
   if (!isLoggedIn) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f] p-4">
-        <div className="card-glass p-8 w-full max-w-md text-center">
-          <h1 className="font-display text-3xl font-bold text-[#d4a843] mb-2">Admin Login</h1>
-          <p className="text-gray-400 mb-8">Enter the master password to manage content.</p>
+      <div className="login-container">
+        {/* Scoped styles override */}
+        <style>{`
+          @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
           
-          <form onSubmit={handleLogin} className="flex flex-col gap-4">
-            <input 
-              type="password" 
-              className="form-control" 
-              placeholder="Enter Password" 
-              value={token} 
-              onChange={(e) => setToken(e.target.value)} 
-              required 
-            />
-            {error && <p className="text-red-500 text-sm">{error}</p>}
-            <button type="submit" className="btn btn-primary w-full" disabled={loading}>
-              {loading ? 'Authenticating...' : 'Login to Dashboard'}
+          .login-container {
+            min-height: 100vh;
+            width: 100vw;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 99999;
+            background: #050507;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            -webkit-font-smoothing: antialiased;
+          }
+
+          .login-card {
+            background: #0c0c0e;
+            border-radius: 16px;
+            padding: 48px 40px 40px 40px;
+            width: 100%;
+            max-width: 440px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 
+                        0 0 40px rgba(201, 168, 76, 0.04);
+            border: 1.5px solid rgba(201, 168, 76, 0.25);
+            text-align: center;
+          }
+
+          .login-brand-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 8px;
+          }
+
+          .login-logo-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+          }
+
+          .login-title-text {
+            font-size: 2.3rem;
+            font-weight: 700;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            background: linear-gradient(135deg, #f5e9c8 0%, #c9a84c 50%, #b38f36 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+          }
+
+          .login-title-subtext {
+            font-size: 2.3rem;
+            font-weight: 700;
+            color: #ffffff;
+            letter-spacing: -0.03em;
+            line-height: 1.1;
+            margin-top: 4px;
+          }
+
+          .login-subtitle {
+            color: #a0aec0;
+            font-size: 0.95rem;
+            margin-top: 14px;
+            margin-bottom: 34px;
+            font-weight: 400;
+          }
+
+          .login-form-group {
+            margin-bottom: 20px;
+            text-align: left;
+          }
+
+          .login-label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: #cbd5e1;
+            margin-bottom: 8px;
+          }
+
+          .login-input {
+            width: 100%;
+            padding: 13px 16px;
+            border: 1.5px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            font-size: 0.95rem;
+            color: #ffffff;
+            background: #141417;
+            outline: none;
+            transition: all 0.2s ease-in-out;
+            font-family: inherit;
+          }
+
+          .login-input::placeholder {
+            color: #4b5563;
+            font-weight: 400;
+          }
+
+          .login-input:focus {
+            border-color: #c9a84c;
+            box-shadow: 0 0 0 4px rgba(201, 168, 76, 0.18);
+          }
+
+          .login-options {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            margin-top: 16px;
+            margin-bottom: 26px;
+          }
+
+          .login-remember {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.92rem;
+            color: #a0aec0;
+            cursor: pointer;
+            user-select: none;
+          }
+
+          .login-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            border-radius: 4px;
+            accent-color: #c9a84c;
+            cursor: pointer;
+          }
+
+          .login-btn {
+            width: 100%;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, #e8c97a 0%, #c9a84c 50%, #b38f36 100%);
+            color: #050507;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.98rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-family: inherit;
+          }
+
+          .login-btn:hover:not(:disabled) {
+            background: linear-gradient(135deg, #f5e9c8 0%, #e8c97a 50%, #c9a84c 100%);
+            box-shadow: 0 0 15px rgba(201, 168, 76, 0.3);
+          }
+
+          .login-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+          }
+
+          .login-footer-links {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 16px;
+          }
+
+          .login-forgot {
+            font-size: 0.92rem;
+            color: #a0aec0;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.2s;
+          }
+
+          .login-forgot:hover {
+            color: #e8c97a;
+          }
+
+          .login-error {
+            color: #e53e3e;
+            font-size: 0.88rem;
+            margin-bottom: 16px;
+            text-align: left;
+            font-weight: 500;
+          }
+        `}</style>
+
+        <div className="login-card">
+          <div className="login-brand-group">
+            <div className="login-logo-row">
+              <LogoSVG />
+              <span className="login-title-text">ArtistVibes</span>
+            </div>
+            <span className="login-title-subtext">Entertainment</span>
+          </div>
+          
+          <p className="login-subtitle">Please enter your user information.</p>
+
+          <form onSubmit={handleLogin}>
+            <div className="login-form-group">
+              <label className="login-label">Username or email</label>
+              <input 
+                className="login-input"
+                value={username} 
+                onChange={e => setUsername(e.target.value)} 
+                required 
+                placeholder="Username" 
+                autoComplete="username" 
+              />
+            </div>
+
+            <div className="login-form-group">
+              <label className="login-label">Password</label>
+              <input 
+                className="login-input"
+                type="password" 
+                value={token} 
+                onChange={(e) => setToken(e.target.value)} 
+                required 
+                placeholder="•••••••" 
+                autoComplete="current-password" 
+              />
+            </div>
+
+            {error && <div className="login-error">{error}</div>}
+
+            <div className="login-options">
+              <label className="login-remember">
+                <input 
+                  type="checkbox" 
+                  className="login-checkbox"
+                  checked={rememberMe}
+                  onChange={e => setRememberMe(e.target.checked)}
+                />
+                Remember me
+              </label>
+            </div>
+
+            <button type="submit" className="login-btn" disabled={loading}>
+              {loading ? 'Signing in...' : 'Sign in'}
             </button>
           </form>
+
+          <div className="login-footer-links">
+            <a href="#forgot" onClick={e => e.preventDefault()} className="login-forgot">
+              Forgot your password?
+            </a>
+          </div>
         </div>
       </div>
     );
   }
 
-  // --- DASHBOARD SCREEN ---
+  // Helper title based on active tab
+  const getTabTitle = () => {
+    switch(activeTab) {
+      case 'all': return 'All Artists Database';
+      case 'featured': return 'Featured Artists Listing';
+      case 'trending': return 'Trendingcollage Selection';
+      case 'exclusive': return 'Exclusive Premium Artists';
+      case 'testimonials': return 'Customer Testimonials';
+      case 'subscribers': return 'Newsletter Subscribers';
+      default: return 'Admin Panel';
+    }
+  };
+
+  const getTabSubtitle = () => {
+    switch(activeTab) {
+      case 'all': return 'Directly view and edit all active and inactive artists inside the website.';
+      case 'featured': return 'These artists are featured inside the listings pages on the frontend.';
+      case 'trending': return 'Artists configured to cycle in the homepage neon-glow trending collage grid.';
+      case 'exclusive': return 'Exclusive stars displayed inside the premium flip-book container on the homepage.';
+      case 'testimonials': return 'Add, edit, or disable client reviews displayed in the homepage slider.';
+      case 'subscribers': return 'People who subscribed to receive email notifications when a new artist is added.';
+      default: return 'ArtistVibes Portal control center';
+    }
+  };
+
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-center mb-6 gap-4 bg-[#10101a] p-6 rounded-2xl border border-[rgba(255,255,255,0.05)] shadow-lg">
-        <div>
-          <h1 className="font-display text-3xl font-bold text-white">Admin Dashboard</h1>
-        </div>
-        <div className="flex items-center gap-4">
-          <button onClick={handleLogout} className="btn btn-ghost btn-sm text-red-400 hover:text-red-500 hover:bg-red-500/10"><FaSignOutAlt /> Logout</button>
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div className="flex gap-4 mb-6 border-b border-[rgba(255,255,255,0.05)] pb-2">
-        <button 
-          onClick={() => setActiveTab('featured')} 
-          className={`px-4 py-2 font-bold text-lg border-b-2 transition-all ${activeTab === 'featured' ? 'text-[#d4a843] border-[#d4a843]' : 'text-gray-500 border-transparent hover:text-gray-300'}`}
-        >
-          Featured Artists ({artists.filter(a => a.isFeatured).length})
-        </button>
-        <button 
-          onClick={() => setActiveTab('testimonials')} 
-          className={`px-4 py-2 font-bold text-lg border-b-2 transition-all ${activeTab === 'testimonials' ? 'text-[#d4a843] border-[#d4a843]' : 'text-gray-500 border-transparent hover:text-gray-300'}`}
-        >
-          Testimonials ({testimonials.length})
-        </button>
-        <button 
-          onClick={() => setActiveTab('subscribers')} 
-          className={`px-4 py-2 font-bold text-lg border-b-2 transition-all ${activeTab === 'subscribers' ? 'text-[#d4a843] border-[#d4a843]' : 'text-gray-500 border-transparent hover:text-gray-300'}`}
-        >
-          Subscribers ({subscribers.length})
-        </button>
-        <button 
-          onClick={() => setActiveTab('trending')} 
-          className={`px-4 py-2 font-bold text-lg border-b-2 transition-all ${activeTab === 'trending' ? 'text-[#d4a843] border-[#d4a843]' : 'text-gray-500 border-transparent hover:text-gray-300'}`}
-        >
-          Trending ({artists.filter(a => a.isTrending).length})
-        </button>
-        <button 
-          onClick={() => setActiveTab('exclusive')} 
-          className={`px-4 py-2 font-bold text-lg border-b-2 transition-all ${activeTab === 'exclusive' ? 'text-[#d4a843] border-[#d4a843]' : 'text-gray-500 border-transparent hover:text-gray-300'}`}
-        >
-          Exclusive ({artists.filter(a => a.isExclusive).length})
-        </button>
-      </div>
-
-      {/* --- FEATURED ARTISTS TAB --- */}
-      {activeTab === 'featured' && (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-white">Manage Featured Artists</h2>
-            <button onClick={openNewArtistForm} className="btn btn-primary btn-sm"><FaPlus /> Add New Artist</button>
+    <div className="admin-shell">
+      {/* Sidebar Navigation */}
+      <aside className={`admin-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
+        <div className="sidebar-brand">
+          <div className="sidebar-brand-row">
+            <LogoSVG />
+            <div>
+              <span className="sidebar-brand-name">ArtistVibes</span>
+              <div className="sidebar-brand-sub">Admin Portal</div>
+            </div>
           </div>
-          
-          <div className="bg-[#14141f] rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)]">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-gray-400">
-                <thead className="bg-[#1a1a2e] text-xs uppercase text-gray-300">
+        </div>
+
+        <nav className="sidebar-nav">
+          <span className="sidebar-section-label">Main Directory</span>
+          <button 
+            onClick={() => { setActiveTab('all'); setMobileMenuOpen(false); }} 
+            className={`sidebar-item ${activeTab === 'all' ? 'active' : ''}`}
+          >
+            <span className="item-icon"><FaThLarge /></span>
+            All Artists
+            <span className="item-count">{artists.length}</span>
+          </button>
+
+          <span className="sidebar-section-label">Homepage Sections</span>
+          <button 
+            onClick={() => { setActiveTab('featured'); setMobileMenuOpen(false); }} 
+            className={`sidebar-item ${activeTab === 'featured' ? 'active' : ''}`}
+          >
+            <span className="item-icon"><FaStar /></span>
+            Featured
+            <span className="item-count">{artists.filter(a => a.isFeatured).length}</span>
+          </button>
+          <button 
+            onClick={() => { setActiveTab('trending'); setMobileMenuOpen(false); }} 
+            className={`sidebar-item ${activeTab === 'trending' ? 'active' : ''}`}
+          >
+            <span className="item-icon"><FaFire /></span>
+            Trending Collage
+            <span className="item-count">{artists.filter(a => a.isTrending).length}</span>
+          </button>
+          <button 
+            onClick={() => { setActiveTab('exclusive'); setMobileMenuOpen(false); }} 
+            className={`sidebar-item ${activeTab === 'exclusive' ? 'active' : ''}`}
+          >
+            <span className="item-icon"><FaCrown /></span>
+            Exclusive Book
+            <span className="item-count">{artists.filter(a => a.isExclusive).length}</span>
+          </button>
+
+          <span className="sidebar-section-label">Social & Marketing</span>
+          <button 
+            onClick={() => { setActiveTab('testimonials'); setMobileMenuOpen(false); }} 
+            className={`sidebar-item ${activeTab === 'testimonials' ? 'active' : ''}`}
+          >
+            <span className="item-icon"><FaQuoteLeft /></span>
+            Testimonials
+            <span className="item-count">{testimonials.length}</span>
+          </button>
+          <button 
+            onClick={() => { setActiveTab('subscribers'); setMobileMenuOpen(false); }} 
+            className={`sidebar-item ${activeTab === 'subscribers' ? 'active' : ''}`}
+          >
+            <span className="item-icon"><FaEnvelope /></span>
+            Subscribers List
+            <span className="item-count">{subscribers.length}</span>
+          </button>
+        </nav>
+
+        <div className="sidebar-footer">
+          <div style={{ padding: '0 16px 12px', fontSize: '0.8rem', color: '#555' }}>
+            Logged in: <strong style={{ color: '#888' }}>{username || 'Administrator'}</strong>
+          </div>
+          <button onClick={handleLogout} className="sidebar-logout">
+            <FaSignOutAlt /> Log Out Portal
+          </button>
+        </div>
+      </aside>
+
+      {/* Main Content Pane */}
+      <main className="admin-main">
+        {/* Topbar Row */}
+        <header className="admin-topbar">
+          <div className="topbar-left">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+              <button 
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)} 
+                className="mobile-menu-btn"
+                aria-label="Toggle menu"
+              >
+                ☰
+              </button>
+              <h1>{getTabTitle()}</h1>
+            </div>
+            <p>{getTabSubtitle()}</p>
+          </div>
+
+          <div className="topbar-right">
+            <div className="topbar-search">
+              <FaSearch />
+              <input 
+                type="text" 
+                placeholder="Search name, category, city..." 
+                value={searchTerm}
+                onChange={e => setSearchTerm(e.target.value)}
+              />
+            </div>
+
+            {activeTab !== 'subscribers' && (
+              <button 
+                onClick={activeTab === 'testimonials' ? openNewTestimonialModal : openNewArtistModal} 
+                className="add-btn"
+              >
+                <FaPlus /> {activeTab === 'testimonials' ? 'Add Testimonial' : 'Add Artist'}
+              </button>
+            )}
+          </div>
+        </header>
+
+        {/* Quick Stats Grid */}
+        <section className="stats-row">
+          <div className="stat-card" style={{ '--stat-accent': '#c9a84c' } as any}>
+            <div className="stat-icon" style={{ background: 'rgba(201,168,76,0.1)', color: '#c9a84c' }}><FaUsers /></div>
+            <div className="stat-value">{artists.length}</div>
+            <div className="stat-label">Total Artists</div>
+          </div>
+          <div className="stat-card" style={{ '--stat-accent': '#a78bfa' } as any}>
+            <div className="stat-icon" style={{ background: 'rgba(139,92,246,0.1)', color: '#a78bfa' }}><FaStar /></div>
+            <div className="stat-value">{artists.filter(a => a.isFeatured).length}</div>
+            <div className="stat-label">Featured</div>
+          </div>
+          <div className="stat-card" style={{ '--stat-accent': '#fb923c' } as any}>
+            <div className="stat-icon" style={{ background: 'rgba(251,146,60,0.1)', color: '#fb923c' }}><FaFire /></div>
+            <div className="stat-value">{artists.filter(a => a.isTrending).length}</div>
+            <div className="stat-label">Trending</div>
+          </div>
+          <div className="stat-card" style={{ '--stat-accent': '#e8c97a' } as any}>
+            <div className="stat-icon" style={{ background: 'rgba(232,201,122,0.1)', color: '#e8c97a' }}><FaCrown /></div>
+            <div className="stat-value">{artists.filter(a => a.isExclusive).length}</div>
+            <div className="stat-label">Exclusive</div>
+          </div>
+          <div className="stat-card" style={{ '--stat-accent': '#22c55e' } as any}>
+            <div className="stat-icon" style={{ background: 'rgba(34,197,94,0.1)', color: '#22c55e' }}><FaEnvelope /></div>
+            <div className="stat-value">{subscribers.length}</div>
+            <div className="stat-label">Subscribers</div>
+          </div>
+        </section>
+
+        {/* Content Panel Area */}
+        <div className="content-panel">
+          {/* Artists Listings */}
+          {['all', 'featured', 'trending', 'exclusive'].includes(activeTab) && (
+            <div style={{ overflowX: 'auto' }}>
+              <table className="data-table">
+                <thead>
                   <tr>
-                    <th className="px-6 py-4">Name</th>
-                    <th className="px-6 py-4">Category</th>
-                    <th className="px-6 py-4">Location</th>
-                    <th className="px-6 py-4">Status / Badges</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                    <th>Artist Details</th>
+                    <th>Category</th>
+                    <th>Location / City</th>
+                    <th>Starting Price</th>
+                    <th>Rating & Shows</th>
+                    <th>Home Display flags</th>
+                    <th style={{ textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {artists.filter(a => a.isFeatured).map((artist) => (
-                    <tr key={artist.id} className="border-b border-[rgba(255,255,255,0.05)] hover:bg-[#1a1a2e]/50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-white">{artist.name}</td>
-                      <td className="px-6 py-4">{artist.category}</td>
-                      <td className="px-6 py-4">{artist.location}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2 flex-wrap">
-                          {artist.isExclusive && <span className="badge badge-gold"><FaCrown /> Exclusive</span>}
-                          {artist.isFeatured && <span className="badge badge-purple"><FaStar /> Featured</span>}
-                          {artist.isActive ? (
-                            <span className="badge badge-success">Active</span>
-                          ) : (
-                            <span className="badge bg-red-500/10 text-red-500 border-red-500/30">Inactive</span>
-                          )}
+                  {filteredArtists.length === 0 ? (
+                    <tr>
+                      <td colSpan={7}>
+                        <div className="empty-state">
+                          <div className="empty-icon">🎤</div>
+                          <div className="empty-title">No Artists Found</div>
+                          <div className="empty-desc">Try modifying your search query or add a new artist using the gold button above.</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <button onClick={() => openEditArtistForm(artist)} className="text-blue-400 hover:text-blue-300 mr-4"><FaEdit size={18} /></button>
-                        <button onClick={() => deleteArtist(artist.id)} className="text-red-500 hover:text-red-400"><FaTrash size={18} /></button>
-                      </td>
                     </tr>
-                  ))}
-                  {artists.filter(a => a.isFeatured).length === 0 && (
-                    <tr><td colSpan={5} className="text-center py-8 text-gray-500">No featured artists found.</td></tr>
+                  ) : (
+                    filteredArtists.map((artist) => (
+                      <tr key={artist.id}>
+                        <td>
+                          <div className="artist-cell">
+                            {artist.imageUrl ? (
+                              <img src={artist.imageUrl} alt={artist.name} className="artist-avatar" />
+                            ) : (
+                              <div className="artist-avatar-placeholder">🎤</div>
+                            )}
+                            <div>
+                              <div className="artist-name">{artist.name}</div>
+                              <div style={{ fontSize: '0.75rem', color: '#555', marginTop: '2px' }}>Order Priority: {artist.order || 0}</div>
+                            </div>
+                          </div>
+                        </td>
+                        <td>
+                          <span style={{ color: '#ccc', fontWeight: 500 }}>{artist.category}</span>
+                        </td>
+                        <td>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px' }}><FaGlobe style={{ fontSize: '0.75rem', color: '#555' }} /> {artist.location || 'Mumbai'}</span>
+                        </td>
+                        <td>
+                          <span style={{ color: '#e8c97a', fontWeight: 600 }}>{artist.price || 'On Request'}</span>
+                        </td>
+                        <td>
+                          <div style={{ display: 'flex', flexDirection: 'column', gap: '2px' }}>
+                            <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#c9a84c', fontSize: '0.82rem', fontWeight: 600 }}>
+                              <FaStar /> {artist.rating || '4.5'}
+                            </span>
+                            <span style={{ fontSize: '0.75rem', color: '#555' }}>
+                              {artist.eventsCount || 0} Events
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          <div className="badge-group">
+                            {artist.isActive ? (
+                              <span className="status-pill status-active">Active</span>
+                            ) : (
+                              <span className="status-pill status-inactive">Inactive</span>
+                            )}
+                            {artist.isFeatured && <span className="status-pill status-featured"><FaStar /> Featured</span>}
+                            {artist.isTrending && <span className="status-pill status-trending"><FaFire /> Trending</span>}
+                            {artist.isExclusive && <span className="status-pill status-exclusive"><FaCrown /> Exclusive</span>}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="action-group">
+                            <button 
+                              onClick={() => openEditArtistModal(artist)} 
+                              className="action-btn action-edit"
+                              title="Edit Artist Details"
+                            >
+                              <FaEdit /> Edit
+                            </button>
+                            <button 
+                              onClick={() => deleteArtist(artist.id, artist.name)} 
+                              className="action-btn action-delete"
+                              title="Remove Artist"
+                            >
+                              <FaTrash /> Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
                   )}
                 </tbody>
               </table>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
-      {/* --- TESTIMONIALS TAB --- */}
-      {activeTab === 'testimonials' && (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-white">Manage Testimonials</h2>
-            <button onClick={openNewTestiForm} className="btn btn-primary btn-sm"><FaPlus /> Add Testimonial</button>
-          </div>
-          
-          <div className="bg-[#14141f] rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)]">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-gray-400">
-                <thead className="bg-[#1a1a2e] text-xs uppercase text-gray-300">
+          {/* Testimonials Listing */}
+          {activeTab === 'testimonials' && (
+            <div style={{ overflowX: 'auto' }}>
+              <table className="data-table">
+                <thead>
                   <tr>
-                    <th className="px-6 py-4">Name</th>
-                    <th className="px-6 py-4">Role</th>
-                    <th className="px-6 py-4">Rating</th>
-                    <th className="px-6 py-4">Status</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                    <th>Client Reviewer</th>
+                    <th>Company / Role</th>
+                    <th style={{ width: '40%' }}>Review Content</th>
+                    <th>Rating</th>
+                    <th>Display Status</th>
+                    <th style={{ textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {testimonials.map((testi) => (
-                    <tr key={testi.id} className="border-b border-[rgba(255,255,255,0.05)] hover:bg-[#1a1a2e]/50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-white">{testi.name}</td>
-                      <td className="px-6 py-4">{testi.role || '-'}</td>
-                      <td className="px-6 py-4 flex items-center text-[#d4a843] gap-1"><FaStar /> {testi.rating}</td>
-                      <td className="px-6 py-4">
-                        {testi.isActive ? <span className="badge badge-success">Active</span> : <span className="badge bg-red-500/10 text-red-500 border-red-500/30">Inactive</span>}
-                      </td>
-                      <td className="px-6 py-4 text-right">
-                        <button onClick={() => openEditTestiForm(testi)} className="text-blue-400 hover:text-blue-300 mr-4"><FaEdit size={18} /></button>
-                        <button onClick={() => deleteTestimonial(testi.id)} className="text-red-500 hover:text-red-400"><FaTrash size={18} /></button>
-                      </td>
-                    </tr>
-                  ))}
-                  {testimonials.length === 0 && (
-                    <tr><td colSpan={5} className="text-center py-8 text-gray-500">No testimonials found.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* --- SUBSCRIBERS TAB --- */}
-      {activeTab === 'subscribers' && (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-white">Newsletter Subscribers</h2>
-            <button onClick={fetchSubscribers} className="btn btn-ghost btn-sm text-gray-400">Refresh List</button>
-          </div>
-          
-          <div className="bg-[#14141f] rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)]">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-gray-400">
-                <thead className="bg-[#1a1a2e] text-xs uppercase text-gray-300">
-                  <tr>
-                    <th className="px-6 py-4">#</th>
-                    <th className="px-6 py-4">Email Address</th>
-                    <th className="px-6 py-4">Subscribed Date</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {subscribers.map((sub, index) => (
-                    <tr key={sub.id} className="border-b border-[rgba(255,255,255,0.05)] hover:bg-[#1a1a2e]/50 transition-colors">
-                      <td className="px-6 py-4 text-gray-500">{index + 1}</td>
-                      <td className="px-6 py-4 font-medium text-white">{sub.email}</td>
-                      <td className="px-6 py-4">{new Date(sub.createdAt).toLocaleDateString()} at {new Date(sub.createdAt).toLocaleTimeString()}</td>
-                      <td className="px-6 py-4 text-right">
-                        <button onClick={() => deleteSubscriber(sub.id)} className="text-red-500 hover:text-red-400" title="Remove subscriber"><FaTrash size={16} /></button>
-                      </td>
-                    </tr>
-                  ))}
-                  {subscribers.length === 0 && (
-                    <tr><td colSpan={4} className="text-center py-8 text-gray-500">No subscribers found yet.</td></tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* --- TRENDING TAB --- */}
-      {activeTab === 'trending' && (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-white">Manage Trending Artists</h2>
-            <button onClick={openNewArtistForm} className="btn btn-primary btn-sm"><FaPlus /> Add Trending Artist</button>
-          </div>
-          
-          <div className="bg-[#14141f] rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)]">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-gray-400">
-                <thead className="bg-[#1a1a2e] text-xs uppercase text-gray-300">
-                  <tr>
-                    <th className="px-6 py-4">Name</th>
-                    <th className="px-6 py-4">Category</th>
-                    <th className="px-6 py-4">Location</th>
-                    <th className="px-6 py-4">Status / Badges</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {artists.filter(a => a.isTrending).map((artist) => (
-                    <tr key={artist.id} className="border-b border-[rgba(255,255,255,0.05)] hover:bg-[#1a1a2e]/50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-white">{artist.name}</td>
-                      <td className="px-6 py-4">{artist.category}</td>
-                      <td className="px-6 py-4">{artist.location}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2 flex-wrap">
-                          {artist.isExclusive && <span className="badge badge-gold"><FaCrown /> Exclusive</span>}
-                          {artist.isFeatured && <span className="badge badge-purple"><FaStar /> Featured</span>}
-                          {artist.isTrending && <span className="badge bg-orange-500/10 text-orange-500 border-orange-500/30">Trending</span>}
-                          {artist.isActive ? (
-                            <span className="badge badge-success">Active</span>
-                          ) : (
-                            <span className="badge bg-red-500/10 text-red-500 border-red-500/30">Inactive</span>
-                          )}
+                  {filteredTestimonials.length === 0 ? (
+                    <tr>
+                      <td colSpan={6}>
+                        <div className="empty-state">
+                          <div className="empty-icon"><FaQuoteLeft /></div>
+                          <div className="empty-title">No Reviews Found</div>
+                          <div className="empty-desc">Create client reviews to display them on the homepage.</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <button onClick={() => openEditArtistForm(artist)} className="text-blue-400 hover:text-blue-300 mr-4"><FaEdit size={18} /></button>
-                        <button onClick={() => deleteArtist(artist.id)} className="text-red-500 hover:text-red-400"><FaTrash size={18} /></button>
-                      </td>
                     </tr>
-                  ))}
-                  {artists.filter(a => a.isTrending).length === 0 && (
-                    <tr><td colSpan={5} className="text-center py-8 text-gray-500">No trending artists found.</td></tr>
+                  ) : (
+                    filteredTestimonials.map((testi) => (
+                      <tr key={testi.id}>
+                        <td>
+                          <div className="artist-cell">
+                            {testi.imageUrl ? (
+                              <img src={testi.imageUrl} alt={testi.name} className="artist-avatar" style={{ borderRadius: '50%' }} />
+                            ) : (
+                              <div className="artist-avatar-placeholder" style={{ borderRadius: '50%' }}>👤</div>
+                            )}
+                            <span className="artist-name">{testi.name}</span>
+                          </div>
+                        </td>
+                        <td>
+                          <span style={{ color: '#888' }}>{testi.role || '-'}</span>
+                        </td>
+                        <td>
+                          <span style={{ fontStyle: 'italic', color: '#bbb', fontSize: '0.82rem' }}>"{testi.content}"</span>
+                        </td>
+                        <td>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '4px', color: '#c9a84c', fontWeight: 600 }}>
+                            <FaStar /> {testi.rating || '5'}
+                          </span>
+                        </td>
+                        <td>
+                          {testi.isActive ? (
+                            <span className="status-pill status-active">Visible</span>
+                          ) : (
+                            <span className="status-pill status-inactive">Hidden</span>
+                          )}
+                        </td>
+                        <td>
+                          <div className="action-group">
+                            <button 
+                              onClick={() => openEditTestimonialModal(testi)} 
+                              className="action-btn action-edit"
+                            >
+                              <FaEdit /> Edit
+                            </button>
+                            <button 
+                              onClick={() => deleteTestimonial(testi.id, testi.name)} 
+                              className="action-btn action-delete"
+                            >
+                              <FaTrash /> Delete
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
                   )}
                 </tbody>
               </table>
             </div>
-          </div>
-        </div>
-      )}
+          )}
 
-      {/* --- EXCLUSIVE TAB --- */}
-      {activeTab === 'exclusive' && (
-        <div className="space-y-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-          <div className="flex justify-between items-center">
-            <h2 className="text-xl font-bold text-white">Manage Exclusive Artists</h2>
-            <button onClick={openNewArtistForm} className="btn btn-primary btn-sm"><FaPlus /> Add Exclusive Artist</button>
-          </div>
-          
-          <div className="bg-[#14141f] rounded-xl overflow-hidden border border-[rgba(255,255,255,0.05)]">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left text-sm text-gray-400">
-                <thead className="bg-[#1a1a2e] text-xs uppercase text-gray-300">
+          {/* Newsletter Subscribers Listing */}
+          {activeTab === 'subscribers' && (
+            <div style={{ overflowX: 'auto' }}>
+              <table className="data-table">
+                <thead>
                   <tr>
-                    <th className="px-6 py-4">Name</th>
-                    <th className="px-6 py-4">Category</th>
-                    <th className="px-6 py-4">Location</th>
-                    <th className="px-6 py-4">Status / Badges</th>
-                    <th className="px-6 py-4 text-right">Actions</th>
+                    <th style={{ width: '10%' }}>No.</th>
+                    <th>Email Address</th>
+                    <th>Subscription Date</th>
+                    <th style={{ textAlign: 'right' }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {artists.filter(a => a.isExclusive).map((artist) => (
-                    <tr key={artist.id} className="border-b border-[rgba(255,255,255,0.05)] hover:bg-[#1a1a2e]/50 transition-colors">
-                      <td className="px-6 py-4 font-medium text-white">{artist.name}</td>
-                      <td className="px-6 py-4">{artist.category}</td>
-                      <td className="px-6 py-4">{artist.location}</td>
-                      <td className="px-6 py-4">
-                        <div className="flex gap-2 flex-wrap">
-                          {artist.isExclusive && <span className="badge badge-gold"><FaCrown /> Exclusive</span>}
-                          {artist.isFeatured && <span className="badge badge-purple"><FaStar /> Featured</span>}
-                          {artist.isTrending && <span className="badge bg-orange-500/10 text-orange-500 border-orange-500/30">Trending</span>}
-                          {artist.isActive ? (
-                            <span className="badge badge-success">Active</span>
-                          ) : (
-                            <span className="badge bg-red-500/10 text-red-500 border-red-500/30">Inactive</span>
-                          )}
+                  {filteredSubscribers.length === 0 ? (
+                    <tr>
+                      <td colSpan={4}>
+                        <div className="empty-state">
+                          <div className="empty-icon"><FaEnvelope /></div>
+                          <div className="empty-title">No Subscribers Yet</div>
+                          <div className="empty-desc">When users sign up for updates on the website, they will appear here.</div>
                         </div>
                       </td>
-                      <td className="px-6 py-4 text-right">
-                        <button onClick={() => openEditArtistForm(artist)} className="text-blue-400 hover:text-blue-300 mr-4"><FaEdit size={18} /></button>
-                        <button onClick={() => deleteArtist(artist.id)} className="text-red-500 hover:text-red-400"><FaTrash size={18} /></button>
-                      </td>
                     </tr>
-                  ))}
-                  {artists.filter(a => a.isExclusive).length === 0 && (
-                    <tr><td colSpan={5} className="text-center py-8 text-gray-500">No exclusive artists found.</td></tr>
+                  ) : (
+                    filteredSubscribers.map((sub, index) => (
+                      <tr key={sub.id}>
+                        <td>
+                          <span style={{ color: '#555', fontWeight: 600 }}>{index + 1}</span>
+                        </td>
+                        <td>
+                          <span className="artist-name" style={{ color: '#e8c97a' }}>{sub.email}</span>
+                        </td>
+                        <td>
+                          <span style={{ color: '#888' }}>
+                            {new Date(sub.createdAt).toLocaleDateString()} at {new Date(sub.createdAt).toLocaleTimeString()}
+                          </span>
+                        </td>
+                        <td>
+                          <div className="action-group">
+                            <button 
+                              onClick={() => deleteSubscriber(sub.id, sub.email)} 
+                              className="action-btn action-delete"
+                            >
+                              <FaTrash /> Remove
+                            </button>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
                   )}
                 </tbody>
               </table>
             </div>
-          </div>
+          )}
         </div>
-      )}
+      </main>
 
       {/* --- ADD/EDIT ARTIST MODAL --- */}
-      {artistFormOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2 className="modal-title mb-6">{editingArtistId ? 'Edit Artist' : 'Add New Artist'}</h2>
+      {showArtistModal && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
+            <div className="admin-modal-header">
+              <h2 className="admin-modal-title">{editingId ? 'Edit Artist Details' : 'Add New Artist to Website'}</h2>
+              <button onClick={() => setShowArtistModal(false)} className="admin-modal-close">✕</button>
+            </div>
             
-            <form onSubmit={saveArtist} className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="form-group mb-0">
-                  <label className="form-label">Name *</label>
-                  <input name="name" className="form-control" value={artistForm.name} onChange={handleArtistFormChange} required />
+            <form onSubmit={saveArtist} className="adm-form-grid">
+              <div className="adm-form-group">
+                <label className="adm-form-label">Full Name *</label>
+                <input 
+                  name="name" 
+                  type="text"
+                  className="adm-form-input" 
+                  value={artistForm.name} 
+                  onChange={handleArtistFormChange} 
+                  placeholder="e.g. Darshan Raval" 
+                  required 
+                />
+              </div>
+
+              <div className="adm-form-group">
+                <label className="adm-form-label">Category *</label>
+                <select 
+                  name="category" 
+                  className="adm-form-input" 
+                  value={artistForm.category} 
+                  onChange={handleArtistFormChange} 
+                  required
+                >
+                  <option value="DJ">DJ</option>
+                  <option value="Singer">Singer</option>
+                  <option value="Dancer">Dancer</option>
+                  <option value="Comedian">Comedian</option>
+                  <option value="Band">Band</option>
+                  <option value="Anchor">Anchor</option>
+                  <option value="Musician">Musician</option>
+                  <option value="Magician">Magician</option>
+                  <option value="Stand-up Comic">Stand-up Comic</option>
+                </select>
+              </div>
+
+              <div className="adm-form-group">
+                <label className="adm-form-label">Location / City</label>
+                <input 
+                  name="location" 
+                  type="text"
+                  className="adm-form-input" 
+                  value={artistForm.location} 
+                  onChange={handleArtistFormChange} 
+                  placeholder="e.g. Mumbai" 
+                />
+              </div>
+
+              <div className="adm-form-group">
+                <label className="adm-form-label">Starting Price</label>
+                <input 
+                  name="price" 
+                  type="text"
+                  className="adm-form-input" 
+                  value={artistForm.price} 
+                  onChange={handleArtistFormChange} 
+                  placeholder="e.g. ₹50,000 onwards" 
+                />
+                <span className="adm-form-hint">Tip: Use "On Request" if pricing varies.</span>
+              </div>
+
+              <div className="adm-form-group">
+                <label className="adm-form-label">Star Rating (1.0 to 5.0)</label>
+                <input 
+                  name="rating" 
+                  type="number" 
+                  step="0.1" 
+                  min="1" 
+                  max="5" 
+                  className="adm-form-input" 
+                  value={artistForm.rating} 
+                  onChange={handleArtistFormChange} 
+                  placeholder="4.5"
+                />
+              </div>
+
+              <div className="adm-form-group">
+                <label className="adm-form-label">Events / Shows Handled</label>
+                <input 
+                  name="eventsCount" 
+                  type="number" 
+                  className="adm-form-input" 
+                  value={artistForm.eventsCount} 
+                  onChange={handleArtistFormChange} 
+                  placeholder="e.g. 150" 
+                />
+              </div>
+
+              <div className="adm-form-group full-width">
+                <label className="adm-form-label">Short Biography / Description</label>
+                <textarea 
+                  name="bio" 
+                  className="adm-form-input" 
+                  rows={3} 
+                  value={artistForm.bio} 
+                  onChange={handleArtistFormChange} 
+                  placeholder="Brief description about the artist's style, experience, and prominent performances..."
+                />
+              </div>
+
+              <div className="adm-form-group full-width">
+                <label className="adm-form-label">Photo Link (URL)</label>
+                <input 
+                  name="imageUrl" 
+                  type="text"
+                  className="adm-form-input" 
+                  value={artistForm.imageUrl} 
+                  onChange={handleArtistFormChange} 
+                  placeholder="https://images.unsplash.com/photo-..." 
+                />
+                {artistForm.imageUrl && (
+                  <img src={artistForm.imageUrl} alt="Preview" className="img-preview" />
+                )}
+              </div>
+
+              <div className="adm-form-group full-width">
+                <label className="adm-form-label">YouTube Video Link (Optional)</label>
+                <input 
+                  name="videoUrl" 
+                  type="text"
+                  className="adm-form-input" 
+                  value={artistForm.videoUrl} 
+                  onChange={handleArtistFormChange} 
+                  placeholder="e.g. https://www.youtube.com/watch?v=..." 
+                />
+              </div>
+
+              <div className="adm-form-group">
+                <label className="adm-form-label">Display Order Index</label>
+                <input 
+                  name="order" 
+                  type="number" 
+                  className="adm-form-input" 
+                  value={artistForm.order} 
+                  onChange={handleArtistFormChange} 
+                  placeholder="0" 
+                />
+                <span className="adm-form-hint">Note: Lower numbers display first on the site.</span>
+              </div>
+
+              {/* Toggle flags switches */}
+              <div className="adm-toggles">
+                <div className="adm-toggle-row">
+                  <div className="adm-toggle-label">
+                    <span className="toggle-icon" style={{ color: '#22c55e' }}>●</span>
+                    Active Status (Visible on site)
+                  </div>
+                  <label className="toggle-switch">
+                    <input 
+                      type="checkbox" 
+                      name="isActive" 
+                      checked={artistForm.isActive} 
+                      onChange={handleArtistFormChange} 
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
                 </div>
-                <div className="form-group mb-0">
-                  <label className="form-label">Category *</label>
-                  <select name="category" className="form-control" value={artistForm.category} onChange={handleArtistFormChange} required>
-                    <option value="">Select Category</option>
-                    <option value="DJ">DJ</option>
-                    <option value="Singer">Singer</option>
-                    <option value="Dancer">Dancer</option>
-                    <option value="Comedian">Comedian</option>
-                    <option value="Band">Band</option>
-                    <option value="Anchor">Anchor</option>
-                    <option value="Musician">Musician</option>
-                    <option value="Magician">Magician</option>
-                    <option value="Stand-up Comic">Stand-up Comic</option>
-                  </select>
+
+                <div className="adm-toggle-row">
+                  <div className="adm-toggle-label">
+                    <span className="toggle-icon" style={{ color: '#a78bfa' }}><FaStar /></span>
+                    Featured Artist
+                  </div>
+                  <label className="toggle-switch">
+                    <input 
+                      type="checkbox" 
+                      name="isFeatured" 
+                      checked={artistForm.isFeatured} 
+                      onChange={handleArtistFormChange} 
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
                 </div>
-                <div className="form-group mb-0">
-                  <label className="form-label">Location</label>
-                  <input name="location" className="form-control" value={artistForm.location} onChange={handleArtistFormChange} />
+
+                <div className="adm-toggle-row">
+                  <div className="adm-toggle-label">
+                    <span className="toggle-icon" style={{ color: '#fb923c' }}><FaFire /></span>
+                    Trending Section Collage
+                  </div>
+                  <label className="toggle-switch">
+                    <input 
+                      type="checkbox" 
+                      name="isTrending" 
+                      checked={artistForm.isTrending} 
+                      onChange={handleArtistFormChange} 
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
                 </div>
-                <div className="form-group mb-0">
-                  <label className="form-label">Starting Price</label>
-                  <input name="price" className="form-control" placeholder="e.g. ₹50,000 onwards" value={artistForm.price} onChange={handleArtistFormChange} />
-                </div>
-                <div className="form-group mb-0">
-                  <label className="form-label">Rating</label>
-                  <input name="rating" type="number" step="0.1" min="1" max="5" className="form-control" placeholder="e.g. 4.5" value={artistForm.rating} onChange={handleArtistFormChange} />
-                </div>
-                <div className="form-group mb-0 col-span-2">
-                  <label className="form-label">Bio / Details</label>
-                  <textarea name="bio" className="form-control" rows={3} placeholder="Artist details..." value={artistForm.bio} onChange={handleArtistFormChange}></textarea>
-                </div>
-                <div className="form-group mb-0 col-span-2">
-                  <label className="form-label">Photo Link (URL)</label>
-                  <input name="imageUrl" className="form-control" placeholder="https://..." value={artistForm.imageUrl} onChange={handleArtistFormChange} />
+
+                <div className="adm-toggle-row">
+                  <div className="adm-toggle-label">
+                    <span className="toggle-icon" style={{ color: '#e8c97a' }}><FaCrown /></span>
+                    Exclusive Flip Book
+                  </div>
+                  <label className="toggle-switch">
+                    <input 
+                      type="checkbox" 
+                      name="isExclusive" 
+                      checked={artistForm.isExclusive} 
+                      onChange={handleArtistFormChange} 
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
                 </div>
               </div>
 
-              <div className="p-4 bg-[#1a1a2e] border border-[rgba(255,255,255,0.05)] rounded-lg flex flex-col gap-3 mt-2">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" name="isExclusive" checked={artistForm.isExclusive} onChange={handleArtistFormChange} className="w-4 h-4 accent-[#d4a843]" />
-                  <span className="text-sm font-medium text-white">Exclusive Artist</span>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" name="isFeatured" checked={artistForm.isFeatured} onChange={handleArtistFormChange} className="w-4 h-4 accent-[#d4a843]" />
-                  <span className="text-sm font-medium text-white">Featured Artist</span>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" name="isTrending" checked={artistForm.isTrending} onChange={handleArtistFormChange} className="w-4 h-4 accent-[#d4a843]" />
-                  <span className="text-sm font-medium text-white">Trending Artist</span>
-                </label>
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" name="isActive" checked={artistForm.isActive} onChange={handleArtistFormChange} className="w-4 h-4 accent-[#d4a843]" />
-                  <span className="text-sm font-medium text-white">Active</span>
-                </label>
-              </div>
-
-              <div className="flex gap-4 mt-6">
-                <button type="button" onClick={() => setArtistFormOpen(false)} className="btn btn-ghost flex-1">Cancel</button>
-                <button type="submit" className="btn btn-primary flex-1" disabled={loading}>{loading ? 'Saving...' : 'Save Artist'}</button>
+              <div className="adm-form-footer">
+                <button type="button" onClick={() => setShowArtistModal(false)} className="adm-btn-cancel">Cancel</button>
+                <button type="submit" className="adm-btn-save" disabled={loading}>
+                  {loading ? 'Saving Changes...' : 'Save Artist'}
+                </button>
               </div>
             </form>
           </div>
@@ -798,149 +1283,114 @@ export default function AdminDashboard() {
       )}
 
       {/* --- ADD/EDIT TESTIMONIAL MODAL --- */}
-      {testiFormOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2 className="modal-title mb-6">{editingTestiId ? 'Edit Testimonial' : 'Add New Testimonial'}</h2>
+      {showTestimonialModal && (
+        <div className="admin-modal-overlay">
+          <div className="admin-modal">
+            <div className="admin-modal-header">
+              <h2 className="admin-modal-title">{editingId ? 'Edit Client Review' : 'Create Customer Review'}</h2>
+              <button onClick={() => setShowTestimonialModal(false)} className="admin-modal-close">✕</button>
+            </div>
             
-            <form onSubmit={saveTestimonial} className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="form-group mb-0">
-                  <label className="form-label">Client Name *</label>
-                  <input name="name" className="form-control" value={testiForm.name} onChange={handleTestiFormChange} required />
-                </div>
-                <div className="form-group mb-0">
-                  <label className="form-label">Role / Company</label>
-                  <input name="role" className="form-control" placeholder="e.g. Event Manager" value={testiForm.role} onChange={handleTestiFormChange} />
-                </div>
-                <div className="form-group mb-0 col-span-2">
-                  <label className="form-label">Testimonial Content *</label>
-                  <textarea name="content" className="form-control" rows={4} value={testiForm.content} onChange={handleTestiFormChange} required></textarea>
-                </div>
-                <div className="form-group mb-0">
-                  <label className="form-label">Rating (1-5)</label>
-                  <input name="rating" type="number" min="1" max="5" className="form-control" value={testiForm.rating} onChange={handleTestiFormChange} />
-                </div>
-                <div className="form-group mb-0">
-                  <label className="form-label">Avatar URL (Optional)</label>
-                  <input name="imageUrl" className="form-control" placeholder="https://..." value={testiForm.imageUrl} onChange={handleTestiFormChange} />
+            <form onSubmit={saveTestimonial} className="adm-form-grid">
+              <div className="adm-form-group">
+                <label className="adm-form-label">Client / Reviewer Name *</label>
+                <input 
+                  name="name" 
+                  type="text"
+                  className="adm-form-input" 
+                  value={testimonialForm.name} 
+                  onChange={handleTestiFormChange} 
+                  placeholder="e.g. Ramesh Patel" 
+                  required 
+                />
+              </div>
+
+              <div className="adm-form-group">
+                <label className="adm-form-label">Role / Organization</label>
+                <input 
+                  name="role" 
+                  type="text"
+                  className="adm-form-input" 
+                  value={testimonialForm.role} 
+                  onChange={handleTestiFormChange} 
+                  placeholder="e.g. Event Planner, Wedding Couple" 
+                />
+              </div>
+
+              <div className="adm-form-group full-width">
+                <label className="adm-form-label">Testimonial Content *</label>
+                <textarea 
+                  name="content" 
+                  className="adm-form-input" 
+                  rows={4} 
+                  value={testimonialForm.content} 
+                  onChange={handleTestiFormChange} 
+                  placeholder="Write the feedback message here..."
+                  required
+                />
+              </div>
+
+              <div className="adm-form-group">
+                <label className="adm-form-label">Rating Stars (1 to 5)</label>
+                <select 
+                  name="rating" 
+                  className="adm-form-input" 
+                  value={testimonialForm.rating} 
+                  onChange={handleTestiFormChange}
+                >
+                  <option value="5">⭐⭐⭐⭐⭐ (5 Stars)</option>
+                  <option value="4">⭐⭐⭐⭐ (4 Stars)</option>
+                  <option value="3">⭐⭐⭐ (3 Stars)</option>
+                  <option value="2">⭐⭐ (2 Stars)</option>
+                  <option value="1">⭐ (1 Star)</option>
+                </select>
+              </div>
+
+              <div className="adm-form-group">
+                <label className="adm-form-label">Avatar URL (Optional)</label>
+                <input 
+                  name="imageUrl" 
+                  type="text"
+                  className="adm-form-input" 
+                  value={testimonialForm.imageUrl} 
+                  onChange={handleTestiFormChange} 
+                  placeholder="https://..." 
+                />
+              </div>
+
+              <div className="adm-toggles">
+                <div className="adm-toggle-row">
+                  <div className="adm-toggle-label">
+                    <span className="toggle-icon" style={{ color: '#22c55e' }}>●</span>
+                    Show feedback on homepage slider
+                  </div>
+                  <label className="toggle-switch">
+                    <input 
+                      type="checkbox" 
+                      name="isActive" 
+                      checked={testimonialForm.isActive} 
+                      onChange={handleTestiFormChange} 
+                    />
+                    <span className="toggle-slider"></span>
+                  </label>
                 </div>
               </div>
 
-              <div className="p-4 bg-[#1a1a2e] border border-[rgba(255,255,255,0.05)] rounded-lg flex flex-col gap-3 mt-2">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" name="isActive" checked={testiForm.isActive} onChange={handleTestiFormChange} className="w-4 h-4 accent-[#d4a843]" />
-                  <span className="text-sm font-medium text-white">Active (Visible on homepage)</span>
-                </label>
-              </div>
-
-              <div className="flex gap-4 mt-6">
-                <button type="button" onClick={() => setTestiFormOpen(false)} className="btn btn-ghost flex-1">Cancel</button>
-                <button type="submit" className="btn btn-primary flex-1" disabled={loading}>{loading ? 'Saving...' : 'Save Testimonial'}</button>
+              <div className="adm-form-footer">
+                <button type="button" onClick={() => setShowTestimonialModal(false)} className="adm-btn-cancel">Cancel</button>
+                <button type="submit" className="adm-btn-save" disabled={loading}>
+                  {loading ? 'Saving Review...' : 'Save Review'}
+                </button>
               </div>
             </form>
           </div>
         </div>
       )}
 
-      {/* --- ADD/EDIT TRENDING MODAL --- */}
-      {trendingFormOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2 className="modal-title mb-6">{editingTrendingId ? 'Edit Trending Artist' : 'Add Trending Artist'}</h2>
-            
-            <form onSubmit={saveTrending} className="flex flex-col gap-4">
-              <div className="form-group">
-                <label className="form-label">Name *</label>
-                <input name="name" className="form-control" value={trendingForm.name} onChange={handleTrendingFormChange} required />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Photo URL / Base64 *</label>
-                <input name="imageUrl" className="form-control" placeholder="https://..." value={trendingForm.imageUrl} onChange={handleTrendingFormChange} required />
-              </div>
-              <div className="form-group">
-                <label className="form-label">Display Order (0, 1, 2...)</label>
-                <input name="order" type="number" className="form-control" value={trendingForm.order} onChange={handleTrendingFormChange} />
-              </div>
-
-              <div className="p-4 bg-[#1a1a2e] border border-[rgba(255,255,255,0.05)] rounded-lg flex flex-col gap-3 mt-2">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" name="isActive" checked={trendingForm.isActive} onChange={handleTrendingFormChange} className="w-4 h-4 accent-[#d4a843]" />
-                  <span className="text-sm font-medium text-white">Active (Visible in collage)</span>
-                </label>
-              </div>
-
-              <div className="flex gap-4 mt-6">
-                <button type="button" onClick={() => setTrendingFormOpen(false)} className="btn btn-ghost flex-1">Cancel</button>
-                <button type="submit" className="btn btn-primary flex-1" disabled={loading}>{loading ? 'Saving...' : 'Save Trending Artist'}</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
-      {/* --- ADD/EDIT EXCLUSIVE MODAL --- */}
-      {exclusiveFormOpen && (
-        <div className="modal-overlay">
-          <div className="modal">
-            <h2 className="modal-title mb-6">{editingExclusiveId ? 'Edit Exclusive Artist' : 'Add Exclusive Artist'}</h2>
-            <form onSubmit={saveExclusive} className="flex flex-col gap-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div className="form-group mb-0">
-                  <label className="form-label">Name *</label>
-                  <input name="name" className="form-control" value={exclusiveForm.name} onChange={handleExclusiveFormChange} required />
-                </div>
-                <div className="form-group mb-0">
-                  <label className="form-label">Category *</label>
-                  <select name="category" className="form-control" value={exclusiveForm.category} onChange={handleExclusiveFormChange} required>
-                    <option value="Singer">Singer</option>
-                    <option value="DJ">DJ</option>
-                    <option value="Dancer">Dancer</option>
-                    <option value="Comedian">Comedian</option>
-                    <option value="Band">Band</option>
-                    <option value="Anchor">Anchor</option>
-                    <option value="Musician">Musician</option>
-                    <option value="Magician">Magician</option>
-                    <option value="Stand-up Comic">Stand-up Comic</option>
-                  </select>
-                </div>
-                <div className="form-group mb-0">
-                  <label className="form-label">Location</label>
-                  <input name="location" className="form-control" value={exclusiveForm.location} onChange={handleExclusiveFormChange} />
-                </div>
-                <div className="form-group mb-0">
-                  <label className="form-label">Starting Price</label>
-                  <input name="price" className="form-control" placeholder="e.g. ₹5,00,000 onwards" value={exclusiveForm.price} onChange={handleExclusiveFormChange} />
-                </div>
-                <div className="form-group mb-0">
-                  <label className="form-label">Rating (1-5)</label>
-                  <input name="rating" type="number" step="0.1" min="1" max="5" className="form-control" value={exclusiveForm.rating} onChange={handleExclusiveFormChange} />
-                </div>
-                <div className="form-group mb-0">
-                  <label className="form-label">Display Order</label>
-                  <input name="order" type="number" className="form-control" value={exclusiveForm.order} onChange={handleExclusiveFormChange} />
-                </div>
-                <div className="form-group mb-0 col-span-2">
-                  <label className="form-label">Bio / Description</label>
-                  <textarea name="bio" className="form-control" rows={3} placeholder="Artist bio shown on the book page..." value={exclusiveForm.bio} onChange={handleExclusiveFormChange}></textarea>
-                </div>
-                <div className="form-group mb-0 col-span-2">
-                  <label className="form-label">Photo URL *</label>
-                  <input name="imageUrl" className="form-control" placeholder="https://..." value={exclusiveForm.imageUrl} onChange={handleExclusiveFormChange} required />
-                  {exclusiveForm.imageUrl && <img src={exclusiveForm.imageUrl} alt="preview" className="mt-2 h-32 object-cover rounded-lg border border-gray-700" />}
-                </div>
-              </div>
-              <div className="p-4 bg-[#1a1a2e] border border-[rgba(255,255,255,0.05)] rounded-lg flex flex-col gap-3 mt-2">
-                <label className="flex items-center gap-3 cursor-pointer">
-                  <input type="checkbox" name="isActive" checked={exclusiveForm.isActive} onChange={handleExclusiveFormChange} className="w-4 h-4 accent-[#d4a843]" />
-                  <span className="text-sm font-medium text-white">Active (Visible on homepage)</span>
-                </label>
-              </div>
-              <div className="flex gap-4 mt-6">
-                <button type="button" onClick={() => setExclusiveFormOpen(false)} className="btn btn-ghost flex-1">Cancel</button>
-                <button type="submit" className="btn btn-primary flex-1" disabled={loading}>{loading ? 'Saving...' : 'Save Exclusive Artist'}</button>
-              </div>
-            </form>
-          </div>
+      {/* Dynamic Toast Notifications */}
+      {toast && (
+        <div className="admin-toast">
+          {toast}
         </div>
       )}
     </div>
