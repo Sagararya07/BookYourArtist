@@ -24,14 +24,21 @@ export default function ArtistDetailsModal({ artist, onClose, onBook }: Props) {
           {/* Image Header */}
           <div className="relative w-full" style={{ background: '#0a0a0f' }}>
             <img 
-              src={artist.imageUrl?.startsWith('/images/') ? (
+              src={(!artist.imageUrl || artist.imageUrl === '') ? (
+                // Fallback by category when no image is set
                 artist.category === 'DJ' ? 'https://images.unsplash.com/photo-1571266028243-3716f02d2d2e?q=80&w=600&auto=format&fit=crop' :
                 artist.category === 'Singer' ? 'https://images.unsplash.com/photo-1516280440502-12f8650f9689?q=80&w=600&auto=format&fit=crop' :
                 artist.category === 'Band' ? 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=600&auto=format&fit=crop' :
                 artist.category === 'Comedian' ? 'https://images.unsplash.com/photo-1527224857830-43a7acc85260?q=80&w=600&auto=format&fit=crop' :
                 'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=600&auto=format&fit=crop'
-              ) : artist.imageUrl} 
-              alt={artist.name} 
+              ) : artist.imageUrl?.startsWith('/images/') ? (
+                artist.category === 'DJ' ? 'https://images.unsplash.com/photo-1571266028243-3716f02d2d2e?q=80&w=600&auto=format&fit=crop' :
+                artist.category === 'Singer' ? 'https://images.unsplash.com/photo-1516280440502-12f8650f9689?q=80&w=600&auto=format&fit=crop' :
+                artist.category === 'Band' ? 'https://images.unsplash.com/photo-1501386761578-eac5c94b800a?q=80&w=600&auto=format&fit=crop' :
+                artist.category === 'Comedian' ? 'https://images.unsplash.com/photo-1527224857830-43a7acc85260?q=80&w=600&auto=format&fit=crop' :
+                'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?q=80&w=600&auto=format&fit=crop'
+              ) : artist.imageUrl}
+              alt={artist.name}
               className="w-full"
               style={{ display: 'block', height: '320px', objectFit: 'cover', objectPosition: 'center 20%' } as React.CSSProperties}
             />

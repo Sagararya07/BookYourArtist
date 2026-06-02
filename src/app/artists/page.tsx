@@ -42,6 +42,13 @@ const ROW_CONFIG = [
 ];
 
 function initials(n:string){return n.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase();}
+
+// Cloudinary face-detection transform: auto-crops to the face in any photo
+function getSmartImageUrl(url:string, w=600, h=750):string {
+  if (!url || !url.includes('res.cloudinary.com')) return url;
+  // Insert face-detection crop transformation between /upload/ and the version/filename
+  return url.replace('/upload/', `/upload/c_fill,g_face,w_${w},h_${h},q_auto,f_auto/`);
+}
 function price(p:string|null|undefined){
   if(!p||p.trim()===''||p==='On Request') return 'On Request';
   const n=parseInt(p.replace(/[^0-9]/g,''));
@@ -91,7 +98,7 @@ function TrendingCollage({artists,onView,onBook,loading,error,onRetry}:{
             <div key={i} className={positions[i]||s.collageTL}>
               <div className={s.collageFrame}>
                 {hasImg
-                  ? <img key={a.id} src={a.imageUrl} alt={a.name} loading="lazy" className={s.collageFadeImg}/>
+                  ? <img key={a.id} src={getSmartImageUrl(a.imageUrl,400,500)} alt={a.name} loading="lazy" className={s.collageFadeImg}/>
                   : <div className={s.collagePlaceholder}>{initials(a.name)}</div>}
                 
                 {/* Category pill top-left - always visible */}
@@ -156,7 +163,7 @@ function TrendingGrid({artists,onView,onBook,loading,error,onRetry}:{
               {/* Top Image Section */}
               <div className={s.imageWrapper}>
                 {hasImg ? (
-                  <img src={item.imageUrl} alt={item.name} className={s.image} loading="lazy" />
+                  <img src={getSmartImageUrl(item.imageUrl,600,750)} alt={item.name} className={s.image} loading="lazy" />
                 ) : (
                   <div className={s.imagePlaceholder}>{initials(item.name)}</div>
                 )}
@@ -248,7 +255,7 @@ function ExclusiveGrid({artists,onView,onBook,loading,error,onRetry}:{
               {/* Top Image Section */}
               <div className={s.imageWrapper}>
                 {hasImg ? (
-                  <img src={item.imageUrl} alt={item.name} className={s.image} loading="lazy" />
+                  <img src={getSmartImageUrl(item.imageUrl,600,750)} alt={item.name} className={s.image} loading="lazy" />
                 ) : (
                   <div className={s.imagePlaceholder}>{initials(item.name)}</div>
                 )}
@@ -364,7 +371,7 @@ function ExclusiveLayout({artists,onView,onBook,loading,error,onRetry,hideDots}:
             {/* Left: image */}
             <div className={s.exclusiveLeft}>
               {hasImg
-                ?<img src={a.imageUrl} alt={a.name}/>
+                ?<img src={getSmartImageUrl(a.imageUrl,500,750)} alt={a.name}/>
                 :<div className={s.exclusivePlaceholder}>{initials(a.name)}</div>}
               {/* Gradient overlay for image */}
               <div className={s.exclImgOverlay}/>
@@ -479,7 +486,7 @@ function FeaturedLayout({artists,onView,onBook,loading,error,onRetry,hideDots}:{
                 {/* Full-bleed background */}
                 <div className={s.featBg}>
                   {hasImg
-                    ?<img src={a.imageUrl} alt={a.name} loading="lazy"/>
+                    ?<img src={getSmartImageUrl(a.imageUrl,600,750)} alt={a.name} loading="lazy"/>
                     :<div className={s.featBgFallback}>{initials(a.name)}</div>}
                 </div>
                 {/* Gradient overlays */}
@@ -588,7 +595,7 @@ function FeaturedGrid({artists,onView,onBook,loading,error,onRetry}:{
               {/* Top Image Section */}
               <div className={s.imageWrapper}>
                 {hasImg ? (
-                  <img src={item.imageUrl} alt={item.name} className={s.image} loading="lazy" />
+                  <img src={getSmartImageUrl(item.imageUrl,600,750)} alt={item.name} className={s.image} loading="lazy" />
                 ) : (
                   <div className={s.imagePlaceholder}>{initials(item.name)}</div>
                 )}

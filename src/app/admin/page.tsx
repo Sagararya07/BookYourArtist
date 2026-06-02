@@ -89,6 +89,45 @@ export default function AdminDashboard() {
   const [showArtistModal, setShowArtistModal] = useState(false);
   const [showTestimonialModal, setShowTestimonialModal] = useState(false);
   const [editingId, setEditingId] = useState<number | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, formType: 'artist' | 'testimonial') => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploadingImage(true);
+    try {
+      const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET || 'YOUR_UPLOAD_PRESET';
+      const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME || 'YOUR_CLOUD_NAME';
+
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('upload_preset', uploadPreset);
+      
+      const res = await fetch(`https://api.cloudinary.com/v1_1/${cloudName}/image/upload`, {
+        method: 'POST',
+        body: formData,
+      });
+
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        console.error('Cloudinary error details:', errData);
+        throw new Error(errData?.error?.message || 'Cloudinary upload failed');
+      }
+      const data = await res.json();
+      
+      if (formType === 'artist') {
+        setArtistForm({ ...artistForm, imageUrl: data.secure_url });
+      } else {
+        setTestimonialForm({ ...testimonialForm, imageUrl: data.secure_url });
+      }
+      setToast('Image uploaded successfully to Cloudinary!');
+    } catch (error) {
+      alert('Error uploading image to Cloudinary. Please check your Cloudinary credentials.');
+      console.error(error);
+    }
+    setUploadingImage(false);
+  };
 
   // Artist Form State
   const [artistForm, setArtistForm] = useState({
@@ -222,10 +261,9 @@ export default function AdminDashboard() {
     const method = editingId ? 'PUT' : 'POST';
 
     try {
-      const compressedImageUrl = await compressImage(artistForm.imageUrl, 600);
+      // Image is already uploaded to Cloudinary, just use the URL
       const payload = { 
         ...artistForm, 
-        imageUrl: compressedImageUrl,
         rating: parseFloat(artistForm.rating) || 4.5,
         eventsCount: parseInt(artistForm.eventsCount) || 0,
         order: parseInt(artistForm.order) || 0
@@ -299,10 +337,9 @@ export default function AdminDashboard() {
     const method = editingId ? 'PUT' : 'POST';
 
     try {
-      const compressedImageUrl = await compressImage(testimonialForm.imageUrl, 200);
+      // Image is already uploaded to Cloudinary, just use the URL
       const payload = { 
         ...testimonialForm, 
-        imageUrl: compressedImageUrl,
         rating: parseInt(testimonialForm.rating) || 5
       };
 
@@ -1165,6 +1202,16 @@ export default function AdminDashboard() {
               </div>
 
               <div className="adm-form-group full-width">
+                <label className="adm-form-label">Upload Photo (Cloudinary)</label>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  className="adm-form-input" 
+                  onChange={(e) => handleImageUpload(e, 'artist')}
+                  style={{ padding: '10px' }}
+                />
+                {uploadingImage && <div style={{ color: '#c9a84c', marginTop: '8px', fontSize: '0.9rem' }}>Uploading to Cloudinary...</div>}
+                <div style={{ margin: '12px 0', textAlign: 'center', color: '#888' }}>OR</div>
                 <label className="adm-form-label">Photo Link (URL)</label>
                 <input 
                   name="imageUrl" 
@@ -1347,7 +1394,17 @@ export default function AdminDashboard() {
               </div>
 
               <div className="adm-form-group">
-                <label className="adm-form-label">Avatar URL (Optional)</label>
+                <label className="adm-form-label">Upload Avatar (Cloudinary)</label>
+                <input 
+                  type="file" 
+                  accept="image/*"
+                  className="adm-form-input" 
+                  onChange={(e) => handleImageUpload(e, 'testimonial')}
+                  style={{ padding: '10px' }}
+                />
+                {uploadingImage && <div style={{ color: '#c9a84c', marginTop: '8px', fontSize: '0.9rem' }}>Uploading to Cloudinary...</div>}
+                
+                <label className="adm-form-label" style={{ marginTop: '12px' }}>OR Avatar URL</label>
                 <input 
                   name="imageUrl" 
                   type="text"
@@ -1356,6 +1413,9 @@ export default function AdminDashboard() {
                   onChange={handleTestiFormChange} 
                   placeholder="https://..." 
                 />
+                {testimonialForm.imageUrl && (
+                  <img src={testimonialForm.imageUrl} alt="Preview" className="img-preview" style={{ marginTop: '10px', maxHeight: '100px' }} />
+                )}
               </div>
 
               <div className="adm-toggles">
