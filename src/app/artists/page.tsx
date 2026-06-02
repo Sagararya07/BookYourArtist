@@ -746,9 +746,14 @@ function ArtistsDiscoveryContent(){
 
           {/* Category Filter Bar - Hidden on 'ALL' section */}
           {activeSection !== 'ALL' && (
-            <div className={s.filterBar} style={{ marginTop: '0', borderTop: 'none', background: 'transparent' }}>
+            <div className={s.filterBar} style={{ 
+              marginTop: '0', 
+              borderTop: 'none', 
+              background: 'transparent',
+              '--active-color': SECTION_TABS.find(t => t.id === activeSection)?.color || '#d4a843'
+            } as React.CSSProperties}>
               <div className={s.filterLabel}>
-                <FaStar style={{ fontSize: 10, color: '#d4a843' }} /> Filter By
+                <FaStar style={{ fontSize: 10, color: SECTION_TABS.find(t => t.id === activeSection)?.color || '#d4a843' }} /> Filter By
               </div>
               <div className={s.filterDivider} />
               <div className={s.filterPills}>

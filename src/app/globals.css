@@ -92,8 +92,14 @@
   --transition-slow:   400ms ease;
 
   --container-max:  1280px;
-  --header-height:  105px;  /* topBar ~55px + navBar 50px */
+  --header-height:  155px;  /* topBar ~105px + navBar 50px */
   --header-mobile:  50px;   /* navBar only on mobile <900px */
+}
+
+@media (max-width: 900px) {
+  :root {
+    --header-height: var(--header-mobile);
+  }
 }
 
 /* ─── RESET & BASE ───────────────────────────────────────── */

@@ -1,4 +1,7 @@
+'use client';
+
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import { FaPhoneAlt, FaEnvelope, FaMapMarkerAlt, FaWhatsapp, FaInstagram, FaFacebookF, FaYoutube } from 'react-icons/fa';
 import styles from './Footer.module.css';
 
@@ -15,6 +18,7 @@ const categories = [
 ];
 
 export default function Footer() {
+  const pathname = usePathname();
   const year = new Date().getFullYear();
   return (
     <footer className={styles.footer}>
@@ -72,7 +76,7 @@ export default function Footer() {
               </li>
               <li>
                 <FaPhoneAlt className={styles.contactIcon} />
-                <a href="tel:+918887929860" className={styles.footerLink}>+91 88879 29860</a>
+                <a href="tel:+918956059005" className={styles.footerLink}>+91 89560 59005</a>
               </li>
               <li>
                 <FaWhatsapp className={styles.contactIcon} />

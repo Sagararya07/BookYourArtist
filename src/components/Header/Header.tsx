@@ -28,6 +28,14 @@ export default function Header() {
     setMenuOpen(false);
   }, [pathname]);
 
+  const handleLinkClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
+    if (pathname.startsWith('/admin') && href !== pathname) {
+      if (!window.confirm("Do you want to logout and leave the admin panel?")) {
+        e.preventDefault();
+      }
+    }
+  };
+
   return (
     <header className={`${styles.header} ${scrolled ? styles.scrolled : ''}`}>
       {/* TOP BAR */}
@@ -40,11 +48,11 @@ export default function Header() {
               <a href="https://youtube.com/@ArtistvibesEntertainment" target="_blank" rel="noreferrer" aria-label="YouTube"><FaYoutube /></a>
             </div>
           </div>
-          <Link href="/" className={styles.logo}>
+          <Link href="/" className={styles.logo} onClick={(e) => handleLinkClick(e, '/')}>
             <img src="/logo.png" alt="Artistvibes Entertainment" className={styles.logoImg} />
           </Link>
           <div className={styles.topRight}>
-            <Link href="/contact" className={`btn ${styles.contactBtn}`}>Get Started</Link>
+            <Link href="/contact" className={`btn ${styles.contactBtn}`} onClick={(e) => handleLinkClick(e, '/contact')}>Get Started</Link>
           </div>
         </div>
       </div>
@@ -53,7 +61,7 @@ export default function Header() {
       <nav className={styles.navBar}>
         <div className={styles.navInner}>
           {/* Mobile: show logo in navbar */}
-          <Link href="/" className={styles.mobileLogo}>
+          <Link href="/" className={styles.mobileLogo} onClick={(e) => handleLinkClick(e, '/')}>
             <img src="/logo.png" alt="Artistvibes Entertainment" className={styles.mobileLogoImg} />
           </Link>
 
@@ -65,6 +73,7 @@ export default function Header() {
                   key={link.href + link.label}
                   href={link.href}
                   className={`${styles.navLink} ${isActive ? styles.active : ''}`}
+                  onClick={(e) => handleLinkClick(e, link.href)}
                 >
                   <span className={styles.navIcon}>{link.icon}</span>
                   <span className={styles.navLabel}>{link.label}</span>
@@ -95,7 +104,12 @@ export default function Header() {
                 key={link.href + link.label}
                 href={link.href}
                 className={`${styles.mobileLink} ${isActive ? styles.active : ''}`}
-                onClick={() => setMenuOpen(false)}
+                onClick={(e) => {
+                  handleLinkClick(e, link.href);
+                  if (!e.defaultPrevented) {
+                    setMenuOpen(false);
+                  }
+                }}
               >
                 <span className={styles.navIcon}>{link.icon}</span>
                 <span className={styles.navLabel}>{link.label}</span>

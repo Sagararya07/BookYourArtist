@@ -7,42 +7,8 @@ import {
 } from 'react-icons/fa';
 import './admin.css';
 
-// High-fidelity SVG logo inspired by ArtistVibes (Gold Monogram)
 const LogoSVG = () => (
-  <svg width="36" height="36" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
-    <defs>
-      <linearGradient id="goldGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-        <stop offset="0%" stopColor="#e8c97a" />
-        <stop offset="50%" stopColor="#c9a84c" />
-        <stop offset="100%" stopColor="#b38f36" />
-      </linearGradient>
-    </defs>
-    {/* Left leg of A and speed lines */}
-    <rect x="5" y="32" width="22" height="7" rx="3.5" fill="url(#goldGrad)" />
-    <rect x="0" y="48" width="30" height="7" rx="3.5" fill="url(#goldGrad)" />
-    <rect x="5" y="64" width="22" height="7" rx="3.5" fill="url(#goldGrad)" />
-    
-    {/* Stylized high-tech AV Monogram */}
-    <path 
-      d="M48 20 L68 80 L88 20" 
-      stroke="url(#goldGrad)" 
-      strokeWidth="10" 
-      strokeLinecap="round" 
-      strokeLinejoin="round" 
-    />
-    <path 
-      d="M35 80 L52 28" 
-      stroke="url(#goldGrad)" 
-      strokeWidth="10" 
-      strokeLinecap="round" 
-    />
-    <path 
-      d="M40 56 H60" 
-      stroke="url(#goldGrad)" 
-      strokeWidth="8" 
-      strokeLinecap="round" 
-    />
-  </svg>
+  <img src="/logo.png" alt="Artistvibes Entertainment" style={{ height: "40px", objectFit: "contain" }} />
 );
 
 // Helper to compress large base64 images before sending to backend to avoid 413 Payload Too Large
@@ -616,12 +582,8 @@ export default function AdminDashboard() {
         `}</style>
 
         <div className="login-card">
-          <div className="login-brand-group">
-            <div className="login-logo-row">
-              <LogoSVG />
-              <span className="login-title-text">ArtistVibes</span>
-            </div>
-            <span className="login-title-subtext">Entertainment</span>
+          <div className="login-brand-group" style={{ marginBottom: '20px' }}>
+            <LogoSVG />
           </div>
           
           <p className="login-subtitle">Please enter your user information.</p>
@@ -671,9 +633,23 @@ export default function AdminDashboard() {
             </button>
           </form>
 
-          <div className="login-footer-links">
-            <a href="#forgot" onClick={e => e.preventDefault()} className="login-forgot">
-              Forgot your password?
+          <div style={{ marginTop: '30px', textAlign: 'center', opacity: 0.6 }}>
+            <a 
+              href="https://www.cypherswift.com/" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              style={{
+                fontSize: '0.7rem',
+                color: '#888',
+                textDecoration: 'none',
+                letterSpacing: '0.05em',
+                textTransform: 'uppercase',
+                transition: 'color 0.2s'
+              }}
+              onMouseEnter={e => e.currentTarget.style.color = '#e8c97a'}
+              onMouseLeave={e => e.currentTarget.style.color = '#888'}
+            >
+              Cypher Swift InfoTech
             </a>
           </div>
         </div>
@@ -711,12 +687,8 @@ export default function AdminDashboard() {
       {/* Sidebar Navigation */}
       <aside className={`admin-sidebar ${mobileMenuOpen ? 'open' : ''}`}>
         <div className="sidebar-brand">
-          <div className="sidebar-brand-row">
+          <div className="sidebar-brand-row" style={{ display: 'flex', justifyContent: 'center', width: '100%', padding: '10px 0' }}>
             <LogoSVG />
-            <div>
-              <span className="sidebar-brand-name">ArtistVibes</span>
-              <div className="sidebar-brand-sub">Admin Portal</div>
-            </div>
           </div>
         </div>
 

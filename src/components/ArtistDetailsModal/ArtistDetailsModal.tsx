@@ -42,17 +42,69 @@ export default function ArtistDetailsModal({ artist, onClose, onBook }: Props) {
               className="w-full"
               style={{ display: 'block', height: '320px', objectFit: 'cover', objectPosition: 'center 20%' } as React.CSSProperties}
             />
-            {artist.isExclusive && (
-              <div className="absolute top-4 left-4 bg-[#d4a843] text-black font-bold px-3 py-1 rounded-full text-xs uppercase tracking-wider shadow-lg">
-                Exclusive
-              </div>
-            )}
+
             <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, var(--bg-secondary), transparent)' }}></div>
           </div>
 
           {/* Details Content */}
           <div className="p-6 sm:p-8 pt-0 -mt-8 relative z-10">
-            <div className="text-[#d4a843] font-bold tracking-widest uppercase text-xs mb-1">{artist.category}</div>
+            <div className="flex flex-wrap items-center gap-2 mb-2">
+              {/* Category pill */}
+              <span style={{
+                display: 'inline-block',
+                padding: '3px 14px',
+                borderRadius: '999px',
+                fontSize: '0.7rem',
+                fontWeight: 800,
+                letterSpacing: '0.12em',
+                textTransform: 'uppercase',
+                background: 'rgba(212,168,67,0.15)',
+                color: '#d4a843',
+                border: '1px solid rgba(212,168,67,0.4)',
+              }}>{artist.category}</span>
+              {/* Section badge */}
+              {artist.isExclusive && (
+                <span style={{
+                  display: 'inline-block',
+                  padding: '3px 14px',
+                  borderRadius: '999px',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  background: 'rgba(212,168,67,0.9)',
+                  color: '#000',
+                }}>✦ Exclusive</span>
+              )}
+              {artist.isFeatured && !artist.isExclusive && (
+                <span style={{
+                  display: 'inline-block',
+                  padding: '3px 14px',
+                  borderRadius: '999px',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  background: 'rgba(167,139,250,0.15)',
+                  color: '#a78bfa',
+                  border: '1px solid rgba(167,139,250,0.4)',
+                }}>★ Featured</span>
+              )}
+              {artist.isTrending && !artist.isExclusive && !artist.isFeatured && (
+                <span style={{
+                  display: 'inline-block',
+                  padding: '3px 14px',
+                  borderRadius: '999px',
+                  fontSize: '0.7rem',
+                  fontWeight: 800,
+                  letterSpacing: '0.12em',
+                  textTransform: 'uppercase',
+                  background: 'rgba(255,107,53,0.15)',
+                  color: '#ff6b35',
+                  border: '1px solid rgba(255,107,53,0.4)',
+                }}>🔥 Trending</span>
+              )}
+            </div>
             <h2 className="font-display text-3xl text-white font-bold mb-3">{artist.name}</h2>
             
             <div className="flex flex-wrap items-center gap-4 mb-4 text-gray-300 text-sm">

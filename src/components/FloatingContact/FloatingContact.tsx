@@ -1,10 +1,12 @@
 'use client';
 
 import { useState } from 'react';
+import { usePathname } from 'next/navigation';
 import { FaWhatsapp, FaPhoneAlt, FaTimes, FaCommentDots } from 'react-icons/fa';
 import styles from './FloatingContact.module.css';
 
 export default function FloatingContact() {
+  const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
   return (
@@ -26,14 +28,14 @@ export default function FloatingContact() {
             </div>
           </a>
           <a
-            href="tel:+918887929860"
+            href="tel:+918956059005"
             className={`${styles.option} ${styles.call}`}
             onClick={() => setOpen(false)}
           >
             <FaPhoneAlt className={styles.optionIcon} />
             <div>
               <div className={styles.optionTitle}>Call Us Now</div>
-              <div className={styles.optionSub}>+91 88879 29860</div>
+              <div className={styles.optionSub}>+91 89560 59005</div>
             </div>
           </a>
         </div>

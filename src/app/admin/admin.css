@@ -8,7 +8,7 @@
 /* ─── ADMIN LAYOUT ─────────────────────────────────────── */
 .admin-shell {
   display: flex;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--header-height, 80px));
   background: #060608;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
   -webkit-font-smoothing: antialiased;
@@ -22,10 +22,10 @@
   border-right: 1px solid rgba(255,255,255,0.06);
   display: flex;
   flex-direction: column;
-  position: fixed;
-  top: 0;
-  left: 0;
-  z-index: 100;
+  position: sticky;
+  top: var(--header-height, 80px);
+  height: calc(100vh - var(--header-height, 80px));
+  z-index: 10;
   transition: transform 0.3s ease;
 }
 
@@ -155,9 +155,8 @@
 /* ─── MAIN CONTENT ─────────────────────────────────────── */
 .admin-main {
   flex: 1;
-  margin-left: 260px;
   padding: 32px 36px;
-  min-height: 100vh;
+  min-height: calc(100vh - var(--header-height, 80px));
 }
 
 /* ─── TOP BAR ──────────────────────────────────────────── */

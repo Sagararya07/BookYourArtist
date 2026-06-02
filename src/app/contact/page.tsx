@@ -50,9 +50,9 @@ export default function ContactPage() {
     {
       icon: <FaPhoneAlt />,
       label: 'Call Us',
-      value: '+91 88879 29860',
+      value: '+91 89560 59005',
       sub: 'Mon – Sat, 10am – 8pm',
-      href: 'tel:+918887929860',
+      href: 'tel:+918956059005',
       color: '#d4a843',
     },
     {
