@@ -15,6 +15,7 @@ export const viewport: Viewport = {
 };
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.artistvibes.in'),
   title: {
     default: 'Artistvibes Entertainment — Premium Artist & Celebrity Management',
     template: '%s | Artistvibes Entertainment',

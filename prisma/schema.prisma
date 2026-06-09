@@ -89,3 +89,16 @@ model ExclusiveArtist {
   isActive  Boolean  @default(true)
   createdAt DateTime @default(now())
 }
+
+model PageSeo {
+  id              Int      @id @default(autoincrement())
+  slug            String   @unique
+  label           String   @default("")
+  path            String   @default("")
+  pageTitle       String   @default("")
+  metaKeywords    String   @default("")
+  metaDescription String   @default("")
+  canonicalUrl    String   @default("")
+  schemaJson      String   @default("")
+  updatedAt       DateTime @updatedAt
+}

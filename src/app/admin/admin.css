@@ -823,6 +823,97 @@ textarea.adm-form-input {
   cursor: pointer;
 }
 
+/* ─── SEO ADMIN PANEL ─────────────────────────────────── */
+.seo-admin-layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+
+.seo-section-title {
+  font-size: 1rem;
+  font-weight: 700;
+  color: #e8c97a;
+  margin: 0 0 6px;
+}
+
+.seo-section-desc {
+  font-size: 0.82rem;
+  color: #777;
+  margin: 0 0 16px;
+  line-height: 1.5;
+}
+
+.seo-page-cards {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.seo-page-card {
+  text-align: left;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 12px;
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.seo-page-card:hover,
+.seo-page-card.active {
+  border-color: rgba(201,168,76,0.4);
+  background: rgba(201,168,76,0.06);
+}
+
+.seo-page-card-label {
+  font-weight: 600;
+  color: #f0f0f0;
+  font-size: 0.92rem;
+}
+
+.seo-page-card-path {
+  font-size: 0.75rem;
+  color: #c9a84c;
+  margin-top: 4px;
+  font-family: monospace;
+}
+
+.seo-page-card-title {
+  font-size: 0.78rem;
+  color: #888;
+  margin-top: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.seo-editor-panel {
+  background: rgba(255,255,255,0.02);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.seo-panel-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: rgba(201,168,76,0.08);
+  border: none;
+  color: #e8c97a;
+  font-size: 0.95rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.seo-form {
+  padding: 20px;
+}
+
 @media (max-width: 900px) {
   .admin-sidebar {
     transform: translateX(-100%);
@@ -839,6 +930,9 @@ textarea.adm-form-input {
     display: flex;
   }
   .adm-form-grid {
+    grid-template-columns: 1fr;
+  }
+  .seo-admin-layout {
     grid-template-columns: 1fr;
   }
   .adm-form-group.full-width,

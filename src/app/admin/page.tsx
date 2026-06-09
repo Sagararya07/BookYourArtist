@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { 
   FaTrash, FaEdit, FaPlus, FaSignOutAlt, FaStar, FaCrown, FaQuoteLeft, 
-  FaSearch, FaUsers, FaEnvelope, FaGlobe, FaFire, FaThLarge 
+  FaSearch, FaUsers, FaEnvelope, FaGlobe, FaFire, FaThLarge, FaSitemap, FaChevronUp, FaChevronDown, FaSave
 } from 'react-icons/fa';
 import './admin.css';
 
@@ -39,13 +39,17 @@ export default function AdminDashboard() {
   const [username, setUsername] = useState('');
   const [rememberMe, setRememberMe] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [activeTab, setActiveTab] = useState<'all' | 'featured' | 'testimonials' | 'subscribers' | 'trending' | 'exclusive'>('all');
+  const [activeTab, setActiveTab] = useState<'all' | 'featured' | 'testimonials' | 'subscribers' | 'trending' | 'exclusive' | 'seo'>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   
   const [artists, setArtists] = useState<any[]>([]);
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [subscribers, setSubscribers] = useState<any[]>([]);
+  const [seoPages, setSeoPages] = useState<any[]>([]);
+  const [selectedSeoSlug, setSelectedSeoSlug] = useState<string | null>(null);
+  const [seoPanelOpen, setSeoPanelOpen] = useState(true);
+  const [savingSeo, setSavingSeo] = useState(false);
   
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -106,6 +110,12 @@ export default function AdminDashboard() {
     name: '', role: '', content: '', rating: '5', imageUrl: '', isActive: true
   });
 
+  // SEO Form State
+  const [seoForm, setSeoForm] = useState({
+    slug: '', label: '', path: '', pageTitle: '', metaKeywords: '',
+    metaDescription: '', canonicalUrl: '', schemaJson: '',
+  });
+
   // Automatically clear toast message
   useEffect(() => {
     if (toast) {
@@ -130,6 +140,7 @@ export default function AdminDashboard() {
         fetchArtists();
         fetchTestimonials();
         fetchSubscribers();
+        fetchSeoPages();
       } else {
         setError('Invalid password');
       }
@@ -161,6 +172,61 @@ export default function AdminDashboard() {
       const data = await res.json();
       setSubscribers(data.data || []);
     }
+  };
+
+  const fetchSeoPages = async () => {
+    const res = await fetch('/api/admin/seo', { headers: { 'x-admin-token': token } });
+    if (res.ok) {
+      const data = await res.json();
+      setSeoPages(data.data || []);
+    }
+  };
+
+  const openSeoEditor = (page: any) => {
+    setSelectedSeoSlug(page.slug);
+    setSeoForm({
+      slug: page.slug,
+      label: page.label || '',
+      path: page.path || '',
+      pageTitle: page.pageTitle || '',
+      metaKeywords: page.metaKeywords || '',
+      metaDescription: page.metaDescription || '',
+      canonicalUrl: page.canonicalUrl || '',
+      schemaJson: page.schemaJson || '',
+    });
+    setSeoPanelOpen(true);
+  };
+
+  const handleSeoFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setSeoForm({ ...seoForm, [e.target.name]: e.target.value });
+  };
+
+  const saveSeoPage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedSeoSlug) return;
+    if (!seoForm.metaDescription.trim()) {
+      setToast('Meta description is required.');
+      return;
+    }
+
+    setSavingSeo(true);
+    try {
+      const res = await fetch(`/api/admin/seo/${selectedSeoSlug}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json', 'x-admin-token': token },
+        body: JSON.stringify(seoForm),
+      });
+      const data = await res.json();
+      if (res.ok) {
+        setToast(`SEO settings saved for ${seoForm.label || selectedSeoSlug}.`);
+        fetchSeoPages();
+      } else {
+        setToast(data.error || 'Failed to save SEO settings.');
+      }
+    } catch {
+      setToast('Network error while saving SEO settings.');
+    }
+    setSavingSeo(false);
   };
 
   const handleLogout = () => {
@@ -666,6 +732,7 @@ export default function AdminDashboard() {
       case 'exclusive': return 'Exclusive Premium Artists';
       case 'testimonials': return 'Customer Testimonials';
       case 'subscribers': return 'Newsletter Subscribers';
+      case 'seo': return 'SEO & Sitemap Settings';
       default: return 'Admin Panel';
     }
   };
@@ -678,6 +745,7 @@ export default function AdminDashboard() {
       case 'exclusive': return 'Exclusive stars displayed inside the premium flip-book container on the homepage.';
       case 'testimonials': return 'Add, edit, or disable client reviews displayed in the homepage slider.';
       case 'subscribers': return 'People who subscribed to receive email notifications when a new artist is added.';
+      case 'seo': return 'Manage page titles, meta descriptions, canonical URLs, and JSON-LD schema for each site page.';
       default: return 'ArtistVibes Portal control center';
     }
   };
@@ -746,6 +814,16 @@ export default function AdminDashboard() {
             Subscribers List
             <span className="item-count">{subscribers.length}</span>
           </button>
+
+          <span className="sidebar-section-label">Site Configuration</span>
+          <button 
+            onClick={() => { setActiveTab('seo'); setMobileMenuOpen(false); fetchSeoPages(); }} 
+            className={`sidebar-item ${activeTab === 'seo' ? 'active' : ''}`}
+          >
+            <span className="item-icon"><FaSitemap /></span>
+            SEO / Sitemap
+            <span className="item-count">{seoPages.length}</span>
+          </button>
         </nav>
 
         <div className="sidebar-footer">
@@ -787,7 +865,7 @@ export default function AdminDashboard() {
               />
             </div>
 
-            {activeTab !== 'subscribers' && (
+            {!['subscribers', 'seo'].includes(activeTab) && (
               <button 
                 onClick={activeTab === 'testimonials' ? openNewTestimonialModal : openNewArtistModal} 
                 className="add-btn"
@@ -1005,6 +1083,124 @@ export default function AdminDashboard() {
                   )}
                 </tbody>
               </table>
+            </div>
+          )}
+
+          {/* SEO / Sitemap */}
+          {activeTab === 'seo' && (
+            <div className="seo-admin-layout">
+              <div className="seo-page-list">
+                <h3 className="seo-section-title">Site Pages</h3>
+                <p className="seo-section-desc">Select a page to edit its SEO title, description, canonical URL, and schema markup.</p>
+                <div className="seo-page-cards">
+                  {seoPages.length === 0 ? (
+                    <div className="empty-state">
+                      <div className="empty-icon"><FaSitemap /></div>
+                      <div className="empty-title">No SEO Pages Found</div>
+                      <div className="empty-desc">Default pages will be created automatically when you open this tab.</div>
+                    </div>
+                  ) : (
+                    seoPages.map((page) => (
+                      <button
+                        key={page.slug}
+                        type="button"
+                        onClick={() => openSeoEditor(page)}
+                        className={`seo-page-card ${selectedSeoSlug === page.slug ? 'active' : ''}`}
+                      >
+                        <div className="seo-page-card-label">{page.label}</div>
+                        <div className="seo-page-card-path">{page.path}</div>
+                        <div className="seo-page-card-title">{page.pageTitle || 'No title set'}</div>
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+
+              {selectedSeoSlug && (
+                <div className="seo-editor-panel">
+                  <button
+                    type="button"
+                    className="seo-panel-toggle"
+                    onClick={() => setSeoPanelOpen(!seoPanelOpen)}
+                  >
+                    <span>SEO Settings — {seoForm.label}</span>
+                    {seoPanelOpen ? <FaChevronUp /> : <FaChevronDown />}
+                  </button>
+
+                  {seoPanelOpen && (
+                    <form onSubmit={saveSeoPage} className="adm-form-grid seo-form">
+                      <div className="adm-form-group full-width">
+                        <label className="adm-form-label">Page Title (Meta Title)</label>
+                        <input
+                          name="pageTitle"
+                          type="text"
+                          className="adm-form-input"
+                          value={seoForm.pageTitle}
+                          onChange={handleSeoFormChange}
+                          placeholder="e.g. Book Artists | Artistvibes Entertainment"
+                        />
+                      </div>
+
+                      <div className="adm-form-group full-width">
+                        <label className="adm-form-label">Meta Keyword</label>
+                        <input
+                          name="metaKeywords"
+                          type="text"
+                          className="adm-form-input"
+                          value={seoForm.metaKeywords}
+                          onChange={handleSeoFormChange}
+                          placeholder="Comma-separated keywords"
+                        />
+                      </div>
+
+                      <div className="adm-form-group full-width">
+                        <label className="adm-form-label">Meta Description <span style={{ color: '#ef4444' }}>*</span></label>
+                        <textarea
+                          name="metaDescription"
+                          className="adm-form-input"
+                          rows={4}
+                          value={seoForm.metaDescription}
+                          onChange={handleSeoFormChange}
+                          placeholder="Brief description shown in search engine results..."
+                          required
+                        />
+                      </div>
+
+                      <div className="adm-form-group full-width">
+                        <label className="adm-form-label">Canonical URL</label>
+                        <input
+                          name="canonicalUrl"
+                          type="url"
+                          className="adm-form-input"
+                          value={seoForm.canonicalUrl}
+                          onChange={handleSeoFormChange}
+                          placeholder="https://www.artistvibes.in/about"
+                        />
+                        <span className="adm-form-hint">The primary URL search engines should index for this page.</span>
+                      </div>
+
+                      <div className="adm-form-group full-width">
+                        <label className="adm-form-label">Schema (JSON)</label>
+                        <textarea
+                          name="schemaJson"
+                          className="adm-form-input"
+                          rows={10}
+                          value={seoForm.schemaJson}
+                          onChange={handleSeoFormChange}
+                          placeholder='Paste JSON-LD schema markup here, e.g. {"@context":"https://schema.org","@type":"LocalBusiness",...}'
+                          style={{ fontFamily: 'monospace', fontSize: '0.85rem' }}
+                        />
+                      </div>
+
+                      <div className="adm-form-group full-width" style={{ display: 'flex', justifyContent: 'flex-end', gap: '12px' }}>
+                        <button type="submit" className="add-btn" disabled={savingSeo}>
+                          <FaSave /> {savingSeo ? 'Saving...' : 'Save SEO Settings'}
+                        </button>
+                      </div>
+                    </form>
+                  )}
+                </div>
+              )}
             </div>
           )}
 

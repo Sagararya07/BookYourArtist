@@ -1,7 +1,19 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { FaStar, FaMusic, FaHandshake, FaHeart, FaGlobeAsia, FaGem, FaUsers, FaAward, FaArrowRight } from "react-icons/fa";
+import { buildMetadata, getPageSeo } from "@/lib/seo";
+import JsonLd from "@/components/Seo/JsonLd";
 import styles from "./about.module.css";
 import StatsBar from "./StatsBar";
+
+export async function generateMetadata(): Promise<Metadata> {
+  const seo = await getPageSeo("about");
+  return buildMetadata(seo, {
+    title: "About Us — Artistvibes Entertainment",
+    description:
+      "Learn about Artistvibes Entertainment — India's trusted 360° artist and celebrity management brand delivering curated talent and luxury entertainment experiences.",
+  });
+}
 
 
 
@@ -36,9 +48,9 @@ const founder = {
 };
 
 export default function AboutPage() {
-
   return (
     <>
+      <JsonLd slug="about" />
       {/* ═══════════════════ HERO SECTION ═══════════════════ */}
       <section className={styles.hero}>
         <div className={styles.heroOverlay} />
